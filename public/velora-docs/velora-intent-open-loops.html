@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Velora Visit recap · What happened last time, what's still pending</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F4F1EA; --bg-elev: #FAF8F3; --panel: #FFFFFF;
+    --ink: #0F0F1A; --ink-2: #1A1A2C;
+    --slate-900: #1F2030; --slate-700: #3A3A4C; --slate-600: #54546A; --slate-500: #717185;
+    --slate-400: #9A9AAA; --slate-300: #C2C2CD; --slate-200: #E2E0D8; --slate-100: #ECEAE2;
+    --indigo-700: #3735A8; --indigo-600: #4742C6; --indigo-500: #5B5BD6; --indigo-400: #7C7CE5;
+    --indigo-100: #E6E6F8; --indigo-50: #F0F0FB;
+    --emerald-600: #0E8A6F; --emerald-500: #10A37F; --emerald-100: #DCF3EC;
+    --amber-700: #B7791F; --amber-500: #D69E2E; --amber-100: #FAEFD3;
+    --rose-700: #B33037; --rose-500: #D14B52; --rose-100: #FBE5E7;
+    --serif: 'Source Serif 4', 'Source Serif Pro', 'Tinos', Georgia, serif;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--sans); color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.55; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+  section { padding: 96px 0; border-top: 1px solid var(--slate-200); }
+  section:first-of-type { border-top: 0; }
+  .topnav { position: sticky; top: 0; z-index: 30; background: rgba(244,241,234,0.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--slate-200); }
+  .topnav-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+  .topnav-brand { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 700; font-size: 13px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--ink); }
+  .topnav-brand .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--indigo-500); box-shadow: 0 0 0 3px var(--indigo-100); }
+  .topnav-links { display: inline-flex; gap: 22px; }
+  .topnav-links a { font-size: 13px; color: var(--slate-500); transition: color .12s ease; }
+  .topnav-links a:hover { color: var(--ink); }
+  .topnav-links a.active { color: var(--indigo-600); font-weight: 600; }
+  .eyebrow { font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 16px; display: inline-flex; align-items: center; gap: 8px; }
+  .eyebrow .pip { width: 6px; height: 6px; border-radius: 999px; background: var(--indigo-500); }
+  h1.h-display { font-family: var(--serif); font-weight: 600; font-size: 64px; line-height: 1.04; letter-spacing: -0.5px; color: var(--ink); margin: 0 0 18px; }
+  h2.h-section { font-family: var(--serif); font-weight: 600; font-size: 44px; line-height: 1.1; letter-spacing: -0.4px; color: var(--ink); margin: 0 0 20px; }
+  h3.h-card { font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 1.2; color: var(--ink); margin: 0 0 12px; letter-spacing: -0.2px; }
+  .lede { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.4; color: var(--slate-700); max-width: 720px; margin: 0 0 24px; }
+  p { color: var(--slate-700); font-size: 16px; line-height: 1.65; margin: 0 0 16px; max-width: 760px; }
+  .muted { color: var(--slate-500); }
+  .strong { color: var(--ink); font-weight: 600; }
+  .cta-row { display: inline-flex; gap: 10px; margin-top: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px; font-family: var(--sans); font-size: 14px; font-weight: 600; line-height: 1; cursor: pointer; transition: transform .12s ease; border: 1px solid transparent; }
+  .btn-primary { background: var(--indigo-600); color: white; box-shadow: 0 8px 18px -8px rgba(71,66,198,0.45); }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--slate-300); }
+  .btn-ghost:hover { background: var(--bg-elev); }
+  .hero { padding: 88px 0 80px; border-top: 0; }
+  .hero .lede { margin-bottom: 28px; }
+  .tagline { font-family: var(--sans); font-size: 16px; color: var(--ink); font-weight: 600; margin: 0 0 28px; }
+  .tagline em { font-style: normal; color: var(--indigo-600); }
+  .case-silos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+  @media (max-width: 820px) { .case-silos { grid-template-columns: 1fr; } }
+  .silo { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 14px; padding: 18px 18px 20px; }
+  .silo-head { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--rose-700); margin-bottom: 10px; }
+  .silo-head .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--rose-500); }
+  .silo-sub { font-size: 13px; font-weight: 500; color: var(--slate-600); margin-bottom: 8px; }
+  .silo ul { list-style: none; padding: 0; margin: 0; }
+  .silo li { font-size: 13.5px; line-height: 1.55; color: var(--slate-700); padding: 5px 0; }
+  .silo li code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .pull-quote { margin: 40px 0 0; padding: 22px 24px; border-left: 3px solid var(--indigo-500); background: var(--indigo-50); border-radius: 10px; font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 840px; }
+  .pull-quote .attrib { display: block; margin-top: 10px; font-style: normal; font-family: var(--sans); font-size: 12.5px; color: var(--slate-500); letter-spacing: 0.2px; }
+  .drawer-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: 36px; margin-top: 36px; align-items: start; }
+  @media (max-width: 880px) { .drawer-grid { grid-template-columns: 1fr; } }
+  .drawer-mock { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 18px; padding: 16px; box-shadow: 0 26px 60px -34px rgba(15,15,26,0.35); }
+  .drawer-mock-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 14px; border-bottom: 1px solid var(--slate-100); margin-bottom: 12px; }
+  .drawer-mock-head .left .label { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 4px; }
+  .drawer-mock-head .left .title { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); }
+  .drawer-mock-head .left .sub { font-size: 11.5px; color: var(--slate-500); margin-top: 1px; }
+  .drawer-mock-head .play { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; background: var(--ink); color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.4px; }
+  .stack-label { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 8px; }
+  .stack-label .l { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-700); }
+  .stack-label .l .num { color: var(--slate-400); margin-right: 6px; }
+  .stack-label .r { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+  .stack-label .r.fact { background: var(--emerald-100); color: var(--emerald-600); }
+  .stack-label .r.suggested { background: var(--indigo-100); color: var(--indigo-600); }
+  .stack-1 { background: var(--bg-elev); border: 1px solid var(--slate-200); border-radius: 12px; padding: 14px; }
+  .fact-card { background: white; border: 1px solid var(--slate-200); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+  .fact-card .h { font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--slate-500); margin-bottom: 4px; }
+  .fact-card .h .pid { color: var(--indigo-500); }
+  .fact-card .h .age { color: var(--rose-700); margin-left: 4px; }
+  .fact-card .body { font-size: 13.5px; color: var(--ink-2); font-weight: 500; line-height: 1.45; }
+  .fact-card .meta { margin-top: 6px; font-size: 11.5px; color: var(--slate-500); font-family: var(--mono); }
+  .stack-1 .v { font-family: var(--mono); font-weight: 600; color: var(--rose-700); }
+  .stack-2 { background: var(--indigo-50); border: 1.5px dashed var(--indigo-400); border-radius: 12px; padding: 14px; }
+  .ai-card { background: white; border: 1.5px dashed var(--indigo-400); border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+  .ai-card .h { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--indigo-600); margin-bottom: 4px; }
+  .ai-card .h .plus { font-size: 13px; color: var(--indigo-500); font-weight: 800; }
+  .ai-card .title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .ai-card table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .ai-card td { padding: 4px 0; color: var(--slate-700); vertical-align: top; }
+  .ai-card td.lbl { color: var(--slate-500); width: 38%; }
+  .ai-card td.val { font-family: var(--mono); color: var(--ink); font-weight: 600; }
+  .ai-card td.tgt { color: var(--slate-500); }
+  .ai-card td .warn { color: var(--rose-700); font-weight: 600; }
+  .ai-card .src { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--slate-200); font-family: var(--mono); font-size: 11px; color: var(--indigo-500); letter-spacing: 0.2px; }
+  .drawer-explain { border-left: 1px solid var(--slate-200); padding-left: 28px; }
+  .drawer-explain .eyebrow { color: var(--ink); }
+  .drawer-explain h4 { font-family: var(--sans); font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+  .drawer-explain p { font-size: 14.5px; line-height: 1.6; color: var(--slate-700); }
+  .drawer-explain .footer-note { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--slate-200); font-size: 12.5px; color: var(--slate-500); }
+  .product-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 18px; align-items: stretch; margin: 32px 0 16px; }
+  @media (max-width: 820px) { .product-flow { grid-template-columns: 1fr; } .product-flow .arrow { display: none; } }
+  .pbox { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 14px; padding: 22px 18px; text-align: center; }
+  .pbox .ico { width: 36px; height: 36px; margin: 0 auto 12px; border-radius: 8px; background: var(--bg-elev); border: 1px solid var(--slate-200); display: inline-flex; align-items: center; justify-content: center; }
+  .pbox .ico svg { color: var(--slate-700); }
+  .pbox h4 { font-family: var(--sans); font-size: 14px; font-weight: 600; margin: 0 0 6px; color: var(--ink); }
+  .pbox p { font-size: 12px; color: var(--slate-500); margin: 0; line-height: 1.5; }
+  .product-flow .arrow { display: flex; align-items: center; justify-content: center; color: var(--slate-400); }
+  .two-stacks { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 28px; }
+  @media (max-width: 820px) { .two-stacks { grid-template-columns: 1fr; } }
+  .stk { border-radius: 14px; padding: 22px; background: var(--panel); border: 1px solid var(--slate-200); }
+  .stk.s2 { background: var(--indigo-50); border: 1.5px dashed var(--indigo-400); }
+  .stk-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .stk-head .l { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-700); }
+  .stk-head .l .num { color: var(--slate-400); margin-right: 6px; }
+  .stk-head .r { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+  .stk.s1 .stk-head .r { background: var(--emerald-100); color: var(--emerald-600); }
+  .stk.s2 .stk-head .r { background: var(--indigo-100); color: var(--indigo-600); }
+  .stk h3 { font-family: var(--serif); font-size: 22px; margin: 0 0 6px; color: var(--ink); }
+  .stk .desc { font-size: 14px; color: var(--slate-700); line-height: 1.55; margin-bottom: 10px; }
+  .stk .no-ai { font-weight: 700; color: var(--ink); }
+  .stk ul { padding-left: 18px; margin: 8px 0 12px; }
+  .stk li { font-size: 13.5px; color: var(--slate-700); margin: 5px 0; line-height: 1.5; }
+  .stk .defence { margin-top: 14px; padding: 10px 12px; background: var(--bg-elev); border-radius: 8px; font-size: 12.5px; color: var(--slate-700); line-height: 1.55; }
+  .stk.s2 .defence { background: white; }
+  .stk .defence b { color: var(--ink); }
+  .two-stacks-foot { margin-top: 18px; text-align: center; font-size: 13.5px; color: var(--slate-500); font-style: italic; font-family: var(--serif); }
+  .same-pt-banner { margin: 24px 0 6px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--slate-200); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-size: 13px; color: var(--slate-600); }
+  .same-pt-banner .lbl { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--indigo-50); color: var(--indigo-600); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; border: 1px solid var(--indigo-100); }
+  .same-pt-banner .strong { color: var(--ink); font-weight: 600; }
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 16px; align-items: start; }
+  @media (max-width: 980px) { .config-grid { grid-template-columns: 1fr; } }
+  .hosp-card { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 14px; padding: 18px; }
+  .hosp-card.center { background: var(--bg-elev); border-color: var(--indigo-100); }
+  .hosp-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .hosp-card-head .h-l .eyebrow-mini { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-500); margin-bottom: 3px; }
+  .hosp-card-head .h-l .name { font-family: var(--serif); font-size: 22px; color: var(--ink); font-weight: 600; }
+  .hosp-card-head .h-r { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--bg-elev); color: var(--slate-600); border: 1px solid var(--slate-200); }
+  .hosp-card-head .h-r.india { background: var(--amber-100); color: var(--amber-700); border-color: transparent; }
+  .hosp-card-head .h-r.us { background: var(--indigo-50); color: var(--indigo-600); border-color: transparent; }
+  .hosp-section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-500); margin: 12px 0 8px; }
+  .rule-row { position: relative; padding: 10px 12px; margin-bottom: 6px; border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--slate-100); display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .rule-row .l { flex: 1; }
+  .rule-row .r { width: 10px; height: 10px; flex-shrink: 0; border-radius: 999px; margin-top: 4px; background: var(--indigo-500); box-shadow: 0 0 0 2px var(--indigo-100); }
+  .hosp-card.center .rule-row .r { background: transparent; box-shadow: none; }
+  .rule-row .meta { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--slate-500); margin-bottom: 1px; }
+  .rule-row .gd { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+  .core-rule { padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; background: white; border: 1px solid var(--slate-200); }
+  .core-rule .key { font-family: var(--mono); font-size: 12.5px; color: var(--indigo-600); margin-bottom: 4px; }
+  .core-rule .tags { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  .tag { display: inline-block; padding: 3px 9px; border-radius: 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; background: var(--bg-elev); color: var(--slate-700); border: 1px solid var(--slate-200); }
+  .hosp-foot { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--slate-200); font-size: 12.5px; color: var(--slate-600); line-height: 1.55; }
+  .hosp-foot .strong { color: var(--ink); font-weight: 600; }
+  .site-footer { padding: 36px 0; border-top: 1px solid var(--slate-200); color: var(--slate-500); font-size: 12.5px; text-align: center; }
+  .site-footer .links { margin-top: 8px; }
+  .site-footer .links a { color: var(--slate-600); margin: 0 8px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--bg-elev); color: var(--slate-700); }
+  hr.thin { border: 0; border-top: 1px dashed var(--slate-200); margin: 24px 0; }
+  .narrow { max-width: 760px; }
+
+  /* ── My open loops · doctor-centric worklist primitive ─────── */
+  .queue-panel { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 18px; box-shadow: 0 26px 60px -34px rgba(15,15,26,0.35); margin-top: 36px; overflow: hidden; }
+  .queue-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--slate-100); gap: 12px; flex-wrap: wrap; }
+  .queue-head .left .label { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 4px; }
+  .queue-head .left .title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .queue-head .left .sub { font-size: 11.5px; color: var(--slate-500); margin-top: 2px; font-family: var(--mono); }
+  .queue-head .right { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat-pill { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; font-family: var(--mono); }
+  .stat-pill.urgent { background: var(--rose-100); color: var(--rose-700); }
+  .stat-pill.notice { background: var(--amber-100); color: var(--amber-700); }
+  .queue-section-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-500); background: var(--bg-elev); border-top: 1px solid var(--slate-100); }
+  .queue-section-head .count { font-family: var(--mono); color: var(--ink-2); }
+  .queue-row { display: grid; grid-template-columns: 96px 70px minmax(180px, 2fr) 1.2fr 90px; gap: 14px; padding: 11px 20px; border-bottom: 1px solid var(--slate-100); align-items: center; font-size: 13px; }
+  .queue-row:last-of-type { border-bottom: 0; }
+  .pill-status { font-size: 9.5px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; color: white; text-align: center; display: inline-block; }
+  .pill-status.stale { background: var(--rose-700); }
+  .pill-status.open { background: var(--amber-700); }
+  .pill-status.unclosed { background: #8a4a14; }
+  .pill-status.signal { background: var(--slate-500); }
+  .queue-row .age { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; }
+  .queue-row .age.warn { color: var(--rose-700); }
+  .queue-row .age.notice { color: var(--amber-700); }
+  .queue-row .item-title { font-weight: 600; color: var(--ink); font-size: 13px; }
+  .queue-row .item-meta { font-size: 11.5px; color: var(--slate-500); margin-top: 1px; font-family: var(--mono); }
+  .queue-row .pname { font-size: 12px; color: var(--slate-700); }
+  .queue-row .pname-id { font-family: var(--mono); font-size: 11px; color: var(--slate-500); margin-top: 1px; }
+  .queue-row .open-link { font-size: 11.5px; color: var(--indigo-500); font-family: var(--mono); text-align: right; }
+  .queue-foot { padding: 14px 20px; background: var(--bg-elev); border-top: 1px solid var(--slate-100); font-size: 11.5px; color: var(--slate-600); line-height: 1.6; }
+  .queue-foot code { background: white; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--slate-200); font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+  .queue-trace { margin-top: 14px; padding: 12px 14px; background: var(--ink); color: #BCCCFF; border-radius: 10px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; overflow-x: auto; }
+  .queue-trace .out { color: #7DE7B6; display: block; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.15); }
+
+  /* ── Visit recap · plan-vs-status diff primitive ───────────────── */
+  .recap-card { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 18px; box-shadow: 0 26px 60px -34px rgba(15,15,26,0.35); margin-top: 36px; overflow: hidden; }
+  .recap-head { padding: 18px 22px; border-bottom: 1px solid var(--slate-100); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  .recap-head .label { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 4px; }
+  .recap-head .title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .recap-head .sub { font-size: 11.5px; color: var(--slate-500); margin-top: 2px; font-family: var(--mono); }
+  .recap-summary { font-family: var(--mono); font-size: 11px; color: var(--slate-500); }
+
+  .timeline-axis { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 16px; align-items: center; padding: 16px 22px 12px; border-bottom: 1px solid var(--slate-100); background: var(--bg-elev); }
+  .axis-label { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; color: var(--slate-700); text-transform: uppercase; }
+  .axis-label.then { color: var(--slate-600); }
+  .axis-label.now { color: var(--ink); text-align: right; }
+  .axis-label .date { display: block; font-size: 10px; color: var(--slate-500); font-weight: 500; margin-top: 2px; text-transform: none; letter-spacing: 0.2px; }
+  .axis-arrow { font-family: var(--mono); font-size: 16px; color: var(--slate-400); text-align: center; }
+
+  .diff-row { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--slate-100); align-items: stretch; }
+  .diff-row:last-of-type { border-bottom: 0; }
+  .diff-row .planned, .diff-row .actual { padding: 12px 14px; border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--slate-200); }
+  .diff-row .planned .pl-label, .diff-row .actual .ac-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--slate-500); margin-bottom: 6px; }
+  .diff-row .planned .pl-title { font-size: 13.5px; color: var(--ink); font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+  .diff-row .planned .pl-detail { font-size: 11.5px; color: var(--slate-600); font-family: var(--mono); line-height: 1.5; }
+  .diff-row .actual .ac-title { font-size: 13.5px; color: var(--ink); font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+  .diff-row .actual .ac-detail { font-size: 11.5px; color: var(--slate-600); font-family: var(--mono); line-height: 1.5; }
+  .diff-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 4px 0; }
+  .diff-arrow .arrow-line { font-family: var(--mono); font-size: 22px; line-height: 1; }
+  .diff-arrow .age-pill { font-family: var(--mono); font-size: 10px; color: var(--slate-500); padding: 3px 8px; background: white; border: 1px solid var(--slate-200); border-radius: 999px; white-space: nowrap; }
+  .diff-arrow .outcome { font-size: 9.5px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; color: white; }
+  .diff-arrow.closed .arrow-line { color: var(--emerald-600); }
+  .diff-arrow.closed .outcome { background: var(--emerald-600); }
+  .diff-arrow.stale .arrow-line { color: var(--rose-700); }
+  .diff-arrow.stale .outcome { background: var(--rose-700); }
+  .diff-arrow.pending .arrow-line { color: #B7791F; }
+  .diff-arrow.pending .outcome { background: #B7791F; }
+  .diff-arrow.missed .arrow-line { color: #8a4a14; }
+  .diff-arrow.missed .outcome { background: #8a4a14; }
+  .diff-arrow.signal .arrow-line { color: var(--slate-500); }
+  .diff-arrow.signal .outcome { background: var(--slate-500); }
+  .diff-row.section-divider { background: var(--bg-elev); padding: 10px 22px; display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-500); border-top: 1px solid var(--slate-100); border-bottom: 1px solid var(--slate-100); }
+  @media (max-width: 720px) {
+    .diff-row { grid-template-columns: 1fr; }
+    .diff-arrow { flex-direction: row; justify-content: flex-start; }
+    .timeline-axis { grid-template-columns: 1fr; gap: 8px; }
+    .axis-label.now { text-align: left; }
+    .axis-arrow { display: none; }
+  }
+  .recap-foot { padding: 14px 22px; background: var(--bg-elev); border-top: 1px solid var(--slate-100); font-size: 11.5px; color: var(--slate-600); line-height: 1.6; }
+  .recap-foot code { background: white; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--slate-200); font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<nav class="topnav" aria-label="Velora intent navigation">
+  <div class="topnav-inner">
+    <a class="topnav-brand" href="index.html"><span class="dot"></span>Velora · Home</a>
+    <div class="topnav-links">
+      <a href="velora-intent-mdt.html">MDT brief</a>
+      <a href="velora-intent-why-flagged.html">Care Gaps</a>
+      <a href="velora-intent-active-meds.html">Med red flags</a>
+      <a class="active" href="velora-intent-open-loops.html">Visit recap</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>Velora · Visit recap</div>
+    <h1 class="h-display">What happened last time.<br/>What's still pending.</h1>
+  </div>
+</section>
+
+<!-- ═══════════ THE CASE ═══════════ -->
+<section id="case">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>The case</div>
+    <h2 class="h-section">Lakshmi Pandey returns · 10:20 OPD · last seen 12 March</h2>
+    <p>Lakshmi was last in this clinic six weeks ago. The note from that visit set a plan — five things were started: an HbA1c, a referral to Cardiology for atypical chest pain, a fasting glucose, atorvastatin 20 mg, and a follow-up booked for 10 March. <span class="strong">She didn't make the follow-up. None of the five was fully closed.</span> When Dr. Pandey opens the chart at 10:18, the EMR shows the last note. Velora goes one step further: it shows what came of each plan item, and what other departments did with her in the gap.</p>
+
+    <div class="case-silos">
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Last visit's plan</div>
+        <div class="silo-sub">Five items, set on 12 March:</div>
+        <ul>
+          <li>HbA1c ordered · returned 7.2 % (above ICMR target)</li>
+          <li>Cardiology referral · "atypical chest pain w/u"</li>
+          <li>Fasting glucose ordered</li>
+          <li>Atorvastatin 20 mg · 30-day supply</li>
+          <li>Follow-up booked for 10 Mar</li>
+        </ul>
+      </div>
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Status today</div>
+        <div class="silo-sub">Plan items vs. what closed:</div>
+        <ul>
+          <li>HbA1c result returned · <span class="strong">no follow-up note</span></li>
+          <li>Cardiology referral <span class="strong">never landed</span> (85 d stale)</li>
+          <li>Fasting glucose <span class="strong">no result</span> on file (75 d)</li>
+          <li>Atorvastatin <span class="strong">no in-hospital refill</span> in 110 d</li>
+          <li>Follow-up <span class="strong">no-show, never rebooked</span></li>
+        </ul>
+      </div>
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>What's new since</div>
+        <div class="silo-sub">Other departments touched her too:</div>
+        <ul>
+          <li>Cardio Stress Test referral · auto-scheduled 10 Apr</li>
+          <li>Endocrinology consult · Dr. Reddy · 26 Apr</li>
+          <li>"Consider GLP-1 if HbA1c remains &gt; 7"</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top: 28px;"><span class="strong">The chart shows the last note. Velora shows what happened with the plan from that note.</span> Five plan items, two cross-team events, all linked back to a single visit_id. Thirty seconds of pre-read before she walks in.</p>
+
+    <blockquote class="pull-quote">
+      "I opened her chart and saw the 12 March note. What I didn't see was that the cardiology referral I sent her on never resulted in a visit. Velora put that next to the note and the lab. Saved me asking the wrong question first."
+      <span class="attrib">— Dr. Pandey · pilot week 4 · 8 May 2026</span>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ═══════════ DRAWER MOCK ═══════════ -->
+<section id="drawer">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>How the recap surface looks</div>
+    <h2 class="h-section">Lakshmi's last visit was 6 weeks ago. Here's where each plan item ended up.</h2>
+    <p class="narrow">Visit recap is a <em>per-returning-patient</em> surface. The last clinical contact's plan, side-by-side with the status of every order, referral, follow-up, and prescription that came out of it. Plus what other departments have done with her in the gap. The thirty-second pre-read for a follow-up slot.</p>
+
+    <div class="recap-card">
+      <div class="recap-head">
+        <div>
+          <div class="label">Velora · Visit recap</div>
+          <div class="title">Lakshmi Pandey · 64F · T2DM, neuropathy</div>
+          <div class="sub">Last visit 12 Mar · returning today 8 May · 57-day gap</div>
+        </div>
+        <div>
+          <div class="label" style="text-align: right;">Outcome summary</div>
+          <div class="recap-summary">5 plan items · 0 closed · 1 stale · 2 pending · 1 missed · 1 no-fill</div>
+        </div>
+      </div>
+
+      <div class="timeline-axis">
+        <span class="axis-label then">12 Mar 2026 · Plan items<span class="date">at last GenMed visit</span></span>
+        <span class="axis-arrow">→ 57 d →</span>
+        <span class="axis-label now">8 May 2026 · Status today<span class="date">at today's OPD slot</span></span>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Plan</div>
+          <div class="pl-title">Order HbA1c</div>
+          <div class="pl-detail">target 7.0 (ICMR) · order_id l-44610</div>
+        </div>
+        <div class="diff-arrow pending">
+          <span class="age-pill">3 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">Result in</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">Returned 7.2% · above target</div>
+          <div class="ac-detail">result_id r-89400 · no clinical note attached</div>
+        </div>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Plan</div>
+          <div class="pl-title">Refer to Cardiology · "atypical chest pain w/u"</div>
+          <div class="pl-detail">referral_id r-22018 · sent same day</div>
+        </div>
+        <div class="diff-arrow stale">
+          <span class="age-pill">85 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">Stale</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">No destination visit recorded</div>
+          <div class="ac-detail">Cardiology hasn't seen her · threshold &gt; 30 d</div>
+        </div>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Plan</div>
+          <div class="pl-title">Order fasting glucose</div>
+          <div class="pl-detail">order_id l-44712 · placed 22 Feb (later in plan)</div>
+        </div>
+        <div class="diff-arrow pending">
+          <span class="age-pill">75 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">Pending</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">No result_id linked</div>
+          <div class="ac-detail">may have been done elsewhere — verify verbally</div>
+        </div>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Plan</div>
+          <div class="pl-title">Atorvastatin 20 mg · 30-day supply</div>
+          <div class="pl-detail">rx_id rx-72918 · prescribed 12 Mar</div>
+        </div>
+        <div class="diff-arrow signal">
+          <span class="age-pill">110 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">No fill</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">Last in-hospital fill 18 Jan</div>
+          <div class="ac-detail">in-hospital pharmacy data only · verify verbally</div>
+        </div>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Plan</div>
+          <div class="pl-title">Follow-up booked 10 Mar</div>
+          <div class="pl-detail">appt_id a-18402 · "HbA1c &amp; medication review"</div>
+        </div>
+        <div class="diff-arrow missed">
+          <span class="age-pill">60 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">No-show</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">Today is the next contact</div>
+          <div class="ac-detail">no rebook on file between then and now</div>
+        </div>
+      </div>
+
+      <div class="diff-row section-divider">Cross-team activity since last visit · 2 events</div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Cross-team event</div>
+          <div class="pl-title">Cardiology · auto-scheduled stress test</div>
+          <div class="pl-detail">referral_id r-22341 · 10 Apr · GenMed-Cardio queue</div>
+        </div>
+        <div class="diff-arrow pending">
+          <span class="age-pill">28 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">Awaiting</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">Awaiting visit</div>
+          <div class="ac-detail">different from Dr. Pandey's stale referral</div>
+        </div>
+      </div>
+
+      <div class="diff-row">
+        <div class="planned">
+          <div class="pl-label">Cross-team event</div>
+          <div class="pl-title">Endocrinology consult note · Dr. Reddy</div>
+          <div class="pl-detail">note_id n-71203 · 26 Apr · "consider GLP-1 if HbA1c &gt; 7"</div>
+        </div>
+        <div class="diff-arrow pending">
+          <span class="age-pill">12 d</span>
+          <span class="arrow-line">→</span>
+          <span class="outcome">Unread</span>
+        </div>
+        <div class="actual">
+          <div class="ac-label">Status today</div>
+          <div class="ac-title">Recommendation unread by GenMed</div>
+          <div class="ac-detail">no GenMed acknowledgement on file</div>
+        </div>
+      </div>
+
+      <div class="recap-foot">
+        Sources: hospital order log · referral log · pharmacy log · cross-department notes · linked by <code>visit_id v-30188</code> + <code>patient_id P-00482</code>. Outcomes (closed/stale/pending/missed/signal) computed against the hospital's signed thresholds.
+        <pre class="queue-trace" style="margin-top: 14px;">MATCH (p:Patient {id: "P-00482"})-[:HAD_VISIT]->(v:Visit {id: "v-30188"})
+OPTIONAL MATCH (v)-[:RESULTED_IN]->(plan:PlanItem)
+OPTIONAL MATCH (plan)-[:CLOSED_BY]->(close:Event)
+OPTIONAL MATCH (p)-[:SUBJECT_OF]->(other:Event)
+WHERE other.created_at &gt;= v.date AND other.specialty &lt;&gt; v.specialty
+RETURN plan, close, other
+ORDER BY plan.id, other.created_at DESC<span class="out">→ 5 plan items + 2 cross-team deltas · 178 ms</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SAME PATIENT, DIFFERENT HOSPITAL ═══════════ -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>Same recap · different hospital</div>
+    <h2 class="h-section">Same plan items. Different hospital. Different staleness thresholds.</h2>
+    <p class="narrow">There is no clinical guideline that says "a fasting glucose is stale at 7 days." That is a workflow choice the hospital makes — based on OPD volume, lab turnaround, referral patterns. Two hospitals can each be correct and pick different numbers.</p>
+    <p class="narrow">Velora's job is to apply <em>this</em> hospital's signed-off config and label each plan item against it. Same code at Medanta and Mayo. Different windows.</p>
+
+    <div class="same-pt-banner">
+      <span class="lbl">Same plan item</span>
+      <span><span class="strong">Lab order</span> · fasting glucose · ordered 22 Feb · no result on file</span>
+      <span class="muted">|</span>
+      <span>Same Velora codebase. Same engine. Two hospitals. Different staleness rules win.</span>
+    </div>
+
+    <div class="config-grid">
+      <div class="hosp-card">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Hospital A</div>
+            <div class="name">Medanta Hospitals</div>
+          </div>
+          <div class="h-r india">India context</div>
+        </div>
+        <div class="hosp-section-title">hospital.yaml · loop thresholds</div>
+        <div class="rule-row"><div class="l"><div class="meta">lab.open_days</div><div class="gd">7 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">referral.unfinished_days</div><div class="gd">30 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">appointment.no_show_grace</div><div class="gd">0 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">pharmacy.no_fill_days</div><div class="gd">90 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">critical_lab.unreviewed_hours</div><div class="gd">24 h</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">discharge.followup_days</div><div class="gd">14 days</div></div><span class="r"></span></div>
+        <div class="hosp-foot"><span class="strong">Lakshmi's fasting glucose flagged at day 8.</span> Statin no-fill flagged at day 91.</div>
+      </div>
+
+      <div class="hosp-card center">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Velora Core</div>
+            <div class="name">Operational config library</div>
+          </div>
+          <div class="h-r">one codebase</div>
+        </div>
+        <p style="font-size:13.5px;color:var(--slate-700);margin-bottom:10px;">Every loop threshold is exposed as <code style="font-family:var(--mono);font-size:12.5px;color:var(--indigo-600);">domain.threshold + days</code>. Each hospital picks its own.</p>
+        <div class="core-rule"><div class="key">lab.open_days</div><div class="tags"><span class="tag">7</span> <span class="tag">14</span> <span class="tag">21</span></div></div>
+        <div class="core-rule"><div class="key">referral.unfinished_days</div><div class="tags"><span class="tag">14</span> <span class="tag">21</span> <span class="tag">30</span></div></div>
+        <div class="core-rule"><div class="key">appointment.no_show_grace</div><div class="tags"><span class="tag">0</span> <span class="tag">3</span> <span class="tag">7</span></div></div>
+        <div class="core-rule"><div class="key">pharmacy.no_fill_days</div><div class="tags"><span class="tag">60</span> <span class="tag">90</span> <span class="tag">120</span></div></div>
+        <div class="core-rule"><div class="key">critical_lab.unreviewed_hours</div><div class="tags"><span class="tag">8</span> <span class="tag">24</span></div></div>
+        <div class="core-rule"><div class="key">discharge.followup_days</div><div class="tags"><span class="tag">7</span> <span class="tag">14</span> <span class="tag">30</span></div></div>
+        <div class="hosp-foot">Add a new operational threshold once → every hospital can opt in via config.</div>
+      </div>
+
+      <div class="hosp-card">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Hospital B</div>
+            <div class="name">Mayo Clinic</div>
+          </div>
+          <div class="h-r us">US context</div>
+        </div>
+        <div class="hosp-section-title">hospital.yaml · loop thresholds</div>
+        <div class="rule-row"><div class="l"><div class="meta">lab.open_days</div><div class="gd">14 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">referral.unfinished_days</div><div class="gd">21 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">appointment.no_show_grace</div><div class="gd">3 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">pharmacy.no_fill_days</div><div class="gd">60 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">critical_lab.unreviewed_hours</div><div class="gd">8 h</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">discharge.followup_days</div><div class="gd">7 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="hosp-foot"><span class="strong">Same fasting glucose flagged at day 15.</span> Statin no-fill flagged at day 61.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    Velora · Visit recap · the per-returning-patient retrospective surface
+    <div class="links">
+      <a href="velora-intent-mdt.html">MDT brief</a> ·
+      <a href="velora-intent-why-flagged.html">Care Gaps</a> ·
+      <a href="velora-intent-active-meds.html">Medication Red Flags</a> ·
+      <a href="velora-intent-open-loops.html">Visit recap</a>
+    </div>
+    <div style="margin-top:8px; color:var(--slate-400); font-size:11.5px;">© Zyvelor Labs · 2026 · zyvelorlabs@tatvacare.in</div>
+  </div>
+</footer>
+
+</body>
+</html>

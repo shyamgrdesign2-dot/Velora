@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Velora Care Gaps · Of patients you've touched, where the next step is missing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg:#F4F1EA; --bg-elev:#FAF8F3; --panel:#FFFFFF; --ink:#0F0F1A; --ink-2:#1A1A2C; --slate-900:#1F2030; --slate-700:#3A3A4C; --slate-600:#54546A; --slate-500:#717185; --slate-400:#9A9AAA; --slate-300:#C2C2CD; --slate-200:#E2E0D8; --slate-100:#ECEAE2; --indigo-700:#3735A8; --indigo-600:#4742C6; --indigo-500:#5B5BD6; --indigo-400:#7C7CE5; --indigo-100:#E6E6F8; --indigo-50:#F0F0FB; --emerald-600:#0E8A6F; --emerald-500:#10A37F; --emerald-100:#DCF3EC; --amber-700:#B7791F; --amber-500:#D69E2E; --amber-100:#FAEFD3; --rose-700:#B33037; --rose-500:#D14B52; --rose-100:#FBE5E7; --serif:'Source Serif 4','Source Serif Pro','Tinos',Georgia,serif; --sans:'Inter',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono','IBM Plex Mono','SF Mono',Consolas,monospace; }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;} body{font-family:var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.55;} a{color:inherit;text-decoration:none;}
+  .wrap{width:100%;max-width:1080px;margin:0 auto;padding:0 32px;} section{padding:96px 0;border-top:1px solid var(--slate-200);} section:first-of-type{border-top:0;}
+  .topnav{position:sticky;top:0;z-index:30;background:rgba(244,241,234,0.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--slate-200);}
+  .topnav-inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:1080px;margin:0 auto;padding:0 32px;}
+  .topnav-brand{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink);}
+  .topnav-brand .dot{width:7px;height:7px;border-radius:999px;background:var(--indigo-500);box-shadow:0 0 0 3px var(--indigo-100);}
+  .topnav-links{display:inline-flex;gap:22px;} .topnav-links a{font-size:13px;color:var(--slate-500);transition:color .12s ease;} .topnav-links a:hover{color:var(--ink);} .topnav-links a.active{color:var(--indigo-600);font-weight:600;}
+  .eyebrow{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--indigo-500);margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;}
+  .eyebrow .pip{width:6px;height:6px;border-radius:999px;background:var(--indigo-500);}
+  h1.h-display{font-family:var(--serif);font-weight:600;font-size:64px;line-height:1.04;letter-spacing:-0.5px;color:var(--ink);margin:0 0 18px;}
+  h2.h-section{font-family:var(--serif);font-weight:600;font-size:44px;line-height:1.1;letter-spacing:-0.4px;color:var(--ink);margin:0 0 20px;}
+  h3.h-card{font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.2;color:var(--ink);margin:0 0 12px;letter-spacing:-0.2px;}
+  .lede{font-family:var(--serif);font-style:italic;font-weight:400;font-size:22px;line-height:1.4;color:var(--slate-700);max-width:720px;margin:0 0 24px;}
+  p{color:var(--slate-700);font-size:16px;line-height:1.65;margin:0 0 16px;max-width:760px;} .muted{color:var(--slate-500);} .strong{color:var(--ink);font-weight:600;}
+  .cta-row{display:inline-flex;gap:10px;margin-top:12px;} .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:600;line-height:1;cursor:pointer;transition:transform .12s ease;border:1px solid transparent;}
+  .btn-primary{background:var(--indigo-600);color:white;box-shadow:0 8px 18px -8px rgba(71,66,198,0.45);} .btn-primary:hover{transform:translateY(-1px);} .btn-ghost{background:transparent;color:var(--ink);border-color:var(--slate-300);} .btn-ghost:hover{background:var(--bg-elev);}
+  .hero{padding:88px 0 80px;border-top:0;} .hero .lede{margin-bottom:28px;} .tagline{font-family:var(--sans);font-size:16px;color:var(--ink);font-weight:600;margin:0 0 28px;} .tagline em{font-style:normal;color:var(--indigo-600);}
+  .case-silos{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px;} @media (max-width:820px){.case-silos{grid-template-columns:1fr;}}
+  .silo{background:var(--panel);border:1px solid var(--slate-200);border-radius:14px;padding:18px 18px 20px;}
+  .silo-head{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--rose-700);margin-bottom:10px;}
+  .silo-head .dot{width:7px;height:7px;border-radius:999px;background:var(--rose-500);}
+  .silo-sub{font-size:13px;font-weight:500;color:var(--slate-600);margin-bottom:8px;} .silo ul{list-style:none;padding:0;margin:0;} .silo li{font-size:13.5px;line-height:1.55;color:var(--slate-700);padding:5px 0;} .silo li code{font-family:var(--mono);font-size:12.5px;color:var(--ink);}
+  .pull-quote{margin:40px 0 0;padding:22px 24px;border-left:3px solid var(--indigo-500);background:var(--indigo-50);border-radius:10px;font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.5;color:var(--ink-2);max-width:840px;}
+  .pull-quote .attrib{display:block;margin-top:10px;font-style:normal;font-family:var(--sans);font-size:12.5px;color:var(--slate-500);letter-spacing:0.2px;}
+  .drawer-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:36px;margin-top:36px;align-items:start;} @media (max-width:880px){.drawer-grid{grid-template-columns:1fr;}}
+  .drawer-mock{background:var(--panel);border:1px solid var(--slate-200);border-radius:18px;padding:16px;box-shadow:0 26px 60px -34px rgba(15,15,26,0.35);}
+  .drawer-mock-head{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 14px;border-bottom:1px solid var(--slate-100);margin-bottom:12px;}
+  .drawer-mock-head .left .label{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--indigo-500);margin-bottom:4px;}
+  .drawer-mock-head .left .title{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);}
+  .drawer-mock-head .left .sub{font-size:11.5px;color:var(--slate-500);margin-top:1px;}
+  .drawer-mock-head .play{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--ink);color:white;font-size:11px;font-weight:600;letter-spacing:0.4px;}
+  .stack-label{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px;}
+  .stack-label .l{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate-700);} .stack-label .l .num{color:var(--slate-400);margin-right:6px;}
+  .stack-label .r{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
+  .stack-label .r.fact{background:var(--emerald-100);color:var(--emerald-600);} .stack-label .r.suggested{background:var(--indigo-100);color:var(--indigo-600);}
+  .stack-1{background:var(--bg-elev);border:1px solid var(--slate-200);border-radius:12px;padding:14px;}
+  .fact-card{background:white;border:1px solid var(--slate-200);border-radius:10px;padding:10px 12px;margin:10px 0;}
+  .fact-card .h{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--slate-500);margin-bottom:4px;}
+  .fact-card .h .pid{color:var(--indigo-500);} .fact-card .h .age{color:var(--rose-700);margin-left:4px;}
+  .fact-card .body{font-size:13.5px;color:var(--ink-2);font-weight:500;line-height:1.45;}
+  .fact-card .meta{margin-top:6px;font-size:11.5px;color:var(--slate-500);font-family:var(--mono);}
+  .stack-1 .v{font-family:var(--mono);font-weight:600;color:var(--rose-700);}
+  .stack-2{background:var(--indigo-50);border:1.5px dashed var(--indigo-400);border-radius:12px;padding:14px;}
+  .ai-card{background:white;border:1.5px dashed var(--indigo-400);border-radius:10px;padding:12px 14px;margin:10px 0;}
+  .ai-card .h{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--indigo-600);margin-bottom:4px;}
+  .ai-card .h .plus{font-size:13px;color:var(--indigo-500);font-weight:800;}
+  .ai-card .title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .ai-card table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .ai-card td{padding:4px 0;color:var(--slate-700);vertical-align:top;}
+  .ai-card td.lbl{color:var(--slate-500);width:38%;} .ai-card td.val{font-family:var(--mono);color:var(--ink);font-weight:600;} .ai-card td.tgt{color:var(--slate-500);} .ai-card td .warn{color:var(--rose-700);font-weight:600;}
+  .ai-card .src{margin-top:8px;padding-top:8px;border-top:1px dashed var(--slate-200);font-family:var(--mono);font-size:11px;color:var(--indigo-500);letter-spacing:0.2px;}
+
+  /* severity dots for fact cards */
+  .sev-dot{display:inline-block;width:8px;height:8px;border-radius:999px;margin-right:6px;vertical-align:middle;}
+  .sev-dot.crit{background:var(--rose-500);box-shadow:0 0 0 2px var(--rose-100);}
+  .sev-dot.warn{background:var(--amber-500);box-shadow:0 0 0 2px var(--amber-100);}
+  .sev-dot.neutral{background:var(--slate-400);box-shadow:0 0 0 2px var(--slate-100);}
+
+  .drawer-explain{border-left:1px solid var(--slate-200);padding-left:28px;} .drawer-explain .eyebrow{color:var(--ink);} .drawer-explain h4{font-family:var(--sans);font-size:14px;font-weight:700;margin:0 0 8px;} .drawer-explain p{font-size:14.5px;line-height:1.6;color:var(--slate-700);}
+  .drawer-explain .footer-note{margin-top:18px;padding-top:14px;border-top:1px dashed var(--slate-200);font-size:12.5px;color:var(--slate-500);}
+  .product-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:18px;align-items:stretch;margin:32px 0 16px;} @media (max-width:820px){.product-flow{grid-template-columns:1fr;}.product-flow .arrow{display:none;}}
+  .pbox{background:var(--panel);border:1px solid var(--slate-200);border-radius:14px;padding:22px 18px;text-align:center;}
+  .pbox .ico{width:36px;height:36px;margin:0 auto 12px;border-radius:8px;background:var(--bg-elev);border:1px solid var(--slate-200);display:inline-flex;align-items:center;justify-content:center;}
+  .pbox .ico svg{color:var(--slate-700);} .pbox h4{font-family:var(--sans);font-size:14px;font-weight:600;margin:0 0 6px;color:var(--ink);} .pbox p{font-size:12px;color:var(--slate-500);margin:0;line-height:1.5;}
+  .product-flow .arrow{display:flex;align-items:center;justify-content:center;color:var(--slate-400);}
+  .two-stacks{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px;} @media (max-width:820px){.two-stacks{grid-template-columns:1fr;}}
+  .stk{border-radius:14px;padding:22px;background:var(--panel);border:1px solid var(--slate-200);} .stk.s2{background:var(--indigo-50);border:1.5px dashed var(--indigo-400);}
+  .stk-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .stk-head .l{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate-700);} .stk-head .l .num{color:var(--slate-400);margin-right:6px;}
+  .stk-head .r{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
+  .stk.s1 .stk-head .r{background:var(--emerald-100);color:var(--emerald-600);} .stk.s2 .stk-head .r{background:var(--indigo-100);color:var(--indigo-600);}
+  .stk h3{font-family:var(--serif);font-size:22px;margin:0 0 6px;color:var(--ink);} .stk .desc{font-size:14px;color:var(--slate-700);line-height:1.55;margin-bottom:10px;} .stk .no-ai{font-weight:700;color:var(--ink);}
+  .stk ul{padding-left:18px;margin:8px 0 12px;} .stk li{font-size:13.5px;color:var(--slate-700);margin:5px 0;line-height:1.5;}
+  .stk .defence{margin-top:14px;padding:10px 12px;background:var(--bg-elev);border-radius:8px;font-size:12.5px;color:var(--slate-700);line-height:1.55;} .stk.s2 .defence{background:white;} .stk .defence b{color:var(--ink);}
+  .two-stacks-foot{margin-top:18px;text-align:center;font-size:13.5px;color:var(--slate-500);font-style:italic;font-family:var(--serif);}
+  .same-pt-banner{margin:24px 0 6px;padding:14px 18px;background:var(--panel);border:1px solid var(--slate-200);border-radius:12px;display:flex;flex-wrap:wrap;align-items:center;gap:18px;font-size:13px;color:var(--slate-600);}
+  .same-pt-banner .lbl{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--indigo-50);color:var(--indigo-600);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;border:1px solid var(--indigo-100);}
+  .same-pt-banner .strong{color:var(--ink);font-weight:600;}
+  .config-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:16px;align-items:start;} @media (max-width:980px){.config-grid{grid-template-columns:1fr;}}
+  .hosp-card{background:var(--panel);border:1px solid var(--slate-200);border-radius:14px;padding:18px;} .hosp-card.center{background:var(--bg-elev);border-color:var(--indigo-100);}
+  .hosp-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+  .hosp-card-head .h-l .eyebrow-mini{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate-500);margin-bottom:3px;}
+  .hosp-card-head .h-l .name{font-family:var(--serif);font-size:22px;color:var(--ink);font-weight:600;}
+  .hosp-card-head .h-r{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--bg-elev);color:var(--slate-600);border:1px solid var(--slate-200);}
+  .hosp-card-head .h-r.india{background:var(--amber-100);color:var(--amber-700);border-color:transparent;} .hosp-card-head .h-r.us{background:var(--indigo-50);color:var(--indigo-600);border-color:transparent;}
+  .hosp-section-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate-500);margin:12px 0 8px;}
+  .rule-row{position:relative;padding:10px 12px;margin-bottom:6px;border-radius:10px;background:var(--bg-elev);border:1px solid var(--slate-100);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .rule-row .l{flex:1;} .rule-row .r{width:10px;height:10px;flex-shrink:0;border-radius:999px;margin-top:4px;background:var(--indigo-500);box-shadow:0 0 0 2px var(--indigo-100);}
+  .hosp-card.center .rule-row .r{background:transparent;box-shadow:none;}
+  .rule-row .meta{font-size:10.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--slate-500);margin-bottom:1px;} .rule-row .gd{font-family:var(--mono);font-size:13px;color:var(--ink);}
+  .core-rule{padding:12px 14px;margin-bottom:8px;border-radius:10px;background:white;border:1px solid var(--slate-200);}
+  .core-rule .key{font-family:var(--mono);font-size:12.5px;color:var(--indigo-600);margin-bottom:4px;} .core-rule .tags{display:inline-flex;flex-wrap:wrap;gap:4px;}
+  .tag{display:inline-block;padding:3px 9px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--bg-elev);color:var(--slate-700);border:1px solid var(--slate-200);}
+  .hosp-foot{margin-top:12px;padding-top:10px;border-top:1px dashed var(--slate-200);font-size:12.5px;color:var(--slate-600);line-height:1.55;} .hosp-foot .strong{color:var(--ink);font-weight:600;}
+  .site-footer{padding:36px 0;border-top:1px solid var(--slate-200);color:var(--slate-500);font-size:12.5px;text-align:center;} .site-footer .links{margin-top:8px;} .site-footer .links a{color:var(--slate-600);margin:0 8px;}
+  .narrow{max-width:760px;}
+
+  /* ── Care gaps · population list primitive ───────────────── */
+  .gap-panel { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 18px; box-shadow: 0 26px 60px -34px rgba(15,15,26,0.35); margin-top: 36px; overflow: hidden; }
+  .gap-panel-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--slate-100); gap: 12px; flex-wrap: wrap; }
+  .gap-panel-head .left .label { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 4px; }
+  .gap-panel-head .left .title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .gap-panel-head .left .sub { font-size: 11.5px; color: var(--slate-500); margin-top: 2px; font-family: var(--mono); }
+  .gap-panel-head .right { font-family: var(--mono); font-size: 11px; color: var(--slate-500); }
+  .gap-tabs { display: flex; gap: 6px; padding: 12px 20px; background: var(--bg-elev); border-bottom: 1px solid var(--slate-100); flex-wrap: wrap; }
+  .gap-tab { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--slate-600); background: white; border: 1px solid var(--slate-200); }
+  .gap-tab.active { background: var(--ink); color: white; border-color: var(--ink); font-weight: 600; }
+  .gap-tab .count { font-family: var(--mono); margin-left: 6px; opacity: 0.7; }
+  .gap-list-head { display: grid; grid-template-columns: minmax(180px,2fr) 1.2fr 1fr 110px; gap: 16px; padding: 10px 20px 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--slate-500); border-bottom: 1px solid var(--slate-100); }
+  .gap-row { display: grid; grid-template-columns: minmax(180px,2fr) 1.2fr 1fr 110px; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--slate-100); align-items: center; font-size: 13px; }
+  .gap-row:last-of-type { border-bottom: 0; }
+  .gap-row .pname { font-weight: 600; color: var(--ink); }
+  .gap-row .pmeta { font-size: 11.5px; color: var(--slate-500); margin-top: 1px; font-family: var(--mono); }
+  .gap-row .last { font-family: var(--mono); font-size: 12px; color: var(--slate-700); }
+  .gap-row .age { font-family: var(--mono); font-size: 13px; color: var(--rose-700); font-weight: 600; }
+  .gap-row .age.warn { color: var(--amber-700); }
+  .gap-row .open-link { font-size: 11.5px; color: var(--indigo-500); font-family: var(--mono); text-align: right; }
+  .gap-foot { padding: 14px 20px; background: var(--bg-elev); border-top: 1px solid var(--slate-100); font-size: 11.5px; color: var(--slate-600); line-height: 1.6; }
+  .gap-foot code { background: white; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--slate-200); font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+  .gap-trace { margin-top: 14px; padding: 12px 14px; background: var(--ink); color: #BCCCFF; border-radius: 10px; font-family: var(--mono); font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; overflow-x: auto; }
+  .gap-trace .out { color: #7DE7B6; display: block; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.15); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="topnav-brand" href="index.html"><span class="dot"></span>Velora · Home</a>
+    <div class="topnav-links">
+      <a href="velora-intent-mdt.html">MDT brief</a>
+      <a class="active" href="velora-intent-why-flagged.html">Care Gaps</a>
+      <a href="velora-intent-active-meds.html">Med red flags</a>
+      <a href="velora-intent-open-loops.html">Visit recap</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>Velora · Care Gaps</div>
+    <h1 class="h-display">Where the next step<br/>is missing.</h1>
+  </div>
+</section>
+
+<section id="case">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>The case</div>
+    <h2 class="h-section">Dr. Anjali Pandey · GenMed · 30 minutes between rounds</h2>
+    <p>It's 11:30. Dr. Pandey has finished morning OPD, has 30 minutes before her ward round. She wants to scan, across all <span class="strong">142 patients she's seen recently</span>, where an action she or a colleague <em>started</em> hasn't closed. Not "patients we've never seen" — there's no recall infrastructure here, and Indian OPD doesn't work that way. Care Gaps is sharper: an event happened, an expected next step was implied, and it hasn't happened yet. Each gap traces to a structured id.</p>
+
+    <div class="case-silos">
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Discharge follow-up missing</div>
+        <div class="silo-sub">Discharged in last 30 d, no follow-up booked:</div>
+        <ul>
+          <li><span class="strong">4 patients</span> · ages 14–28 d</li>
+          <li>Anchor: <code>discharge_id</code> · expected: scheduled OPD</li>
+          <li>Action: book a follow-up via OPD desk</li>
+        </ul>
+      </div>
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Lab returned, unread</div>
+        <div class="silo-sub">Result drawn, no clinical note attached:</div>
+        <ul>
+          <li><span class="strong">5 patients</span> · oldest 5 d (K+ 5.9)</li>
+          <li>Anchor: <code>result_id</code> · expected: clinical note</li>
+          <li>Action: review and document</li>
+        </ul>
+      </div>
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Referral never landed</div>
+        <div class="silo-sub">Referral sent, no destination visit:</div>
+        <ul>
+          <li><span class="strong">6 patients</span> · oldest 85 d</li>
+          <li>Anchor: <code>referral_id</code> · expected: <code>destination_visit_id</code></li>
+          <li>Action: re-send or call the destination dept</li>
+        </ul>
+      </div>
+      <div class="silo">
+        <div class="silo-head"><span class="dot"></span>Drug-target mismatch</div>
+        <div class="silo-sub">On therapy, last lab outside target:</div>
+        <ul>
+          <li><span class="strong">8 patients</span> · metformin + HbA1c &gt; 8</li>
+          <li>Anchor: <code>rx_id</code> + <code>result_id</code> · target: ICMR</li>
+          <li>Action: review at next encounter</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top: 28px;"><span class="strong">Every gap is a join between two existing rows</span> — an event that happened (admission, lab, referral, prescription) and an expected next-step row that's missing. Cypher checks the join. No gap depends on data that doesn't exist. No gap depends on a patient the hospital has never seen.</p>
+
+    <blockquote class="pull-quote">
+      "I had thirty minutes between rounds. Care Gaps showed me four discharges with no follow-up booked from my unit, and a stale referral I'd sent two months ago. I called the OPD desk and the cardiology lead. Closed five things in twenty minutes."
+      <span class="attrib">— Dr. Pandey · pilot week 4 · 8 May 2026</span>
+    </blockquote>
+  </div>
+</section>
+
+<section id="drawer">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>How the gap dashboard looks</div>
+    <h2 class="h-section">23 open gaps across 142 active patients. Grouped by category. Anchored to events that already happened.</h2>
+    <p class="narrow">Care Gaps is a <em>panel-level dashboard</em> — different shape from the MDT drawer. The doctor scans it between rounds. Tabs pivot the list by gap category (discharge follow-up, lab unread, referral stale, drug-target mismatch). Each row carries a structured anchor (<code>discharge_id</code>, <code>result_id</code>, <code>referral_id</code>, <code>rx_id</code>) and the expected next-step that's missing. Click any patient to open the MDT brief.</p>
+
+    <div class="gap-panel">
+      <div class="gap-panel-head">
+        <div class="left">
+          <div class="label">Velora · Care Gaps</div>
+          <div class="title">Dr. A. Pandey · GenMed · 142 active patients</div>
+          <div class="sub">23 open gaps across 4 categories · refreshed 11:32 IST · 89 ms</div>
+        </div>
+        <div class="right">discharge · lab · referral · drug-target</div>
+      </div>
+
+      <div class="gap-tabs">
+        <span class="gap-tab active">All <span class="count">23</span></span>
+        <span class="gap-tab">Discharge follow-up <span class="count">4</span></span>
+        <span class="gap-tab">Lab unread <span class="count">5</span></span>
+        <span class="gap-tab">Referral stale <span class="count">6</span></span>
+        <span class="gap-tab">Drug-target <span class="count">8</span></span>
+      </div>
+
+      <div class="gap-list-head">
+        <span>Patient</span>
+        <span>Gap</span>
+        <span>Anchor event</span>
+        <span style="text-align:right;">Action</span>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Ramesh Kumar · 58M</div>
+          <div class="pmeta">P-00671 · post-MI · CKD stage 3</div>
+        </div>
+        <div class="last">Discharged 21 Apr · no follow-up booked</div>
+        <div class="age">discharge_id d-44219 · 17 d</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Lakshmi Pandey · 64F</div>
+          <div class="pmeta">P-00482 · T2DM · neuropathy</div>
+        </div>
+        <div class="last">K+ 5.9 returned 22 Apr · no clinical note attached</div>
+        <div class="age">result_id r-88172 · 5 d</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Lakshmi Pandey · 64F</div>
+          <div class="pmeta">P-00482 · T2DM · neuropathy</div>
+        </div>
+        <div class="last">Cardiology referral sent 12 Feb · no destination visit</div>
+        <div class="age">referral_id r-22018 · 85 d</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Suresh Iyer · 62M</div>
+          <div class="pmeta">P-00219 · post-MI · T2DM</div>
+        </div>
+        <div class="last">On metformin · last HbA1c 8.4 (4 mo) · target ICMR &lt; 7</div>
+        <div class="age">rx_id rx-71044 + result_id r-89401</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Mohammed Faisal · 61M</div>
+          <div class="pmeta">P-01122 · T2DM · NAFLD</div>
+        </div>
+        <div class="last">Endo referral sent 22 Mar · no destination visit</div>
+        <div class="age">referral_id r-22344 · 47 d</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">Anita Mehta · 47F</div>
+          <div class="pmeta">P-00813 · T2DM · HTN</div>
+        </div>
+        <div class="last">Discharged 10 Apr · no follow-up booked</div>
+        <div class="age">discharge_id d-44488 · 28 d</div>
+        <a class="open-link" href="velora-intent-mdt.html">Open MDT →</a>
+      </div>
+
+      <div class="gap-row">
+        <div>
+          <div class="pname">+ 17 more gaps</div>
+          <div class="pmeta">across 12 patients · 4 categories</div>
+        </div>
+        <div class="last">view all 23</div>
+        <div class="age">—</div>
+        <a class="open-link" href="#">Expand list →</a>
+      </div>
+
+      <div class="gap-foot">
+        Each gap is a join between an existing event and a missing expected next-step. Sources: discharge log, hospital lab signed reference range, referral log + destination visit log, prescription log + lab targets per ICMR / ADA / KDIGO. Hospital config sets the windows.
+        <pre class="gap-trace">MATCH (d:Doctor {email: "anjali.pandey@zydus.in"})-[:CARES_FOR]->(p:Patient)
+MATCH (p)-[:HAD]->(e:Event)
+WHERE e.expected_next IS NOT NULL
+AND NOT EXISTS { MATCH (e)-[:CLOSED_BY]->(:Event) }
+RETURN p.patient_id, p.name, e.type, e.id, e.opened_at, e.expected_next
+ORDER BY e.opened_at ASC<span class="out">→ 23 gaps across 4 categories · 11:32 IST · 89 ms</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow"><span class="pip"></span>Same event · different hospital</div>
+    <h2 class="h-section">Same event. Different hospital. Different threshold wins.</h2>
+    <p class="narrow">A K+ of 5.9 might be tier-warning at one hospital and tier-critical at another, depending on the lab's signed reference range. An admission in the last 30 days might or might not flag depending on the hospital's operational window. Velora's job is to apply <em>this</em> hospital's signed thresholds and cite which rule fired.</p>
+
+    <div class="same-pt-banner">
+      <span class="lbl">Same event</span>
+      <span><span class="strong">K+ 5.9 mmol/L</span> · 22 Apr · post-discharge · unreviewed</span>
+      <span class="muted">|</span>
+      <span>Same Velora codebase. Same engine. Two hospitals. Different threshold rules win.</span>
+    </div>
+
+    <div class="config-grid">
+      <div class="hosp-card">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Hospital A</div>
+            <div class="name">Medanta Hospitals</div>
+          </div>
+          <div class="h-r india">India context</div>
+        </div>
+        <div class="hosp-section-title">hospital.yaml · flag thresholds</div>
+        <div class="rule-row"><div class="l"><div class="meta">bp.threshold_body</div><div class="gd">WHO HEARTS 2023</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">critical_lab.source</div><div class="gd">Hospital lab signed</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">polypharmacy.body</div><div class="gd">NICE NG56</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">admission.window_days</div><div class="gd">30 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">followup.window_days</div><div class="gd">30 days</div></div><span class="r"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">severity.tiers</div><div class="gd">3 (crit · warn · neutral)</div></div><span class="r"></span></div>
+        <div class="hosp-foot"><span class="strong">Ramesh's K+ tagged critical · BP tagged warning</span> · admission flag fires (day 17 of 30).</div>
+      </div>
+
+      <div class="hosp-card center">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Velora Core</div>
+            <div class="name">Flag rule library</div>
+          </div>
+          <div class="h-r">one codebase</div>
+        </div>
+        <p style="font-size:13.5px;color:var(--slate-700);margin-bottom:10px;">Each flag detector exposes its source as <code style="font-family:var(--mono);font-size:12.5px;color:var(--indigo-600);">domain.threshold_body</code>. Hospitals pick the body that wins.</p>
+        <div class="core-rule"><div class="key">bp.threshold_body</div><div class="tags"><span class="tag">WHO HEARTS</span> <span class="tag">ICMR HTN</span> <span class="tag">AHA 2017</span></div></div>
+        <div class="core-rule"><div class="key">critical_lab.source</div><div class="tags"><span class="tag">Hospital lab signed</span> <span class="tag">Mayo lab signed</span></div></div>
+        <div class="core-rule"><div class="key">polypharmacy.body</div><div class="tags"><span class="tag">NICE NG56</span> <span class="tag">ADA</span> <span class="tag">ICMR</span></div></div>
+        <div class="core-rule"><div class="key">admission.window_days</div><div class="tags"><span class="tag">7</span> <span class="tag">14</span> <span class="tag">30</span> <span class="tag">60</span></div></div>
+        <div class="core-rule"><div class="key">followup.window_days</div><div class="tags"><span class="tag">14</span> <span class="tag">30</span> <span class="tag">60</span></div></div>
+        <div class="core-rule"><div class="key">severity.tiers</div><div class="tags"><span class="tag">3</span> <span class="tag">4</span></div></div>
+        <div class="hosp-foot">Add a new threshold body once → every hospital can opt in via config.</div>
+      </div>
+
+      <div class="hosp-card">
+        <div class="hosp-card-head">
+          <div class="h-l">
+            <div class="eyebrow-mini">Hospital B</div>
+            <div class="name">Mayo Clinic</div>
+          </div>
+          <div class="h-r us">US context</div>
+        </div>
+        <div class="hosp-section-title">hospital.yaml · flag thresholds</div>
+        <div class="rule-row"><div class="l"><div class="meta">bp.threshold_body</div><div class="gd">AHA 2017</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">critical_lab.source</div><div class="gd">Mayo lab signed</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">polypharmacy.body</div><div class="gd">ADA polypharmacy</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">admission.window_days</div><div class="gd">30 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">followup.window_days</div><div class="gd">14 days</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="rule-row"><div class="l"><div class="meta">severity.tiers</div><div class="gd">3 (crit · warn · neutral)</div></div><span class="r" style="background:var(--slate-300);box-shadow:0 0 0 2px var(--slate-100);"></span></div>
+        <div class="hosp-foot"><span class="strong">Same K+ tagged critical (Mayo lab cut)</span> · BP tagged critical at 156 (AHA stricter cut).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    Velora · Care Gaps · the panel-level dashboard of expected-but-missing next steps
+    <div class="links">
+      <a href="velora-intent-mdt.html">MDT brief</a> ·
+      <a href="velora-intent-why-flagged.html">Care Gaps</a> ·
+      <a href="velora-intent-active-meds.html">Medication Red Flags</a> ·
+      <a href="velora-intent-open-loops.html">Visit recap</a>
+    </div>
+    <div style="margin-top:8px; color:var(--slate-400); font-size:11.5px;">© Zyvelor Labs · 2026 · zyvelorlabs@tatvacare.in</div>
+  </div>
+</footer>
+
+</body>
+</html>

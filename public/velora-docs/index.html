@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Velora · Clinical intelligence for the multi-specialty hospital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ──────────────────────────────────────────────────────────
+     Velora · Homepage
+     Visual language: modern SaaS, white background, all-Inter,
+     bento grid. Deliberately different from the editorial
+     intent-detail pages (which use cream + serif).
+     ────────────────────────────────────────────────────────── */
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAFC;
+    --bg-tint: #F4F4F8;
+    --panel: #FFFFFF;
+    --ink: #0A0A14;
+    --ink-2: #1A1A28;
+    --slate-700: #2E2E40;
+    --slate-600: #4A4A5E;
+    --slate-500: #6B6B80;
+    --slate-400: #9A9AAE;
+    --slate-300: #C5C5D2;
+    --slate-200: #E2E2EB;
+    --slate-100: #EFEFF4;
+    --slate-50:  #F7F7FA;
+
+    --indigo-700: #3735A8;
+    --indigo-600: #4742C6;
+    --indigo-500: #5B5BD6;
+    --indigo-400: #7C7CE5;
+    --indigo-300: #A6A6F0;
+    --indigo-100: #E6E6F8;
+    --indigo-50:  #F0F0FB;
+
+    --rose-600: #D14B52;
+    --rose-100: #FBE5E7;
+    --emerald-600: #0E8A6F;
+    --emerald-100: #DCF3EC;
+    --amber-600: #B7791F;
+    --amber-100: #FAEFD3;
+
+    /* Per-intent accent (for cards) */
+    --c-mdt: #5B5BD6;
+    --c-loops: #B7791F;
+    --c-meds: #D14B52;
+    --c-trends: #0E8A6F;
+    --c-flags: #C53030;
+
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .wrap {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ── NAV ───────────────────────────────────────────────── */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--slate-100);
+  }
+  nav.top .inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+  .brand .mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--indigo-500), var(--indigo-700));
+    display: inline-flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .brand .mark svg { display: block; }
+  .brand .v {
+    color: var(--ink);
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-size: 14.5px;
+  }
+  nav.top .links {
+    display: inline-flex; align-items: center; gap: 28px;
+  }
+  nav.top .links a {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--slate-600);
+    transition: color .12s;
+  }
+  nav.top .links a:hover { color: var(--ink); }
+  nav.top .right { display: inline-flex; gap: 10px; align-items: center; }
+  .btn {
+    display: inline-flex;
+    align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform .1s, box-shadow .15s, background .12s;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -10px rgba(10,10,20,0.4); }
+  .btn-ghost {
+    border-color: var(--slate-200);
+    background: white;
+    color: var(--ink);
+  }
+  .btn-ghost:hover { background: var(--bg-soft); border-color: var(--slate-300); }
+
+  /* ── HERO ──────────────────────────────────────────────── */
+  .hero {
+    padding: 96px 0 80px;
+    position: relative;
+  }
+  .hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: var(--indigo-50);
+    color: var(--indigo-600);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-bottom: 24px;
+    border: 1px solid var(--indigo-100);
+  }
+  .hero .eyebrow .pip {
+    width: 6px; height: 6px;
+    background: var(--indigo-500);
+    border-radius: 999px;
+  }
+  .hero h1 {
+    font-size: 80px;
+    line-height: 1.0;
+    font-weight: 800;
+    letter-spacing: -2.4px;
+    color: var(--ink);
+    margin: 0 0 24px;
+    max-width: 920px;
+  }
+  .hero h1 .accent { color: var(--indigo-500); }
+  .hero .lede {
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--slate-600);
+    max-width: 720px;
+    margin: 0 0 40px;
+    font-weight: 400;
+  }
+  .hero .ctas { display: inline-flex; gap: 12px; }
+  .btn-lg { padding: 14px 22px; font-size: 14.5px; border-radius: 12px; }
+
+  /* ── SECTION HEADERS ───────────────────────────────────── */
+  section { padding: 96px 0; }
+  section.tinted { background: var(--bg-soft); border-top: 1px solid var(--slate-100); border-bottom: 1px solid var(--slate-100); }
+  .section-head { max-width: 760px; margin: 0 0 40px; }
+  .section-head .eyebrow {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--indigo-500);
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    font-size: 44px;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--ink);
+    margin: 0 0 18px;
+  }
+  .section-head p {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--slate-600);
+    margin: 0;
+  }
+
+  /* ── WHAT VELORA IS ────────────────────────────────────── */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 32px;
+  }
+  @media (max-width: 880px) { .pillars { grid-template-columns: 1fr; } }
+  .pillar {
+    padding: 28px;
+    background: var(--panel);
+    border: 1px solid var(--slate-200);
+    border-radius: 18px;
+    transition: transform .15s, border-color .15s;
+  }
+  .pillar:hover { border-color: var(--slate-300); transform: translateY(-2px); }
+  .pillar .ico {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--indigo-50);
+    color: var(--indigo-600);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .pillar h3 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .pillar p {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--slate-600);
+    margin: 0;
+  }
+
+  /* ── THE STORY ─────────────────────────────────────────── */
+  .story {
+    background: var(--bg-soft);
+    border: 1px solid var(--slate-100);
+    border-radius: 24px;
+    padding: 48px;
+    margin-top: 40px;
+  }
+  .story h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 8px;
+    letter-spacing: -0.3px;
+  }
+  .story-intro {
+    font-size: 17px;
+    color: var(--slate-700);
+    line-height: 1.65;
+    max-width: 760px;
+    margin: 0 0 28px;
+  }
+  .archetypes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 880px) { .archetypes { grid-template-columns: 1fr; } }
+  .arch {
+    padding: 24px;
+    background: white;
+    border: 1px solid var(--slate-200);
+    border-radius: 14px;
+    position: relative;
+  }
+  .arch .num {
+    width: 28px; height: 28px;
+    background: var(--ink);
+    color: white;
+    border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .arch h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+  .arch .who {
+    font-size: 13px;
+    color: var(--slate-500);
+    margin-bottom: 14px;
+  }
+  .arch .desc {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--slate-700);
+    margin-bottom: 12px;
+  }
+  .arch .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: var(--bg-tint);
+    color: var(--slate-600);
+  }
+
+  /* ── FIVE INTENTS · equal-weight grid ──────────────────── */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  @media (max-width: 980px) { .bento { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .bento { grid-template-columns: 1fr; } }
+  .intent-card {
+    padding: 28px;
+    border: 1px solid var(--slate-200);
+    border-radius: 18px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform .15s, border-color .15s, box-shadow .15s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    min-height: 220px;
+  }
+  .intent-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--slate-300);
+    box-shadow: 0 14px 38px -18px rgba(10,10,20,0.18);
+  }
+  .intent-card .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--slate-400);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .intent-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+  .intent-card p {
+    font-size: 14px;
+    color: var(--slate-600);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .intent-card .open {
+    margin-top: 18px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .intent-card .open svg { transition: transform .12s; }
+  .intent-card:hover .open svg { transform: translateX(3px); }
+
+  /* Per-intent stripe — left edge color */
+  .intent-card::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .intent-card.c-mdt::before { background: var(--c-mdt); }
+  .intent-card.c-loops::before { background: var(--c-loops); }
+  .intent-card.c-meds::before { background: var(--c-meds); }
+  .intent-card.c-trends::before { background: var(--c-trends); }
+  .intent-card.c-flags::before { background: var(--c-flags); }
+
+  /* The 6th cell — soft CTA to the rule library */
+  .bento-cta {
+    padding: 28px;
+    border-radius: 18px;
+    border: 1px dashed var(--slate-300);
+    background: var(--bg-soft);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    min-height: 220px;
+    transition: border-color .12s, background .12s;
+  }
+  .bento-cta:hover { border-color: var(--slate-400); background: white; }
+  .bento-cta .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--slate-400);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .bento-cta h3 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .bento-cta p {
+    font-size: 13.5px;
+    color: var(--slate-600);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .bento-cta .open {
+    margin-top: 18px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--indigo-600);
+  }
+
+  /* ── INTENT × PATIENT MATRIX ───────────────────────────── */
+  .matrix-wrap {
+    margin-top: 32px;
+    background: white;
+    border: 1px solid var(--slate-200);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .matrix thead th {
+    text-align: left;
+    padding: 18px 20px;
+    background: var(--bg-soft);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--slate-500);
+    border-bottom: 1px solid var(--slate-200);
+    vertical-align: top;
+  }
+  .matrix thead th:not(:last-child) { border-right: 1px solid var(--slate-100); }
+  .matrix thead th .small {
+    display: block;
+    margin-top: 4px;
+    text-transform: none;
+    font-size: 12px;
+    letter-spacing: 0;
+    color: var(--slate-400);
+    font-weight: 500;
+  }
+  .matrix tbody td {
+    padding: 20px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--slate-100);
+  }
+  .matrix tbody td:not(:last-child) { border-right: 1px solid var(--slate-100); }
+  .matrix tbody tr:last-child td { border-bottom: 0; }
+  .matrix .intent-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: color .12s;
+  }
+  .matrix .intent-name:hover { color: var(--indigo-600); }
+  .matrix .intent-name .arrow { color: var(--slate-400); transition: transform .12s, color .12s; }
+  .matrix .intent-name:hover .arrow { transform: translateX(2px); color: var(--indigo-600); }
+  .matrix .intent-blurb {
+    font-size: 12.5px;
+    color: var(--slate-500);
+    margin-top: 4px;
+    line-height: 1.45;
+    max-width: 240px;
+  }
+  .matrix .surfaces {
+    font-size: 13px;
+    color: var(--slate-700);
+    line-height: 1.55;
+  }
+  .matrix .surfaces .label {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 1px 7px;
+    border-radius: 4px;
+    background: var(--emerald-100);
+    color: var(--emerald-600);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .matrix .none {
+    font-size: 12.5px;
+    color: var(--slate-400);
+    font-style: italic;
+  }
+  .matrix em {
+    color: var(--slate-600);
+    font-style: italic;
+  }
+
+  .matrix-foot {
+    padding: 14px 20px;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--slate-200);
+    font-size: 12.5px;
+    color: var(--slate-500);
+  }
+
+  /* ── GUIDELINES BY SPECIALTY ───────────────────────────── */
+  .guideline-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  @media (max-width: 980px) { .guideline-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .guideline-grid { grid-template-columns: 1fr; } }
+  .gd-card {
+    padding: 24px;
+    background: white;
+    border: 1px solid var(--slate-200);
+    border-radius: 16px;
+  }
+  .gd-card .specialty {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--slate-500);
+    margin-bottom: 4px;
+  }
+  .gd-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 14px;
+    letter-spacing: -0.2px;
+  }
+  .gd-card .gd-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px dashed var(--slate-100);
+    font-size: 13px;
+  }
+  .gd-card .gd-row:first-of-type { border-top: 0; padding-top: 0; }
+  .gd-card .gd-row .l {
+    color: var(--slate-700);
+    font-weight: 500;
+  }
+  .gd-card .gd-row .r {
+    color: var(--slate-500);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-align: right;
+  }
+  .gd-card .gd-row .r .india {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--amber-100);
+    color: var(--amber-600);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── CLOSING CTA ───────────────────────────────────────── */
+  .closing {
+    background: var(--ink);
+    color: white;
+    border-radius: 28px;
+    padding: 64px 56px;
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 880px) { .closing { grid-template-columns: 1fr; padding: 48px 32px; } }
+  .closing h2 {
+    font-size: 40px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.8px;
+    margin: 0 0 14px;
+    line-height: 1.05;
+  }
+  .closing p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 22px;
+    line-height: 1.6;
+  }
+  .closing .ctas { display: inline-flex; gap: 10px; flex-wrap: wrap; }
+  .closing .btn-primary { background: white; color: var(--ink); }
+  .closing .btn-primary:hover { background: rgba(255,255,255,0.92); }
+  .closing .btn-ghost {
+    background: transparent;
+    color: white;
+    border-color: rgba(255,255,255,0.25);
+  }
+  .closing .btn-ghost:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.4); }
+  .closing-side {
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding-left: 32px;
+  }
+  @media (max-width: 880px) { .closing-side { border-left: 0; padding-left: 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); } }
+  .closing-side h4 {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin: 0 0 14px;
+  }
+  .closing-side ul { list-style: none; padding: 0; margin: 0; }
+  .closing-side li { font-size: 13.5px; color: rgba(255,255,255,0.8); padding: 4px 0; }
+
+  /* ── FOOTER ────────────────────────────────────────────── */
+  footer.site {
+    padding: 60px 0 100px;
+    border-top: 1px solid var(--slate-100);
+    background: var(--bg-soft);
+  }
+  footer.site .row {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 32px;
+    flex-wrap: wrap;
+  }
+  footer.site .col h5 {
+    font-size: 11.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--slate-500); margin: 0 0 12px;
+  }
+  footer.site .col a {
+    display: block; padding: 4px 0;
+    font-size: 13px; color: var(--slate-600);
+  }
+  footer.site .col a:hover { color: var(--ink); }
+  footer.site .credits {
+    margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--slate-200);
+    font-size: 12px; color: var(--slate-400);
+  }
+
+  /* ── V0 · TODAY'S PANEL BRIEFER ───────────────────────── */
+  .briefer { background: white; border: 1px solid var(--slate-200); border-radius: 18px; box-shadow: 0 26px 60px -34px rgba(15,15,26,0.35); margin-top: 36px; overflow: hidden; }
+  .briefer-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 18px 22px; border-bottom: 1px solid var(--slate-100); gap: 12px; flex-wrap: wrap; }
+  .briefer-head .label { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 4px; }
+  .briefer-head .title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .briefer-head .sub { font-size: 11.5px; color: var(--slate-500); margin-top: 2px; font-family: var(--mono); }
+  .briefer-head .right { font-family: var(--mono); font-size: 11px; color: var(--slate-500); }
+  .briefer-row { display: grid; grid-template-columns: 70px minmax(180px, 1.2fr) minmax(220px, 2fr) 92px; gap: 16px; padding: 14px 22px; border-bottom: 1px solid var(--slate-100); align-items: center; }
+  .briefer-row:last-of-type { border-bottom: 0; }
+  .briefer-row.flagged { background: linear-gradient(to right, var(--rose-50, #FDF3F4) 0%, transparent 30%); }
+  .briefer-row.flagged-amber { background: linear-gradient(to right, #FBF5E5 0%, transparent 30%); }
+  .briefer-row .slot-time { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--slate-700); letter-spacing: 0.6px; padding: 4px 8px; background: var(--slate-100); border-radius: 6px; text-align: center; display: inline-block; align-self: start; }
+  .briefer-row .pname { font-weight: 600; color: var(--ink); font-size: 13.5px; }
+  .briefer-row .ptags { font-family: var(--mono); font-size: 11.5px; color: var(--slate-500); margin-top: 2px; }
+  .briefer-row .flags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .flag-chip { font-size: 11.5px; padding: 4px 10px; border-radius: 999px; font-weight: 500; line-height: 1.3; }
+  .flag-chip.crit { background: var(--rose-100); color: #8E2330; border: 1px solid #F5C2C7; }
+  .flag-chip.warn { background: var(--amber-100); color: #7B4A12; border: 1px solid #EDD6A0; }
+  .flag-chip.notice { background: var(--slate-100); color: var(--slate-700); border: 1px solid var(--slate-200); }
+  .flag-chip.none { font-style: italic; color: var(--slate-400); background: transparent; padding-left: 0; }
+  .briefer-row .open-link { font-size: 11.5px; color: var(--indigo-500); font-family: var(--mono); text-align: right; white-space: nowrap; }
+  .briefer-foot { padding: 14px 22px; background: var(--bg-soft); border-top: 1px solid var(--slate-100); font-size: 11.5px; color: var(--slate-500); line-height: 1.55; font-family: var(--mono); }
+
+  /* ── V0 · PATIENT BRIEF teaser ───────────────────────── */
+  .brief-teaser { background: var(--panel); border: 1px solid var(--slate-200); border-radius: 18px; padding: 28px 32px; margin-top: 28px; display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: center; }
+  @media (max-width: 720px) { .brief-teaser { grid-template-columns: 1fr; } }
+  .brief-teaser .label { font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-500); margin-bottom: 8px; }
+  .brief-teaser h3 { font-size: 22px; font-weight: 700; line-height: 1.25; margin: 0 0 10px; color: var(--ink); }
+  .brief-teaser p { font-size: 14.5px; color: var(--slate-700); margin: 0; line-height: 1.55; max-width: 560px; }
+  .brief-teaser .open-cta { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; background: var(--ink); color: white; border-radius: 12px; font-size: 13.5px; font-weight: 600; text-decoration: none; }
+  .v0-foot { margin-top: 28px; font-size: 13.5px; color: var(--slate-500); text-align: center; max-width: 720px; margin-left: auto; margin-right: auto; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ NAV ════════════════ -->
+<nav class="top">
+  <div class="inner">
+    <a class="brand" href="index.html">
+      <span class="mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L13.7 8.7L20.5 11L13.7 13.3L12 20L10.3 13.3L3.5 11L10.3 8.7L12 2Z" fill="white"/>
+        </svg>
+      </span>
+      <span class="v">Velora</span>
+    </a>
+    <div class="links">
+      <a href="#story">The story</a>
+      <a href="#intents">Four intents</a>
+      <a href="#matrix">Matrix</a>
+      <a href="velora-guidelines.html">Guidelines</a>
+    </div>
+    <div class="right">
+      <a class="btn btn-primary" href="velora-intent-mdt.html">See MDT in action
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span class="pip"></span>
+      Clinical intelligence · multi-specialty hospitals
+    </div>
+    <h1>
+      Velora reads what no <span class="accent">single doctor</span> can read in time.
+    </h1>
+    <p class="lede">A clinical intelligence layer over the hospital's complete data — clinical, billing, lab, pharmacy, imaging — that stitches departments and surfaces what matters before the patient walks in. Four intents, one Knowledge Graph, every claim cited.</p>
+  </div>
+</section>
+
+
+<!-- ════════════════ THE STORY ════════════════ -->
+<section id="story" class="tinted">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The story · a busy multi-specialty hospital</div>
+      <h2>By 9am, a doctor has met three kinds of patient.</h2>
+      <p>Each one needs a different first move from Velora. The patient never sees these labels — Velora detects the situation from <code style="font-family:var(--mono);font-size:14px;color:var(--indigo-600);">patient × this_doctor × hospital</code> and adapts the surface accordingly.</p>
+    </div>
+
+    <div class="archetypes">
+      <div class="arch">
+        <div class="num">1</div>
+        <h4>Already in your care</h4>
+        <div class="who">Patient you've seen before · your own notes on file</div>
+        <div class="desc">Your memory and prior charts cover most. Velora fills the in-between — what other specialties did between your visits, and which loops you started haven't closed.</div>
+        <span class="tag">Augments memory</span>
+      </div>
+      <div class="arch">
+        <div class="num">2</div>
+        <h4>New to your care, known here</h4>
+        <div class="who">First visit with you · the hospital has history</div>
+        <div class="desc">You walk in cold to a patient the hospital already knows. Cardio started a drug last week, Endo flagged a lab, Pulmo has an open consult. Velora stitches the cross-specialty picture before the consult.</div>
+        <span class="tag">Cross-specialty stitching</span>
+      </div>
+      <div class="arch">
+        <div class="num">3</div>
+        <h4>First visit to the hospital</h4>
+        <div class="who">Brand new to the hospital · or referred in with paper records</div>
+        <div class="desc">No prior records → honest empty state. If they walk in with external documents (referral letter, scanned labs, prior Rx, imaging), Velora OCRs and structures them into Stack 1, tagged <em>external · unverified</em>.</div>
+        <span class="tag">Honest empty state · OCR'd externals</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ THE FOUR INTENTS ════════════════ -->
+<section id="intents" class="tinted">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The four intents · what Velora does for a doctor</div>
+      <h2>One platform. Four jobs every multi-specialty doctor has, every day.</h2>
+      <p>MDT is the anchor — the cross-specialty deep-dive when a patient walks in. The other three orbit it, each with its own UI shape: Care Gaps as a population list, Medication Red Flags as a prescribe-time checkpoint, Visit recap as a return-visit timeline. Same engine. Same citations. Different shape per intent — the MDT format isn't force-fit on any of them.</p>
+    </div>
+
+    <aside id="why-four" style="max-width: 720px; margin: 0 0 32px; padding: 18px 22px; background: var(--indigo-50); border-left: 3px solid var(--indigo-500); border-radius: 8px;">
+      <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--indigo-600); margin: 0 0 6px;">Clinically defensible in Indian OPD</div>
+      <p style="font-size: 14.5px; line-height: 1.55; color: var(--slate-700); margin: 0;">
+        Every flag in V0 is anchored to <em>an event that already exists</em> in the hospital's records — an admission, a referral that was sent, a critical lab that was drawn, a prescription that was written. No "find the patients you might be missing" framing — those don't fit Indian OPD without recall infrastructure. The four intents below all act on patients who are already in the system.
+      </p>
+    </aside>
+
+    <div class="bento">
+      <a href="velora-intent-mdt.html" class="intent-card c-mdt" style="grid-column: span 2;">
+        <div>
+          <div class="num">01 · Anchor intent</div>
+          <h3>MDT brief — read across the silos when you open a patient</h3>
+          <p>Cross-specialty stitched dossier. What each team has said, what's pending across them, the patient's journey across visits, with each clinical claim cited to the guideline body the hospital chose. Stack 1 facts. Stack 2 guideline-anchored panels. The deep view, before consultation.</p>
+        </div>
+        <span class="open">Open the MDT walkthrough
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="velora-intent-why-flagged.html" class="intent-card c-trends">
+        <div>
+          <div class="num">02 · Population</div>
+          <h3>Care Gaps — expected next step is missing</h3>
+          <p>Of the patients you've touched, who has an action that should have happened by now and didn't. Discharged 22 d ago · no follow-up booked. HbA1c returned high · no clinical note attached. Referral sent · no destination visit. Each gap anchored to a structured event that already happened.</p>
+        </div>
+        <span class="open">Open
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="velora-intent-active-meds.html" class="intent-card c-meds">
+        <div>
+          <div class="num">03 · Action checkpoint</div>
+          <h3>Medication Red Flags — DDI · allergy · target</h3>
+          <p>At the prescribe click: drug-drug interaction, allergy match, drug-target mismatch (HbA1c &gt; 8 on metformin, BP uncontrolled on a BP drug), polypharmacy. Each card cites a Lexicomp / formulary / ICMR rule. The doctor accepts or overrides; nothing is auto-stopped.</p>
+        </div>
+        <span class="open">Open
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="velora-intent-open-loops.html" class="intent-card c-loops">
+        <div>
+          <div class="num">04 · Returning patient</div>
+          <h3>Visit recap — what happened last time, what's still pending</h3>
+          <p>For a patient walking back in: their last visit's plan, which orders came back, which referrals landed, what's changed since. The 30-second pre-read before the door opens on a follow-up.</p>
+        </div>
+        <span class="open">Open
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="velora-guidelines.html" class="bento-cta">
+        <div>
+          <div class="num">+</div>
+          <h3>Clinical Guidelines library</h3>
+          <p>Every rule cites a guideline body. The library of who's used per specialty, configurable per hospital — ICMR, KDIGO, ESC, NICE, ADA, WHO HEARTS.</p>
+        </div>
+        <span class="open">Browse the catalogue
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+    </div>
+
+    <p class="v0-foot" style="margin-top: 36px;">
+      Same Knowledge Graph powers all four intents. Every flag and every panel cites a guideline body or a hospital config row — never an LLM judgment. <a href="velora-guidelines.html" style="color: var(--indigo-600); border-bottom: 1px dotted;">Browse the guideline library →</a>
+    </p>
+  </div>
+</section>
+
+
+<!-- ════════════════ INTENT × PATIENT MATRIX ════════════════ -->
+<section id="matrix" class="tinted">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Intent × Patient · how each intent behaves per archetype</div>
+      <h2>Four intents. Three patients. Twelve answers.</h2>
+      <p>The doctor asks in plain language. The agent maps the question to one of the four intents and surfaces the answer for the patient in front of them — accounting for what the hospital actually knows about that patient. Cells describe what the agent returns, not what gets asked. Click any intent name to open its full case page.</p>
+    </div>
+
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th style="width: 22%;">Intent</th>
+            <th style="width: 26%;">Returning to this doctor <span class="small">Patient archetype 1</span></th>
+            <th style="width: 26%;">New to you · known to hospital <span class="small">Patient archetype 2</span></th>
+            <th style="width: 26%;">First visit to the hospital <span class="small">Patient archetype 3</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1: MDT brief -->
+          <tr>
+            <td>
+              <a class="intent-name" href="velora-intent-mdt.html">
+                ① MDT brief
+                <span class="arrow">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </a>
+              <div class="intent-blurb">Cross-specialty stitched dossier. What each team has said, what's pending across them, with citations.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>events from other specialties since your last note · attributed by provider · cross-team conflicts flagged.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>full multi-specialty timeline · per-team assessments · pending handoffs · last MDT if documented.</div>
+            </td>
+            <td>
+              <p class="none">No prior record. OCR'd referral docs (if uploaded) appear in Stack 1, tagged <em>external · unverified</em>.</p>
+            </td>
+          </tr>
+
+          <!-- Row 2: Care Gaps -->
+          <tr>
+            <td>
+              <a class="intent-name" href="velora-intent-why-flagged.html">
+                ② Care Gaps
+                <span class="arrow">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </a>
+              <div class="intent-blurb">Expected next step missing. Discharge → no follow-up · lab returned → no note · referral sent → no destination visit.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>your own loose threads — discharges with no follow-up booked, labs you ordered returned unread, referrals you sent without a destination visit.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>cross-team gaps left open — referrals another dept sent that didn't land, labs they ordered unread, drug-target mismatches on their scripts.</div>
+            </td>
+            <td>
+              <p class="none">Empty state — no events to anchor a gap to. Care Gaps doesn't fire on first-time patients.</p>
+            </td>
+          </tr>
+
+          <!-- Row 3: Medication Red Flags -->
+          <tr>
+            <td>
+              <a class="intent-name" href="velora-intent-active-meds.html">
+                ③ Medication Red Flags
+                <span class="arrow">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </a>
+              <div class="intent-blurb">DDI · allergy · drug-target · polypharmacy. Each card cites a Lexicomp / formulary / ICMR rule.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>DDI vs full active list (your scripts + others') · allergies on file · drug-target check on your prescribing (e.g., HbA1c &gt; 8 on metformin).</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>5+ active meds with prescriber per drug · cross-team DDI · cited rule per flag (Lexicomp / formulary / ADA / ICMR).</div>
+            </td>
+            <td>
+              <p class="none">No meds, allergies, or labs on file. OCR'd external Rx/labs (if uploaded) in Stack 1, tagged <em>external · unverified</em>.</p>
+            </td>
+          </tr>
+
+          <!-- Row 4: Visit recap -->
+          <tr>
+            <td>
+              <a class="intent-name" href="velora-intent-open-loops.html">
+                ④ Visit recap
+                <span class="arrow">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </a>
+              <div class="intent-blurb">Last visit's plan vs status today. Which orders came back, which referrals landed, what's changed since.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>last visit's plan items (yours) · status of each — closed, stale, missed · cross-team activity since that visit.</div>
+            </td>
+            <td>
+              <div class="surfaces"><span class="label">Surfaces</span>last visit's plan (with another doctor) · status of each item today · what's changed across teams since that encounter.</div>
+            </td>
+            <td>
+              <p class="none">No last visit to recap. The agent points to MDT brief instead, which renders an empty-state cross-specialty view.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════ GUIDELINES BY SPECIALTY · TEASER ════════════════ -->
+<section id="guidelines">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Clinical Guidelines</div>
+      <h2>Every clinical claim cites a published body. Hospitals choose which body wins.</h2>
+      <p>Velora catalogues the recognised guideline bodies for every specialty — global, regional, and India-specific — and tags each one with the conditions it covers. The hospital's deployment config picks which body wins per condition. <span class="strong">It is not a fixed list — hospitals can use one body, mix several, or swap mid-pilot. Velora's engine doesn't change; only the cited authority does.</span></p>
+      <p style="font-size:14.5px; margin-top:14px;">The full catalogue — every body per specialty, with the publishing organisation and source URL — lives on its own page.</p>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <a href="velora-guidelines.html" class="bento-cta" style="display: flex; max-width: 100%; flex-direction: row; align-items: center; gap: 24px;">
+        <div style="flex: 1;">
+          <div class="num">→</div>
+          <h3 style="font-size: 24px;">Browse Clinical Guidelines</h3>
+          <p>11 specialties · 60+ bodies · India and global. Cardiology · Nephrology · Endocrinology · General Medicine · Pulmonology · Oncology · Pediatrics · Ob-Gyn · ICU · Neurology · Gastroenterology. Hover any body to see the source organisation and where its latest guideline lives.</p>
+        </div>
+        <span class="open" style="margin-top: 0; font-size: 14.5px;">Open the catalogue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+    </div>
+
+    <!-- Hidden: legacy inline guideline grid kept commented out for reference -->
+    <div class="guideline-grid" style="display:none;">
+      <!-- Cardiology -->
+      <div class="gd-card">
+        <div class="specialty">Cardiology</div>
+        <h4>AF · HF · ACS · HTN · lipids</h4>
+        <div class="gd-row"><div class="l">Atrial fibrillation</div><div class="r">ESC 2024 · AHA/ACC 2023 <span class="india">CSI</span></div></div>
+        <div class="gd-row"><div class="l">Heart failure</div><div class="r">ESC 2021 · AHA/ACC 2022</div></div>
+        <div class="gd-row"><div class="l">Resistant HTN</div><div class="r">ESC/ESH 2023 · AHA 2017</div></div>
+        <div class="gd-row"><div class="l">Lipid management</div><div class="r">ACC 2018 · CSI<span class="india">India</span></div></div>
+      </div>
+
+      <!-- Nephrology -->
+      <div class="gd-card">
+        <div class="specialty">Nephrology</div>
+        <h4>CKD · PD · HD · anaemia</h4>
+        <div class="gd-row"><div class="l">PD adequacy</div><div class="r">KDIGO 2006 · ISN-India 2020 <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">CKD staging</div><div class="r">KDIGO 2024 · ISN-India 2020 <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Anaemia in CKD</div><div class="r">KDIGO 2012 · ISN-India 2021 <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Mineral &amp; bone disorder</div><div class="r">KDIGO 2017 · ISN-India</div></div>
+      </div>
+
+      <!-- Endocrinology -->
+      <div class="gd-card">
+        <div class="specialty">Endocrinology</div>
+        <h4>T2DM · thyroid · obesity</h4>
+        <div class="gd-row"><div class="l">Diabetes (HbA1c targets)</div><div class="r">ADA 2024 · ICMR 2018 <span class="india">IN</span> · RSSDI 2022 <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Thyroid (hypothyroidism)</div><div class="r">ATA 2014 · ICMR thyroid <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Obesity</div><div class="r">WHO Asian-cut <span class="india">IN</span> · WHO global</div></div>
+        <div class="gd-row"><div class="l">Lipid in DM</div><div class="r">ADA 2024 · ICMR Diabetes <span class="india">IN</span></div></div>
+      </div>
+
+      <!-- General Medicine -->
+      <div class="gd-card">
+        <div class="specialty">General Medicine</div>
+        <h4>HTN · polypharmacy · screening</h4>
+        <div class="gd-row"><div class="l">Hypertension thresholds</div><div class="r">WHO HEARTS 2023 · ICMR HTN <span class="india">IN</span> · AHA 2017</div></div>
+        <div class="gd-row"><div class="l">Polypharmacy review</div><div class="r">NICE NG56 · ADA · ICMR</div></div>
+        <div class="gd-row"><div class="l">Adult immunisation</div><div class="r">CDC ACIP · IAP-Adult <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Statin in primary prevention</div><div class="r">ACC 2018 · ICMR <span class="india">IN</span></div></div>
+      </div>
+
+      <!-- Pulmonology -->
+      <div class="gd-card">
+        <div class="specialty">Pulmonology</div>
+        <h4>COPD · asthma · TB</h4>
+        <div class="gd-row"><div class="l">COPD</div><div class="r">GOLD 2024 · ICS-India <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Asthma</div><div class="r">GINA 2023 · ICS-India <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Tuberculosis</div><div class="r">RNTCP / NTEP <span class="india">IN</span> · WHO TB</div></div>
+        <div class="gd-row"><div class="l">ILD</div><div class="r">ATS/ERS · ICS-ILD <span class="india">IN</span></div></div>
+      </div>
+
+      <!-- Oncology -->
+      <div class="gd-card">
+        <div class="specialty">Oncology</div>
+        <h4>Solid tumours · screening</h4>
+        <div class="gd-row"><div class="l">Breast cancer surveillance</div><div class="r">NCCN 2024 · NCG India 2024 <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Cervical screening</div><div class="r">WHO 2021 · ICMR cervix <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Lung cancer</div><div class="r">NCCN · NCG India <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Colorectal screening</div><div class="r">USPSTF 2021 · NCG India <span class="india">IN</span></div></div>
+      </div>
+
+      <!-- Pediatrics -->
+      <div class="gd-card">
+        <div class="specialty">Pediatrics</div>
+        <h4>Growth · vaccines · newborn</h4>
+        <div class="gd-row"><div class="l">Immunisation schedule</div><div class="r">IAP 2024 <span class="india">IN</span> · WHO EPI</div></div>
+        <div class="gd-row"><div class="l">Growth monitoring</div><div class="r">WHO charts · IAP charts <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Neonatal hyperbilirubinaemia</div><div class="r">AAP · NNF India <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Childhood obesity</div><div class="r">IAP <span class="india">IN</span> · WHO</div></div>
+      </div>
+
+      <!-- Obstetrics & Gynecology -->
+      <div class="gd-card">
+        <div class="specialty">Obstetrics &amp; Gynec</div>
+        <h4>ANC · GDM · screening</h4>
+        <div class="gd-row"><div class="l">Antenatal care</div><div class="r">FOGSI <span class="india">IN</span> · WHO ANC · MoHFW <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Gestational diabetes</div><div class="r">DIPSI <span class="india">IN</span> · ADA · IADPSG</div></div>
+        <div class="gd-row"><div class="l">Hypertensive disorders</div><div class="r">FOGSI <span class="india">IN</span> · ACOG · NICE</div></div>
+        <div class="gd-row"><div class="l">PCOS</div><div class="r">FOGSI <span class="india">IN</span> · Rotterdam · ESHRE</div></div>
+      </div>
+
+      <!-- ICU / Critical Care -->
+      <div class="gd-card">
+        <div class="specialty">ICU · critical care</div>
+        <h4>Sepsis · ARDS · stroke</h4>
+        <div class="gd-row"><div class="l">Sepsis bundle</div><div class="r">SSC 2021 · ISCCM <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">ARDS</div><div class="r">Berlin · ISCCM <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">Acute stroke</div><div class="r">AHA/ASA · INSA <span class="india">IN</span></div></div>
+        <div class="gd-row"><div class="l">VTE prophylaxis</div><div class="r">ACCP · ISCCM <span class="india">IN</span></div></div>
+      </div>
+    </div>
+
+    <p style="margin-top: 28px; max-width: 760px; font-size: 14px; color: var(--slate-500); line-height: 1.6;">
+      <span style="color: var(--ink); font-weight: 600;">Reading the badges:</span>
+      <span style="display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 4px; background: var(--amber-100); color: var(--amber-600); font-size: 10px; font-weight: 700; letter-spacing: 0.2px;">IN</span>
+      indicates an India-context guideline body. A hospital can pick the India-context body, the global body, or both as primary/secondary in <code style="font-family:var(--mono);font-size:13px;color:var(--indigo-600);">hospital.yaml</code>. Velora's engine is the same; the cited body changes per row.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════ CLOSING CTA ════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="closing">
+      <div>
+        <h2>Ready to see the four intents land at Zydus?</h2>
+        <p>60-day pilot · 5–10 doctors · one department (start with General Medicine — the broadest cross-specialty exposure). All four intents against the hospital's real data: MDT brief, Care Gaps, Medication Red Flags, Visit recap. The day-60 success bar is one line — a Zydus doctor opened an intent and acted on it.</p>
+        <div class="ctas">
+          <a class="btn btn-primary btn-lg" href="velora-intent-mdt.html">Start with the MDT walkthrough
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a class="btn btn-ghost btn-lg" href="#intents">See all four intents</a>
+        </div>
+      </div>
+      <div class="closing-side">
+        <h4>What ships at day 60</h4>
+        <ul>
+          <li>· MDT brief — Stack 1 facts + Stack 2 guideline panels with patient journey</li>
+          <li>· Care Gaps — annotated OPD + admitted list with severity-tier flags</li>
+          <li>· Medication Red Flags — DDI, allergy, target, duplicate at the prescribe view</li>
+          <li>· Visit recap — last visit's plan + status of every order, referral, follow-up since</li>
+          <li>· 3 starter rule sets (KDIGO PD · ESC AF · ICMR T2DM)</li>
+          <li>· Trace on every claim · doctor verifies before acting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="site">
+  <div class="wrap">
+    <div class="row">
+      <div class="col" style="max-width: 320px;">
+        <div class="brand" style="margin-bottom: 8px;">
+          <span class="mark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.7 8.7L20.5 11L13.7 13.3L12 20L10.3 13.3L3.5 11L10.3 8.7L12 2Z" fill="white"/>
+            </svg>
+          </span>
+          <span class="v">Velora</span>
+        </div>
+        <p style="font-size:13px; color: var(--slate-500); margin: 0 0 8px;">Clinical intelligence layer for the multi-specialty hospital. A librarian, not a clinician.</p>
+        <p style="font-size:12px; color: var(--slate-400); margin: 0;">By Zyvelor Labs · zyvelorlabs@tatvacare.in</p>
+      </div>
+      <div class="col">
+        <h5>Four intents</h5>
+        <a href="velora-intent-mdt.html">MDT brief — anchor</a>
+        <a href="velora-intent-why-flagged.html">Care Gaps</a>
+        <a href="velora-intent-active-meds.html">Medication Red Flags</a>
+        <a href="velora-intent-open-loops.html">Visit recap</a>
+      </div>
+      <div class="col">
+        <h5>Specs</h5>
+        <a href="Velora_V0_Spec.docx">V0 product spec</a>
+        <a href="Velora_V0_Intent_Spec.md">Intent spec (MD)</a>
+        <a href="velora-guidelines.html">Guideline library</a>
+      </div>
+    </div>
+    <div class="credits">
+      © Zyvelor Labs · 2026 · Velora is a research-stage clinical intelligence layer · It is observational, not directive · Every claim cites a source.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

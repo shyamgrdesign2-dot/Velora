@@ -7,7 +7,7 @@ Five real OMOP CDM v5.4 exports — one MD per patient documents the cross-consu
 | # | Person ID | Display name | Sex · Age | Visits | Provs | Care | OMOP scenario | Doc |
 |---|---|---|---|---:|---:|---|---|---|
 | P1 | 1093717054960 | **Lakshmi Iyer** | F · 76 | 21 | 15 | OPD | Breast Ca stage IA + CAD + CKD + OSA · 17-day burst | [P1](./P1-lakshmi-iyer-1093717054960.md) |
-| P2 | 843373981236 | **Suresh Patel** | M · 60 | 28 | 12 | OPD | Colon Ca T3N2b + lung mets + polypharmacy · 13 mo | [P2](./P2-suresh-patel-843373981236.md) · [walkthrough](./P2-suresh-patel-DESIGN-WALKTHROUGH.md) |
+| P2 | 843373981236 | **Suresh Patel** | M · 60 | 28 | 12 | OPD | Colon Ca T3N2b + lung mets + polypharmacy · 13 mo | [P2](./P2-suresh-patel-843373981236.md) |
 | P3 | 375391871728 | **Asha Krishnan** | F · 57 | 59 | 4 | OPD | HTN + post-Achilles repair + intercurrent viral fevers · 12 mo | [P3](./P3-asha-krishnan-375391871728.md) |
 | P4 | 241381057447 | **Meera Joshi** | F · 58 | 40 | 11 | OPD | CAD + CVA + DM + Hypothyroid + NAFLD + obesity · 13 mo | [P4](./P4-meera-joshi-241381057447.md) |
 | P5 | 714696991886 | **Anita Desai** | F · 64 | 33 | 15 | OPD | DM + HTN + hypertriglyceridaemia + recurrent pancreatitis + asthma · 17 mo | [P5](./P5-anita-desai-714696991886.md) |

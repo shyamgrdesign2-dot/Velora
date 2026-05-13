@@ -328,10 +328,10 @@ These are not show-stoppers. They are explicit. The brief is designed to be *hon
 - [CROSS-CONSULTATION-BRIEF-ARCHETYPE.md](./CROSS-CONSULTATION-BRIEF-ARCHETYPE.md) — developer-facing schema + ASCII wireframes + how-to-add-a-patient
 - [P1-lakshmi-iyer-1093717054960.md](./P1-lakshmi-iyer-1093717054960.md) — F · 76 · breast Ca pre-op
 - [P2-suresh-patel-843373981236.md](./P2-suresh-patel-843373981236.md) — M · 60 · colon Ca + lung mets (LIVE demo)
-- [P2-suresh-patel-DESIGN-WALKTHROUGH.md](./P2-suresh-patel-DESIGN-WALKTHROUGH.md) — full product walkthrough of the Suresh case
 - [P3-asha-krishnan-375391871728.md](./P3-asha-krishnan-375391871728.md) — F · 57 · minimal-data case
 - [P4-meera-joshi-241381057447.md](./P4-meera-joshi-241381057447.md) — F · 58 · CAD + CVA + DM
 - [P5-anita-desai-714696991886.md](./P5-anita-desai-714696991886.md) — F · 64 · hyperTG + pancreatitis
+- [P6-arjun-verma-319033560465.md](./P6-arjun-verma-319033560465.md) — M · 14 · Wilson's + acute HAV · IPD + OPD
 
 ---
 

@@ -119,7 +119,7 @@ function GroupSourceTip({
     <>
       <span
         ref={ref}
-        className="relative inline-flex shrink-0 cursor-pointer items-center align-middle text-tp-slate-500 hover:text-tp-slate-700"
+        className="relative inline-flex shrink-0 cursor-pointer items-center align-middle text-tp-slate-600 hover:text-tp-slate-800"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
@@ -127,7 +127,9 @@ function GroupSourceTip({
         tabIndex={0}
         aria-label="Source"
       >
-        <InfoCircle size={11} variant="Linear" />
+        {/* Bold variant + bumped size so the trigger is clearly visible at the
+            12px tag font scale. Previous 11px Linear was visually anaemic. */}
+        <InfoCircle size={14} variant="Bold" />
       </span>
       <FloatingTooltip
         open={open}
@@ -181,15 +183,21 @@ function MedicalHistorySubheadingTag({
   group: VeloraV0MedicalHistoryGroup
 }) {
   const tone = group.tone ?? "neutral"
+  // Tone palette:
+  //   primary   →  red  (the headline diagnosis driving everything else)
+  //   neutral   →  slate (co-morbidities, surgical history, generic groups)
+  //   positive  →  violet (allergy verifications + family/social — the
+  //                "absence-as-data" groups; visually distinct from clinical
+  //                problems so the eye reads them as context not concern)
   const toneClass =
     tone === "primary"
       ? "bg-tp-error-50 text-tp-error-700"
       : tone === "positive"
-        ? "bg-tp-success-50 text-tp-success-700"
+        ? "bg-tp-violet-50 text-tp-violet-700"
         : "bg-tp-slate-100 text-tp-slate-700"
   return (
     <span
-      className={`inline-flex items-center gap-[4px] rounded-[4px] px-[6px] py-[2px] text-[11px] font-semibold leading-[1.4] ${toneClass}`}
+      className={`inline-flex items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
     >
       <span>{group.title}</span>
       <GroupSourceTip sources={group.sources} reasoning={group.reasoning} />
@@ -282,8 +290,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               <div className="flex flex-col gap-[8px] pl-[2px]">
                 {data.medicalHistory.map((group, gi) => {
                   const isPositive = group.tone === "positive"
-                  // Join all items in the group with " | " — HighlightLine renders
-                  // these as styled PipeDivider glyphs (slate-200 vertical bar).
+                  // Join items with " | ". HighlightLine renders the pipes
+                  // as styled PipeDivider glyphs (slate-200 vertical bar).
+                  // Per content style: each item is `**Name** (detail, detail)`
+                  // with no em-dashes anywhere in the items themselves.
                   const joinedText = group.items.map((it) => it.text).join(" | ")
                   return (
                     <div key={gi} className="flex flex-col gap-[2px]">
@@ -291,7 +301,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                         <MedicalHistorySubheadingTag group={group} />
                       </div>
                       <div className="ml-[2px] flex gap-[6px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
-                        <span className={`mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full ${isPositive ? "bg-tp-success-500" : "bg-tp-slate-500"}`} />
+                        <span className={`mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full ${isPositive ? "bg-tp-violet-500" : "bg-tp-slate-500"}`} />
                         <span className="min-w-0 flex-1"><HighlightLine text={joinedText} /></span>
                       </div>
                     </div>

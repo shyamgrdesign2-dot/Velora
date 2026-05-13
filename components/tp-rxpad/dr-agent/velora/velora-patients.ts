@@ -209,6 +209,7 @@ const VELORA_V0_PATIENT_IDS = new Set([
   "asha-krishnan",
   "meera-joshi",
   "anita-desai",
+  "arjun-verma",
 ])
 
 export function getVeloraWelcomeActions(patientId: string) {

@@ -61,6 +61,15 @@ export const SMART_SUMMARY_BY_CONTEXT: Record<string, SmartSummaryData> = {
     activeMeds: [],
     labFlagCount: 0,
   },
+  "arjun-verma": {
+    specialtyTags: [],
+    followUpOverdueDays: 0,
+    patientNarrative: "14M · person_id 319033560465 · OMOP-backed. Decompensated Wilson's disease + acute Hepatitis A (HAV IgM+) on background hypothyroidism. 3-day IPD admission (24-26 Feb 2026) + 5 OPD follow-ups. First patient with structured note + lab data — 315 serial LFT measurements.",
+    chronicConditions: ["Wilson's disease", "Acute Hepatitis A (HAV IgM+)", "Hypothyroidism", "Decompensated chronic liver disease"],
+    allergies: [],
+    activeMeds: ["Cilamin 250 mg (Penicillamine)", "Zinfate (Zinc)", "Wysolone (Prednisolone) tapering", "Ursocol 300 (UDCA)", "Hepamerz", "Aldactone 25", "Looz syrup (Lactulose)", "Thyrox 125 mcg"],
+    labFlagCount: 0,
+  },
 
   // ═══════════════ Doctor Agent v0 mock patients (kept intact for the docs surface) ═══════════════
   "__patient__": {

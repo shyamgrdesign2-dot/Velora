@@ -62,6 +62,17 @@ export interface RxContextOption {
   isToday?: boolean
   gender?: "M" | "F"
   age?: number
+  /** Care-type indicator surfaced as a coloured chip in the PatientSelector
+   *  dropdown. Use:
+   *    "IPD"       — patient has at least one inpatient visit_occurrence
+   *                  (visit_concept_id = 9201) in their OMOP slice. Renders
+   *                  as a red chip to flag the admission event.
+   *    "IPD + OPD" — patient has BOTH inpatient and outpatient visits.
+   *                  Renders as a red chip (the IPD signal is what matters).
+   *    "OPD"       — pure outpatient. Default / unlabelled in the UI to
+   *                  avoid chip noise on the majority case.
+   *  When undefined the field is treated as "OPD" and no chip renders. */
+  careType?: "OPD" | "IPD" | "IPD + OPD"
 }
 
 // ═══════════════ SMART SUMMARY DATA ═══════════════

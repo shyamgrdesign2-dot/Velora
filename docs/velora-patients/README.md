@@ -4,13 +4,14 @@ Five real OMOP CDM v5.4 exports — one MD per patient documents the cross-consu
 
 ## Roster
 
-| # | Person ID | Display name | Sex · Age | Visits | Provs | OMOP scenario | Doc |
-|---|---|---|---|---:|---:|---|---|
-| P1 | 1093717054960 | **Lakshmi Iyer** | F · 76 | 21 | 15 | Breast Ca stage IA + CAD + CKD + OSA · 17-day burst | [P1](./P1-lakshmi-iyer-1093717054960.md) |
-| P2 | 843373981236 | **Suresh Patel** | M · 60 | 28 | 12 | Colon Ca T3N2b + lung mets + polypharmacy · 13 mo | [P2](./P2-suresh-patel-843373981236.md) · [walkthrough](./P2-suresh-patel-DESIGN-WALKTHROUGH.md) |
-| P3 | 375391871728 | **Asha Krishnan** | F · 57 | 59 | 4 | HTN + post-Achilles repair + intercurrent viral fevers · 12 mo | [P3](./P3-asha-krishnan-375391871728.md) |
-| P4 | 241381057447 | **Meera Joshi** | F · 58 | 40 | 11 | CAD + CVA + DM + Hypothyroid + NAFLD + obesity · 13 mo | [P4](./P4-meera-joshi-241381057447.md) |
-| P5 | 714696991886 | **Anita Desai** | F · 64 | 33 | 15 | DM + HTN + hypertriglyceridaemia + recurrent pancreatitis + asthma · 17 mo | [P5](./P5-anita-desai-714696991886.md) |
+| # | Person ID | Display name | Sex · Age | Visits | Provs | Care | OMOP scenario | Doc |
+|---|---|---|---|---:|---:|---|---|---|
+| P1 | 1093717054960 | **Lakshmi Iyer** | F · 76 | 21 | 15 | OPD | Breast Ca stage IA + CAD + CKD + OSA · 17-day burst | [P1](./P1-lakshmi-iyer-1093717054960.md) |
+| P2 | 843373981236 | **Suresh Patel** | M · 60 | 28 | 12 | OPD | Colon Ca T3N2b + lung mets + polypharmacy · 13 mo | [P2](./P2-suresh-patel-843373981236.md) · [walkthrough](./P2-suresh-patel-DESIGN-WALKTHROUGH.md) |
+| P3 | 375391871728 | **Asha Krishnan** | F · 57 | 59 | 4 | OPD | HTN + post-Achilles repair + intercurrent viral fevers · 12 mo | [P3](./P3-asha-krishnan-375391871728.md) |
+| P4 | 241381057447 | **Meera Joshi** | F · 58 | 40 | 11 | OPD | CAD + CVA + DM + Hypothyroid + NAFLD + obesity · 13 mo | [P4](./P4-meera-joshi-241381057447.md) |
+| P5 | 714696991886 | **Anita Desai** | F · 64 | 33 | 15 | OPD | DM + HTN + hypertriglyceridaemia + recurrent pancreatitis + asthma · 17 mo | [P5](./P5-anita-desai-714696991886.md) |
+| P6 | 319033560465 | **Arjun Verma** | M · 14 | 6 | 2 | **IPD+OPD** | Wilson's + acute HAV · 3-day admission + 5 OPD f/u · **315 labs + 4 notes** | [P6](./P6-arjun-verma-319033560465.md) |
 
 > Display names are anonymised. Person IDs are canonical OMOP `person_id`s. Mobile numbers in the UI are deterministic from the person_id suffix (real format, fabricated digits).
 

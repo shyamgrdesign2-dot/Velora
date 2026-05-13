@@ -1213,6 +1213,216 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   freshness: "Synced just now",
 }
 
+// ═════════════════════════════════════════════════════════════════════════
+// ARJUN_VERMA_BRIEF_MOCK  ·  P6 · person_id 319033560465 · M · 14
+// ─────────────────────────────────────────────────────────────────────────
+// Scenario: 3-day inpatient admission (24-26 Feb 2026) for decompensated
+// Wilson's disease + acute Hepatitis A in a pediatric patient, followed by
+// 5 OPD reviews over the next month. FIRST patient in the catalogue with:
+//   · a real inpatient visit_occurrence row (visit_concept_id = 9201)
+//   · structured OMOP `note` rows (Presenting Complaints + Discharge Condition)
+//   · 315 lab measurements (type 44818702) — serial LFT monitoring
+// Demonstrates the "IPD + OPD continuum" rendering for the brief.
+// ═════════════════════════════════════════════════════════════════════════
+export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
+  patientName: "Arjun Verma",
+  patientMeta: "M, 14y",
+  patientGender: "M",
+  patientAge: 14,
+  patientMobile: "+91 98765 60465",
+  patientId: "319033560465",
+  medicalHistory: [
+    {
+      title: "Primary problem",
+      tone: "primary",
+      items: [
+        { text: "**Wilson's disease** — on chelation therapy (Penicillamine + Zinc)" },
+        { text: "**Acute Hepatitis A** — HAV IgM positive · admitted 24 Feb 2026 with jaundice + hepatic decompensation" },
+        { text: "**Decompensated chronic liver disease** — ascites + cholestasis on the IPD admission" },
+      ],
+      sources: [
+        { doctor: "Hepatology · Provider 11764 (IPD admission)", date: "24 Feb 2026" },
+        { doctor: "Hepatology · Provider 11764 (Discharge)", date: "26 Feb 2026" },
+        { doctor: "Hepatology · Provider 11764 (OPD follow-up)", date: "3 Mar 2026" },
+        { doctor: "Hepatology · Provider 11764 (OPD follow-up)", date: "10 Mar 2026" },
+        { doctor: "Provider 19580 (Co-consultation)", date: "10 Mar 2026" },
+        { doctor: "Hepatology · Provider 11764 (OPD follow-up)", date: "25 Mar 2026" },
+      ],
+      reasoning:
+        "13 condition_occurrence rows tagged HAV IgM POSITIVE across the IPD admission + 5 OPD follow-ups. Wilson's disease is inferred from the Cilamin (Penicillamine) + Zinfate (Zinc) regimen — the classic chelation-plus-anti-absorption combination. The combination of Wilson's + acute HAV in a 14-y-o is what tipped the patient into hepatic decompensation requiring admission.",
+    },
+    {
+      title: "Co-morbidities",
+      tone: "neutral",
+      items: [{ text: "**Hypothyroidism** — on Thyroxine 125 mcg OD" }],
+      sources: [
+        { doctor: "Hepatology · Provider 11764", date: "across visits" },
+      ],
+      reasoning:
+        "13 condition_occurrence rows tagged HYPOTHYROIDISM as Active. On stable Thyroxine 125 mcg replacement — not the driver of the admission but relevant for chronic-care continuity.",
+    },
+    {
+      title: "Surgical history",
+      tone: "neutral",
+      items: [{ text: "None recorded in the OMOP window" }],
+      sources: [],
+      reasoning: "No surgical procedures in the observation window (Feb-Mar 2026). The Wilson's diagnosis predates this window but no past surgery is documented.",
+    },
+    {
+      title: "Allergies & safety",
+      tone: "positive",
+      items: [{ text: "Allergy review **not explicitly verified** in record — pre-Penicillamine challenge documentation absent" }],
+      sources: [],
+      reasoning:
+        "Penicillamine carries a non-trivial hypersensitivity / nephrotic-syndrome risk. The absence of a documented allergy review on initiation is a meaningful gap — flag for the next OPD visit.",
+    },
+  ],
+  windowDays: 29,
+  specialties: [
+    {
+      source: { specialty: "Hepatology · IPD admission", author: "Dr Provider 11764", date: "24-26 Feb 2026" },
+      reason: "The index admission. 3-day stay with full discharge summary content available.",
+      dateRangeLabel: "24 → 26 Feb '26 (IPD)",
+      consultationCount: 1,
+      doctorsLabel: "Dr Provider 11764",
+      lines: [
+        "**Findings**: H/O **jaundice** | **fever** | **abdominal pain** | burning micturition | decreased oral intake | **itching over body × 1-1.5 months** | HAV IgM positive on admission",
+        "**Medications**: **Wysolone 10 mg** (Prednisolone — taper started) | **Cilamin 250 mg** (Penicillamine) | **Zinfate** (Zinc) | **Ursocol 300** (UDCA) | **Hepamerz sachet** (L-ornithine L-aspartate) | **Aldactone 25** (Spironolactone for ascites) | **Looz syrup** (Lactulose for HE prophylaxis) | **Thyrox 125 mcg** continued",
+        "**Plan**: Discharged on **26 Feb in BETTER condition** | review LFTs at every OPD | continue chelation + zinc | symptomatic + hepatoprotective regimen | OPD review **3 Mar 2026**",
+      ],
+      openLoops: [
+        "**Hospital Course narrative** captured as 2 note rows only (Presenting Complaints + Discharge Condition); full course-in-hospital + treatment timeline not in OMOP `note`",
+        "**OT Notes / Operative Notes** section absent — confirm no procedures during stay",
+        "**Warning Signs + Discharge Advice** narrative not in `note` table — patient counselled verbally?",
+      ],
+    },
+    {
+      source: { specialty: "Hepatology · OPD follow-up series", author: "Dr Provider 11764", date: "25 Mar 2026" },
+      reason: "Post-discharge surveillance — five reviews over the month after admission.",
+      dateRangeLabel: "24 Feb → 25 Mar '26",
+      consultationCount: 5,
+      doctorsLabel: "Dr Provider 11764",
+      lines: [
+        "**Findings**: Serial LFT monitoring across 5 visits | Bilirubin Total + Direct + Indirect + SGPT/ALT trended at every visit | clinical recovery — discharge condition documented as 'BETTER'",
+        "**Medications (ongoing)**: **Cilamin 250 mg** | **Zinfate** | **Wysolone** taper schedule | **Ursocol 300** | **Folimax D3 Forte** | **Nusam 400** (SAMe) | **Hepamerz** | **ProHance LIV** | **Ostocalcium** | **Pregaba 50** (neuropathic component) | **Thyrox 125 mcg**",
+        "**Plan**: Continue chelation indefinitely | quarterly LFT review at minimum | watch for Wilson's-related neuropsychiatric features | HAV is acute — expect resolution; re-test IgG seroconversion",
+      ],
+      openLoops: [
+        "**Penicillamine 24-h urinary copper** monitoring — not on file",
+        "**Wilson's gene confirmation (ATP7B)** status not in record",
+        "**Family screening** for Wilson's — siblings not documented",
+        "**HAV IgG seroconversion** check not scheduled",
+      ],
+    },
+    {
+      source: { specialty: "Co-consultation", author: "Dr Provider 19580", date: "10 Mar 2026" },
+      reason: "Single co-consultation during one OPD visit — specialty not resolved from the export.",
+      dateRangeLabel: "10 Mar '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Provider 19580",
+      lines: [
+        "**Findings**: Specialty not resolved (provider table not in export)",
+        "**Plan**: Likely cross-team opinion during an OPD review — content not surfaced in structured data",
+      ],
+      openLoops: [
+        "**Provider → specialty lookup** missing for this provider",
+        "**Co-consultation reason** not in `observation` rows",
+      ],
+    },
+  ],
+  collisions: [
+    {
+      kind: "ddi",
+      title: "**Penicillamine + Prednisolone** — pediatric immunosuppression burden during acute viral infection",
+      points: [
+        "Penicillamine adds T-cell modulation to a Prednisolone-tapering background.",
+        "Patient has active HAV — viral clearance kinetics may be slowed.",
+        "Pediatric Wilson's regimen typically separates initiation of chelation from steroid use unless specifically AIH-overlap indicated.",
+      ],
+      rule: {
+        body: "AASLD",
+        year: "2023",
+        section: "Wilson's Disease Practice Guidance",
+        description: "American Association for the Study of Liver Diseases — Wilson's disease diagnosis and management.",
+        fetches: "Chelation initiation timing + steroid co-administration criteria.",
+      },
+    },
+    {
+      kind: "coordination-gap",
+      title: "**Penicillamine safety monitoring** — 24-h urinary copper + CBC + urinalysis not on file",
+      points: [
+        "Standard of care: 24-h urinary copper at weeks 1, 4, 12 after initiation.",
+        "Penicillamine-induced nephrotic syndrome surveillance: urine PCR monthly × 6 months.",
+        "Neither investigation appears in measurement rows for this patient.",
+      ],
+      rule: {
+        body: "AASLD",
+        year: "2023",
+        section: "Wilson's monitoring",
+        description: "AASLD Wilson's disease practice guidance — monitoring on chelation therapy.",
+        fetches: "Urinary copper + renal function surveillance schedule.",
+      },
+    },
+    {
+      kind: "coordination-gap",
+      title: "**Family screening for Wilson's disease** — siblings + first-degree relatives not documented",
+      points: [
+        "Wilson's is autosomal recessive — first-degree relatives have 25% risk of being affected.",
+        "AASLD recommends ATP7B + serum ceruloplasmin + 24-h copper for all first-degree relatives.",
+        "Family screening status not in observation or condition rows.",
+      ],
+      rule: {
+        body: "AASLD",
+        year: "2023",
+        section: "Family screening",
+        description: "AASLD Wilson's disease practice guidance — proband family screening protocol.",
+        fetches: "First-degree-relative screening obligation.",
+      },
+    },
+  ],
+  pendingMdtItems: [
+    "Schedule 24-h urinary copper at the 1-month-post-initiation mark.",
+    "Order serum ceruloplasmin baseline + repeat.",
+    "Confirm ATP7B gene-test status — initiate if not done.",
+    "Family screening counselling for siblings + parents.",
+    "Re-test HAV IgG to confirm seroconversion at 6-week mark.",
+  ],
+  syntheses: [
+    {
+      panelTitle: "LFT trend · serial monitoring during recovery",
+      guideline: {
+        body: "AASLD",
+        year: "2023",
+        description: "American Association for the Study of Liver Diseases — Acute Hepatitis A clinical course.",
+        fetches: "Bilirubin + transaminase resolution timeline in acute HAV.",
+      },
+      rows: [
+        { label: "Serial Bilirubin (Total)", value: "70 readings across 6 visits", ref: "From measurement rows tagged 'Liver Function Tests - LFT|Serum Bilirubin Total'. Daily during admission + at every OPD f/u.", tone: "ok" },
+        { label: "Serial SGPT (ALT)", value: "70 readings", ref: "From measurement rows tagged 'Liver Function Tests - LFT|SGPT (AST)'. Trend supports HAV resolution.", tone: "ok" },
+        { label: "Direct vs Indirect Bilirubin split", value: "Captured in 70 paired rows", ref: "Both fractions measured at every visit — supports cholestatic pattern on admission, resolving on follow-up.", tone: "ok" },
+      ],
+      note: "The richest serial-lab dataset of any catalogue patient. Strong recovery trajectory; Wilson's chelation can continue uninterrupted.",
+    },
+    {
+      panelTitle: "Wilson's disease monitoring status",
+      guideline: {
+        body: "AASLD",
+        year: "2023",
+        description: "AASLD Wilson's disease practice guidance.",
+        fetches: "Chelation efficacy monitoring + family screening obligations.",
+      },
+      rows: [
+        { label: "Penicillamine started", value: "Yes (Cilamin 250 mg)", ref: "From drug_exposure rows during IPD admission.", tone: "ok" },
+        { label: "24-h urinary copper", value: "Not on file", ref: "No measurement row matches /copper|cuprum/ pattern.", tone: "alert" },
+        { label: "Serum ceruloplasmin", value: "Not on file", ref: "No measurement row matches.", tone: "alert" },
+        { label: "Family screening", value: "Not documented", ref: "No observation rows tagged family_history_*.", tone: "alert" },
+      ],
+      note: "Treatment is started; the surveillance scaffolding around it isn't. Three of four monitoring inputs need to land before the next visit.",
+    },
+  ],
+  freshness: "Synced just now",
+}
+
 /**
  * MDT brief mock — shared by the chat reply pipeline and the deep-dive
  * documentation page. Keeping it as a single export means the doc page renders
@@ -1633,6 +1843,16 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
       rxOutput: { kind: "velora_v0_mdt_brief", data: SURESH_PATEL_BRIEF_MOCK },
+    }
+  }
+  if (m.includes("arjun") || m.includes("verma") || m.includes("319033560465")) {
+    return {
+      text:
+        "Here's the cross-consultation brief — 3-day IPD admission for decompensated Wilson's + acute Hepatitis A, followed by 5 OPD reviews. Serial LFT trend supports recovery; chelation monitoring gaps flagged.",
+      loadingHint: "Reading IPD admission + 5 OPD follow-ups…",
+      loadingDelayMs: 1400,
+      suggestions: subSuggestionsFor("mdt_brief"),
+      rxOutput: { kind: "velora_v0_mdt_brief", data: ARJUN_VERMA_BRIEF_MOCK },
     }
   }
   // Lakshmi catches both her name AND the generic no-name fall-through —

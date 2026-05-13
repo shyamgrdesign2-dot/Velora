@@ -228,6 +228,13 @@ export function PatientSelector({
                         ))}
                       </span>
                     </div>
+                    {/* Care-type chip — surfaces when the patient has any
+                        inpatient visit on record. Red because an IPD event
+                        is high-signal and should catch the eye. "OPD" is
+                        the implicit default and renders nothing. */}
+                    {option.careType && option.careType !== "OPD" && (
+                      <span className="flex-shrink-0 rounded-[4px] bg-tp-error-50 px-[5px] py-[1px] text-[10px] font-semibold text-tp-error-600">{option.careType}</span>
+                    )}
                     {option.isToday && <span className="flex-shrink-0 rounded-[4px] bg-tp-success-50 px-[5px] py-[1px] text-[10px] font-medium text-tp-success-600">Today</span>}
                   </button>
                 )

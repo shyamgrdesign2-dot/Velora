@@ -39,12 +39,17 @@ import type { RxContextOption, SpecialtyTabId } from "./types"
 //   P3  Asha Krishnan  F · 57 · HTN + post-Achilles repair + intercurrent viral fevers
 //   P4  Meera Joshi    F · 58 · CAD + CVA + DM + Hypothyroid + NAFLD + obesity
 //   P5  Anita Desai    F · 64 · DM + HTN + hypertriglyceridaemia + recurrent pancreatitis + asthma
+//   P6  Arjun Verma    M · 14 · Wilson's disease + acute HAV · IPD admission + OPD f/u  (IPD demo)
 export const RX_CONTEXT_OPTIONS: RxContextOption[] = [
   { id: "lakshmi-iyer",   label: "Lakshmi Iyer",   meta: "F, 76y · +91 98765 54960 · 1093717054960", kind: "patient", isToday: true, gender: "F", age: 76 },
   { id: "suresh-patel",   label: "Suresh Patel",   meta: "M, 60y · +91 98333 83625 · 843373981236", kind: "patient", isToday: true, gender: "M", age: 60 },
   { id: "asha-krishnan",  label: "Asha Krishnan",  meta: "F, 57y · +91 98765 71728 · 375391871728", kind: "patient", isToday: true, gender: "F", age: 57 },
   { id: "meera-joshi",    label: "Meera Joshi",    meta: "F, 58y · +91 98765 57447 · 241381057447", kind: "patient", isToday: true, gender: "F", age: 58 },
   { id: "anita-desai",    label: "Anita Desai",    meta: "F, 64y · +91 98765 91886 · 714696991886", kind: "patient", isToday: true, gender: "F", age: 64 },
+  // P6 is the only patient in the catalogue with a real inpatient
+  // visit_occurrence (visit_concept_id = 9201) on file. The careType chip
+  // surfaces this in the PatientSelector dropdown.
+  { id: "arjun-verma",    label: "Arjun Verma",    meta: "M, 14y · +91 98765 60465 · 319033560465", kind: "patient", isToday: true, gender: "M", age: 14, careType: "IPD + OPD" },
 ]
 
 // Default selection — Lakshmi Iyer is the first patient in the catalogue

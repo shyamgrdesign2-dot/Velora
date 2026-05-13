@@ -1593,61 +1593,58 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     m.includes("cross-consultation") ||
     m.includes("cross consultation")
 
-  if (isCrossConsult || m.includes("lakshmi") || m.includes("iyer") || m.includes("1093717054960")) {
-    if (m.includes("lakshmi") || m.includes("iyer") || m.includes("1093717054960")) {
-      return {
-        text: "Here's the cross-consultation brief — 5 specialties active in a 17-day pre-op work-up. Cardiac + OSA + CKD clearances pending.",
-        loadingHint: "Reading 5 specialty streams…",
-        loadingDelayMs: 1200,
-        suggestions: subSuggestionsFor("mdt_brief"),
-        rxOutput: { kind: "velora_v0_mdt_brief", data: LAKSHMI_IYER_BRIEF_MOCK },
-      }
+  // Explicit name matches first — each takes priority over the generic
+  // fallback. The Suresh / Asha / Meera / Anita / Lakshmi name keywords are
+  // distinct so order between them doesn't matter; what matters is that the
+  // generic "Show cross-consultation brief" with no patient name lands on
+  // Lakshmi (the catalogue's first / default patient) at the end.
+  if (m.includes("asha") || m.includes("krishnan") || m.includes("375391871728")) {
+    return {
+      text: "Here's the cross-consultation brief — narrow specialty footprint (4 teams, 59 visits). Allergy review missing across all prescriptions.",
+      loadingHint: "Reading the record…",
+      loadingDelayMs: 1000,
+      suggestions: subSuggestionsFor("mdt_brief"),
+      rxOutput: { kind: "velora_v0_mdt_brief", data: ASHA_KRISHNAN_BRIEF_MOCK },
     }
   }
-  if (isCrossConsult || m.includes("asha") || m.includes("krishnan") || m.includes("375391871728")) {
-    if (m.includes("asha") || m.includes("krishnan") || m.includes("375391871728")) {
-      return {
-        text: "Here's the cross-consultation brief — narrow specialty footprint (4 teams, 59 visits). Allergy review missing across all prescriptions.",
-        loadingHint: "Reading the record…",
-        loadingDelayMs: 1000,
-        suggestions: subSuggestionsFor("mdt_brief"),
-        rxOutput: { kind: "velora_v0_mdt_brief", data: ASHA_KRISHNAN_BRIEF_MOCK },
-      }
+  if (m.includes("meera") || m.includes("joshi") || m.includes("241381057447")) {
+    return {
+      text: "Here's the cross-consultation brief — CAD + prior CVA on DAPT for 12+ months. De-escalation review overdue; glimepiride double-dose flagged.",
+      loadingHint: "Reading 11 specialty streams…",
+      loadingDelayMs: 1400,
+      suggestions: subSuggestionsFor("mdt_brief"),
+      rxOutput: { kind: "velora_v0_mdt_brief", data: MEERA_JOSHI_BRIEF_MOCK },
     }
   }
-  if (isCrossConsult || m.includes("meera") || m.includes("joshi") || m.includes("241381057447")) {
-    if (m.includes("meera") || m.includes("joshi") || m.includes("241381057447")) {
-      return {
-        text: "Here's the cross-consultation brief — CAD + prior CVA on DAPT for 12+ months. De-escalation review overdue; glimepiride double-dose flagged.",
-        loadingHint: "Reading 11 specialty streams…",
-        loadingDelayMs: 1400,
-        suggestions: subSuggestionsFor("mdt_brief"),
-        rxOutput: { kind: "velora_v0_mdt_brief", data: MEERA_JOSHI_BRIEF_MOCK },
-      }
+  if (m.includes("anita") || m.includes("desai") || m.includes("714696991886")) {
+    return {
+      text: "Here's the cross-consultation brief — severe hypertriglyceridaemia driving recurrent pancreatitis. Fibrate not on board; triple anti-HTN cross-specialty.",
+      loadingHint: "Reading 15 specialty streams…",
+      loadingDelayMs: 1400,
+      suggestions: subSuggestionsFor("mdt_brief"),
+      rxOutput: { kind: "velora_v0_mdt_brief", data: ANITA_DESAI_BRIEF_MOCK },
     }
   }
-  if (isCrossConsult || m.includes("anita") || m.includes("desai") || m.includes("714696991886")) {
-    if (m.includes("anita") || m.includes("desai") || m.includes("714696991886")) {
-      return {
-        text: "Here's the cross-consultation brief — severe hypertriglyceridaemia driving recurrent pancreatitis. Fibrate not on board; triple anti-HTN cross-specialty.",
-        loadingHint: "Reading 15 specialty streams…",
-        loadingDelayMs: 1400,
-        suggestions: subSuggestionsFor("mdt_brief"),
-        rxOutput: { kind: "velora_v0_mdt_brief", data: ANITA_DESAI_BRIEF_MOCK },
-      }
-    }
-  }
-  if (isCrossConsult || m.includes("suresh") || m.includes("patel") || m.includes("843373981236")) {
+  if (m.includes("suresh") || m.includes("patel") || m.includes("843373981236")) {
     return {
       text:
         "Here's the cross-consultation brief — 12 specialties touched in the last 13 months. Oncology surveillance gap + polypharmacy flags surfaced.",
       loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
-      rxOutput: {
-        kind: "velora_v0_mdt_brief",
-        data: SURESH_PATEL_BRIEF_MOCK,
-      },
+      rxOutput: { kind: "velora_v0_mdt_brief", data: SURESH_PATEL_BRIEF_MOCK },
+    }
+  }
+  // Lakshmi catches both her name AND the generic no-name fall-through —
+  // she's the catalogue's default patient so the unqualified pill opens her
+  // brief.
+  if (isCrossConsult || m.includes("lakshmi") || m.includes("iyer") || m.includes("1093717054960")) {
+    return {
+      text: "Here's the cross-consultation brief — 5 specialties active in a 17-day pre-op work-up. Cardiac + OSA + CKD clearances pending.",
+      loadingHint: "Reading 5 specialty streams…",
+      loadingDelayMs: 1200,
+      suggestions: subSuggestionsFor("mdt_brief"),
+      rxOutput: { kind: "velora_v0_mdt_brief", data: LAKSHMI_IYER_BRIEF_MOCK },
     }
   }
 

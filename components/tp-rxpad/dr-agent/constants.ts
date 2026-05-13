@@ -47,10 +47,12 @@ export const RX_CONTEXT_OPTIONS: RxContextOption[] = [
   { id: "anita-desai",    label: "Anita Desai",    meta: "F, 64y · +91 98765 91886 · 714696991886", kind: "patient", isToday: true, gender: "F", age: 64 },
 ]
 
-// Default selection — Suresh Patel is the LIVE cross-consultation brief case
-// with a complete `SURESH_PATEL_BRIEF_MOCK` mock. Opening the Velora panel
-// without an explicit selection lands on his card.
-export const CONTEXT_PATIENT_ID = "suresh-patel"
+// Default selection — Lakshmi Iyer is the first patient in the catalogue
+// and the default landing when the Velora panel opens without an explicit
+// selection. Per product call (her case is the cleanest entry point: a
+// recent multi-specialty pre-op work-up that demonstrates every section of
+// the brief without overwhelming a first-time viewer).
+export const CONTEXT_PATIENT_ID = "lakshmi-iyer"
 
 /** Auto-sent from appointment-row AI icon — must match panel handling for quick snapshot vs full summary */
 export const QUICK_CLINICAL_SNAPSHOT_PROMPT = "Quick clinical snapshot"

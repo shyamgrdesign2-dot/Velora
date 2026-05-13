@@ -98,25 +98,18 @@ function compactDoctorsLabel(raw: string): string {
 }
 
 /**
- * SpecialtyContextBanner — quiet inline identity line at the top of every
+ * SpecialtyContextBanner — quiet inline caption at the top of every
  * specialty body.
  *
- * No background, no border, no highlight — just a single bracketed line
- * with pipe dividers, the same "structural punctuation" visual language
- * the body PipeDividers use. Reads as a caption under the section heading,
- * not as a decorated panel.
- *
- * Format:
- *   (Dr Name  |  N visits  |  date range)
- *
- * Renders nothing when no structured doctor / visit / range info exists.
+ * Shows only `N visits  |  date range`. The doctor name(s) are not
+ * repeated here — each visit card below already names its doctor in
+ * the header strip, and repeating the team-level doctor list above
+ * was redundant.
  */
 function SpecialtyContextBanner({ rec }: { rec: VeloraV0Attribution }) {
-  const doctorLabel = rec.doctorsLabel ? compactDoctorsLabel(rec.doctorsLabel) : null
   const visitCount = typeof rec.consultationCount === "number" ? rec.consultationCount : null
   const dateRange = rec.dateRangeLabel ?? null
   const segments: string[] = []
-  if (doctorLabel) segments.push(doctorLabel)
   if (visitCount !== null) segments.push(`${visitCount} visit${visitCount === 1 ? "" : "s"}`)
   if (dateRange) segments.push(dateRange)
   if (segments.length === 0) return null
@@ -849,35 +842,38 @@ function DetailedSpecialtyBody({
               {c.symptoms && (
                 <p className="min-w-0">
                   <ChipLabel text="Symptoms" />
-                  <HighlightLine text={c.symptoms} />
+                  <HighlightLine text={c.symptoms} plain />
                 </p>
               )}
               {c.examination && (
                 <p className="min-w-0">
                   <ChipLabel text="Examination" />
-                  <HighlightLine text={c.examination} />
+                  <HighlightLine text={c.examination} plain />
                 </p>
               )}
               {findings && (
                 <p className="min-w-0">
-                  <ChipLabel text="Findings" />
-                  <HighlightLine text={findings} />
+                  <ChipLabel text="Diagnosis" />
+                  <HighlightLine text={findings} plain />
                 </p>
               )}
               {c.medications && (
                 <p className="min-w-0">
                   <ChipLabel text="Medications" />
-                  <HighlightLine text={c.medications} />
+                  <HighlightLine text={c.medications} plain />
                 </p>
               )}
               {planRows.length > 0 && (
-                <div className="flex flex-col gap-[2px]">
+                <div>
+                  {/* Plan chip is a normal inline-block element (not a
+                      flex-direction-column child) so it hugs its text
+                      instead of stretching to full row width. */}
                   <ChipLabel text="Plan" />
-                  <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
+                  <ul className="mt-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
                     {planRows.map((r, ri) => (
                       <li key={ri} className="min-w-0">
                         <span className="font-medium text-tp-slate-600">{r.label}: </span>
-                        <HighlightLine text={r.content} />
+                        <HighlightLine text={r.content} plain />
                       </li>
                     ))}
                   </ul>

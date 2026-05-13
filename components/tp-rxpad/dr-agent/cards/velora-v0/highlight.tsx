@@ -81,11 +81,17 @@ function PlainRun({ text }: { text: string }) {
   )
 }
 
-export function HighlightLine({ text }: { text: string }) {
+export function HighlightLine({ text, plain = false }: { text: string; plain?: boolean }) {
   return (
     <>
       {tokenise(text).map((run, i) => {
         if (run.kind === "bold") {
+          // `plain` mode: render the **bold** marker as plain text — used
+          // inside Stack-1 verbatim content (visit cards) where we never
+          // re-style what the doctor wrote.
+          if (plain) {
+            return <PlainRun key={i} text={run.value} />
+          }
           return (
             <strong key={i} className="font-semibold text-tp-slate-900">
               {run.value}

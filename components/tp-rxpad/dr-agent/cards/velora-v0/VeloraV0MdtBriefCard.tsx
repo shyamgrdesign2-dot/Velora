@@ -1,7 +1,8 @@
 "use client"
 
-import React, { useRef, useState } from "react"
-import { Hospital, Flag, Diagram, InfoCircle } from "iconsax-reactjs"
+import React, { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
+import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, CloseCircle, Calendar } from "iconsax-reactjs"
 import { FlagArrow } from "../../shared/FlagArrow"
 import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
@@ -58,34 +59,191 @@ function formatPatientStrip(data: {
   return `${data.patientName} (${inner.join(", ")})`
 }
 
-function HeaderTrailing({ rec }: { rec: VeloraV0Attribution }) {
-  // Rich trailing: date range + doctors + consultation count + info icon.
-  // Consolidates everything the old standalone "Based on N consultations…"
-  // provenance paragraph used to say, so the body can start with Findings
-  // immediately below the heading.
-  //
-  // Preference order:
-  //   1. New structured fields (dateRangeLabel + doctorsLabel + consultationCount)
-  //   2. Legacy single-date trailing (rec.source.date)
-  const sourceLine = `${rec.source.specialty} Rx signed ${shortDate(rec.source.date)} by ${rec.source.author}`
+function HeaderTrailing({
+  rec,
+  onOpenSidebar,
+}: {
+  rec: VeloraV0Attribution
+  onOpenSidebar: () => void
+}) {
+  // Rich trailing: date range + doctors + consultation count + chevron.
+  // The chevron is a clickable affordance that opens the specialty sidebar
+  // (per-consultation timeline). It replaces the old info icon — the info
+  // icon's content has moved into the sidebar where the doctor can see the
+  // full per-visit Rx instead of a static tooltip blurb.
   const hasStructured = rec.dateRangeLabel || rec.doctorsLabel || typeof rec.consultationCount === "number"
+  const segments: string[] = []
   if (hasStructured) {
-    const segments: string[] = []
     if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
     if (typeof rec.consultationCount === "number") segments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
     if (rec.doctorsLabel) segments.push(rec.doctorsLabel)
-    return (
-      <span className="flex shrink-0 items-center gap-[5px] text-[12px] text-tp-slate-500">
-        <span className="text-tp-slate-500">{segments.join(" · ")}</span>
-        <SourceInfoTip source={sourceLine} reason={rec.reason} />
-      </span>
-    )
+  } else {
+    segments.push(`(${shortDate(rec.source.date)})`)
   }
   return (
-    <span className="flex shrink-0 items-center gap-[5px] text-[13px] text-tp-slate-500">
-      <span className="text-tp-slate-400">({shortDate(rec.source.date)})</span>
-      <SourceInfoTip source={sourceLine} reason={rec.reason} />
-    </span>
+    <button
+      type="button"
+      onClick={onOpenSidebar}
+      className="flex shrink-0 items-center gap-[6px] rounded-[4px] px-[6px] py-[2px] text-[12px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
+      aria-label={`Open ${rec.source.specialty} consultation timeline`}
+    >
+      <span>{segments.join(" · ")}</span>
+      <ArrowRight2 size={14} variant="Linear" />
+    </button>
+  )
+}
+
+/**
+ * SpecialtySidebar — slide-in panel showing a specialty's full consultation
+ * timeline. Each entry can expand to reveal the full Rx for that visit
+ * (findings + medications + plan).
+ *
+ * Renders through a portal so it floats above the chat surface.
+ */
+function SpecialtySidebar({
+  open,
+  rec,
+  patientLabel,
+  onClose,
+}: {
+  open: boolean
+  rec: VeloraV0Attribution | null
+  patientLabel: string
+  onClose: () => void
+}) {
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    if (!open) setExpandedIdx(null)
+  }, [open])
+  if (!mounted || !open || !rec) return null
+
+  const consultations = rec.consultations ?? []
+  const isEmpty = consultations.length === 0
+  const subtitleSegments: string[] = []
+  if (rec.dateRangeLabel) subtitleSegments.push(rec.dateRangeLabel)
+  if (typeof rec.consultationCount === "number") subtitleSegments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
+  if (rec.doctorsLabel) subtitleSegments.push(rec.doctorsLabel)
+
+  return createPortal(
+    <div className="fixed inset-0 z-[10000] flex" aria-modal="true" role="dialog">
+      {/* Scrim */}
+      <div className="absolute inset-0 bg-black/45 transition-opacity" onClick={onClose} />
+      {/* Panel — slides in from the right */}
+      <div className="relative ml-auto flex h-full w-full max-w-[480px] flex-col bg-white shadow-2xl">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-[12px] border-b border-tp-slate-100 px-[18px] py-[14px]">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
+              <Calendar size={12} variant="Bulk" />
+              <span>{patientLabel}</span>
+            </div>
+            <div className="mt-[2px] text-[16px] font-semibold text-tp-slate-900">
+              {rec.source.specialty}
+            </div>
+            {subtitleSegments.length > 0 && (
+              <div className="mt-[1px] text-[12px] text-tp-slate-500">{subtitleSegments.join(" · ")}</div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 text-tp-slate-400 hover:text-tp-slate-700"
+            aria-label="Close timeline"
+          >
+            <CloseCircle size={22} variant="Linear" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-[18px] py-[14px]">
+          {isEmpty ? (
+            <div className="rounded-[8px] border border-tp-slate-200 bg-tp-slate-50/70 px-[12px] py-[14px] text-[13px] leading-[1.5] text-tp-slate-600">
+              <strong className="font-semibold text-tp-slate-800">No per-consultation detail captured yet.</strong>
+              <br />
+              The card above shows the aggregate picture for this team. Per-visit
+              breakdown (findings · medications prescribed · plan) lands here
+              once the data pipeline surfaces it.
+            </div>
+          ) : (
+            <ol className="relative ml-[6px] flex flex-col gap-[4px] border-l border-tp-slate-200 pl-[14px]">
+              {consultations.map((c, i) => {
+                const isExpanded = expandedIdx === i
+                const isIpd = c.visitType === "IPD"
+                return (
+                  <li key={i} className="relative">
+                    {/* Timeline dot — IPD gets red, otherwise slate */}
+                    <span
+                      className={`absolute -left-[20px] top-[10px] inline-block h-[10px] w-[10px] rounded-full ring-[3px] ring-white ${isIpd ? "bg-tp-error-500" : "bg-tp-slate-400"}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setExpandedIdx(isExpanded ? null : i)}
+                      className="flex w-full flex-col items-start rounded-[8px] px-[10px] py-[8px] text-left transition-colors hover:bg-tp-slate-50"
+                    >
+                      <div className="flex w-full items-center gap-[6px]">
+                        <span className="text-[12px] font-semibold text-tp-slate-700">{c.date}</span>
+                        {isIpd && (
+                          <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+                            IPD
+                          </span>
+                        )}
+                        <span className="text-[11.5px] text-tp-slate-500">· {c.doctor}</span>
+                        <span className="ml-auto text-tp-slate-400">
+                          <ArrowRight2
+                            size={14}
+                            variant="Linear"
+                            style={{ transform: isExpanded ? "rotate(90deg)" : "none", transition: "transform 150ms ease" }}
+                          />
+                        </span>
+                      </div>
+                      <div className="mt-[2px] text-[13px] leading-[1.45] text-tp-slate-800">
+                        <HighlightLine text={c.headline} />
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="mb-[6px] ml-[2px] mt-[2px] flex flex-col gap-[6px] rounded-[8px] border border-tp-slate-200 bg-tp-slate-50/60 px-[12px] py-[10px]">
+                        {c.findings && (
+                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
+                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                              Findings
+                            </span>
+                            <HighlightLine text={c.findings} />
+                          </p>
+                        )}
+                        {c.medications && (
+                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
+                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                              Medications
+                            </span>
+                            <HighlightLine text={c.medications} />
+                          </p>
+                        )}
+                        {c.plan && (
+                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
+                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                              Plan
+                            </span>
+                            <HighlightLine text={c.plan} />
+                          </p>
+                        )}
+                        {!c.findings && !c.medications && !c.plan && (
+                          <p className="text-[12px] italic leading-[1.5] text-tp-slate-500">
+                            No further detail captured for this visit.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
+            </ol>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -100,108 +258,91 @@ function HeaderTrailing({ rec }: { rec: VeloraV0Attribution }) {
  * Replaces the original per-item "N rows" caption pattern with a single
  * group-level audit trail. Same trust contract, far less visual noise.
  */
-function GroupSourceTip({
-  sources,
-  reasoning,
-}: {
-  sources?: Array<{ doctor: string; date: string }>
-  reasoning?: string
-}) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLSpanElement>(null)
-  if ((!sources || sources.length === 0) && !reasoning) return null
-  // Cap visible source rows so the tooltip doesn't grow unbounded for groups
-  // backed by 15+ visits. The +N indicator preserves the count signal.
-  const MAX_VISIBLE = 6
-  const visibleSources = sources?.slice(0, MAX_VISIBLE) ?? []
-  const overflow = (sources?.length ?? 0) - visibleSources.length
-  return (
-    <>
-      <span
-        ref={ref}
-        className="relative inline-flex shrink-0 cursor-pointer items-center align-middle text-tp-slate-600 hover:text-tp-slate-800"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        tabIndex={0}
-        aria-label="Source"
-      >
-        {/* Bold variant + bumped size so the trigger is clearly visible at the
-            12px tag font scale. Previous 11px Linear was visually anaemic. */}
-        <InfoCircle size={14} variant="Bold" />
-      </span>
-      <FloatingTooltip
-        open={open}
-        triggerRef={ref}
-        placement="top-center"
-        width={300}
-        className="rounded-[6px] bg-tp-slate-800 px-[10px] py-[8px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-lg"
-      >
-        {visibleSources.length > 0 && (
-          <span className="block">
-            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
-              Sources ({sources?.length ?? 0})
-            </span>
-            <span className="mt-[4px] block">
-              {visibleSources.map((s, i) => (
-                <span key={i} className="block text-tp-slate-100">
-                  • {s.doctor} · {s.date}
-                </span>
-              ))}
-              {overflow > 0 && (
-                <span className="block text-tp-slate-400">+ {overflow} more consultation{overflow === 1 ? "" : "s"}</span>
-              )}
-            </span>
-          </span>
-        )}
-        {reasoning && (
-          <span className={`block ${visibleSources.length > 0 ? "mt-[6px] border-t border-tp-slate-700 pt-[6px]" : ""}`}>
-            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Why this matters</span>
-            <br />
-            <span className="text-white">{reasoning}</span>
-          </span>
-        )}
-      </FloatingTooltip>
-    </>
-  )
-}
-
 /**
- * MedicalHistorySubheadingTag — visual tag for each medical-history group title.
+ * MedicalHistorySubheadingTag — inline tag with hover-anywhere tooltip.
  *
- * Tone-aware pill that mirrors the system's existing chip language:
- *   · primary (red)   — the headline diagnosis driving everything else
- *   · neutral (slate) — co-morbidities, surgical history, etc.
- *   · positive (green) — explicit-negative verifications (allergies / family)
+ * Single chip that renders inline with the content that follows it (no
+ * separate row / column / bullet dot). The entire chip is the hover trigger,
+ * not just the info icon — the user doesn't have to aim at a tiny target.
  *
- * Carries a trailing ⓘ that opens the group's source + reasoning tooltip.
+ * Tone palette:
+ *   primary  → red    (the headline diagnosis driving everything else)
+ *   neutral  → slate  (co-morbidities, surgical history, generic groups)
+ *   positive → violet (allergy verifications + family/social — absence-as-data)
+ *
+ * Tooltip contents — sources list + reasoning sentence — render through a
+ * FloatingTooltip portal so they escape any clipping ancestor.
  */
 function MedicalHistorySubheadingTag({
   group,
 }: {
   group: VeloraV0MedicalHistoryGroup
 }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
   const tone = group.tone ?? "neutral"
-  // Tone palette:
-  //   primary   →  red  (the headline diagnosis driving everything else)
-  //   neutral   →  slate (co-morbidities, surgical history, generic groups)
-  //   positive  →  violet (allergy verifications + family/social — the
-  //                "absence-as-data" groups; visually distinct from clinical
-  //                problems so the eye reads them as context not concern)
   const toneClass =
     tone === "primary"
       ? "bg-tp-error-50 text-tp-error-700"
       : tone === "positive"
         ? "bg-tp-violet-50 text-tp-violet-700"
         : "bg-tp-slate-100 text-tp-slate-700"
+  const hasTip = (group.sources && group.sources.length > 0) || !!group.reasoning
+  // Cap visible source rows so the tooltip doesn't grow unbounded.
+  const MAX_VISIBLE = 6
+  const visibleSources = group.sources?.slice(0, MAX_VISIBLE) ?? []
+  const overflow = (group.sources?.length ?? 0) - visibleSources.length
   return (
-    <span
-      className={`inline-flex items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
-    >
-      <span>{group.title}</span>
-      <GroupSourceTip sources={group.sources} reasoning={group.reasoning} />
-    </span>
+    <>
+      <span
+        ref={ref}
+        className={`mr-[6px] inline-flex shrink-0 items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass} ${hasTip ? "cursor-help" : ""}`}
+        onMouseEnter={() => hasTip && setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => hasTip && setOpen(true)}
+        onBlur={() => setOpen(false)}
+        tabIndex={hasTip ? 0 : -1}
+      >
+        <span>{group.title}</span>
+        {hasTip && <InfoCircle size={16} variant="Linear" />}
+      </span>
+      {hasTip && (
+        <FloatingTooltip
+          open={open}
+          triggerRef={ref}
+          placement="top-center"
+          width={320}
+          className="rounded-[6px] bg-tp-slate-800 px-[10px] py-[8px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-lg"
+        >
+          {visibleSources.length > 0 && (
+            <span className="block">
+              <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+                Sources ({group.sources?.length ?? 0})
+              </span>
+              <span className="mt-[4px] block">
+                {visibleSources.map((s, i) => (
+                  <span key={i} className="block text-tp-slate-100">
+                    • {s.doctor} · {s.date}
+                  </span>
+                ))}
+                {overflow > 0 && (
+                  <span className="block text-tp-slate-400">
+                    + {overflow} more consultation{overflow === 1 ? "" : "s"}
+                  </span>
+                )}
+              </span>
+            </span>
+          )}
+          {group.reasoning && (
+            <span className={`block ${visibleSources.length > 0 ? "mt-[6px] border-t border-tp-slate-700 pt-[6px]" : ""}`}>
+              <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Why this matters</span>
+              <br />
+              <span className="text-white">{group.reasoning}</span>
+            </span>
+          )}
+        </FloatingTooltip>
+      )}
+    </>
   )
 }
 
@@ -240,6 +381,9 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   const patientLine = formatPatientStrip(data)
   const headlines = data.chronicConditions ?? []
   const hasHeadlines = headlines.length > 0
+  // Which specialty (by index) has its sidebar open? -1 means none.
+  const [openSidebarIdx, setOpenSidebarIdx] = useState<number>(-1)
+  const openRec = openSidebarIdx >= 0 ? data.specialties[openSidebarIdx] ?? null : null
 
   return (
     <div className="flex flex-col gap-[10px]" data-mdt-card="root">
@@ -287,24 +431,24 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   The ⓘ on the tag opens a tooltip listing every OMOP consultation
                   feeding the group, plus the reasoning for why it's surfaced.
                   No "N rows" caption clutter; no separate per-item icons. */}
-              <div className="flex flex-col gap-[8px] pl-[2px]">
+              {/* Each group renders as a single flowing paragraph: the tone-
+                  tinted chip sits inline at the start (mr-[6px] gap to the
+                  text), the joined item text flows after it and wraps below
+                  naturally. No standalone row, no bullet dot — the chip IS
+                  the visual anchor. Saves vertical real estate, makes the
+                  card feel one continuous summary instead of a flex-grid. */}
+              <div className="flex flex-col gap-[6px] pl-[2px]">
                 {data.medicalHistory.map((group, gi) => {
-                  const isPositive = group.tone === "positive"
                   // Join items with " | ". HighlightLine renders the pipes
                   // as styled PipeDivider glyphs (slate-200 vertical bar).
                   // Per content style: each item is `**Name** (detail, detail)`
-                  // with no em-dashes anywhere in the items themselves.
+                  // with no em-dashes inside.
                   const joinedText = group.items.map((it) => it.text).join(" | ")
                   return (
-                    <div key={gi} className="flex flex-col gap-[2px]">
-                      <div>
-                        <MedicalHistorySubheadingTag group={group} />
-                      </div>
-                      <div className="ml-[2px] flex gap-[6px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
-                        <span className={`mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full ${isPositive ? "bg-tp-violet-500" : "bg-tp-slate-500"}`} />
-                        <span className="min-w-0 flex-1"><HighlightLine text={joinedText} /></span>
-                      </div>
-                    </div>
+                    <p key={gi} className="text-[13.5px] leading-[1.55] text-tp-slate-700">
+                      <MedicalHistorySubheadingTag group={group} />
+                      <HighlightLine text={joinedText} />
+                    </p>
                   )
                 })}
               </div>
@@ -334,7 +478,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 <SectionSummaryBar
                   label={rec.source.specialty}
                   icon="medical-service"
-                  trailing={<HeaderTrailing rec={rec} />}
+                  trailing={<HeaderTrailing rec={rec} onOpenSidebar={() => setOpenSidebarIdx(idx)} />}
                 />
               </div>
               {/* Body — Findings / Medications / Plan as bulleted rows.
@@ -347,39 +491,32 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   (The provenance paragraph that used to live above this body
                   is gone — its date-range / doctor / count content now lives
                   in the section heading's trailing slot.) */}
-              <ul data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[4px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
+              <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[5px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
                 {rec.lines.map((line, i) => {
                   const labelMatch = line.match(/^\*\*([^*]+)\*\*:\s*(.*)$/)
                   const label = labelMatch?.[1]
                   const content = labelMatch?.[2] ?? line
                   // Hide a medications row entirely when there's nothing
-                  // ongoing — see comment block above.
+                  // ongoing.
                   if (label && /medications?/i.test(label) && /^no ongoing\b/i.test(content)) {
                     return null
                   }
                   return (
-                    <li key={i} className="flex gap-[6px]">
-                      <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-                      {/* Single inline-flow span: the label is an `inline-flex`
-                          chip that floats at the start of the content, and the
-                          actual text wraps naturally around it. This collapses
-                          the previous two-row pattern (chip on row 1, content
-                          on row 2 due to flex-wrap) into one continuous block
-                          — significant vertical-space savings on narrow widths.
-                          Implementation note: a wrapper `<span>` (not flex)
-                          lets the chip behave like a leading inline element. */}
-                      <span className="min-w-0 flex-1">
-                        {label && (
-                          <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                            {label}
-                          </span>
-                        )}
-                        <HighlightLine text={content} />
-                      </span>
-                    </li>
+                    // Inline-flow paragraph: the label chip floats at the
+                    // start, content wraps after it. No bullet dot — the chip
+                    // is the visual anchor (mirrors the medical-history
+                    // section's rendering style).
+                    <p key={i} className="min-w-0">
+                      {label && (
+                        <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                          {label}
+                        </span>
+                      )}
+                      <HighlightLine text={content} />
+                    </p>
                   )
                 })}
-              </ul>
+              </div>
               {/* Open-loops disclosure — the anti-data-loss layer. Shows
                   what's *captured upstream but not surfaced* in this card,
                   plus guideline-anchored gaps (overdue surveillance, no-result
@@ -516,6 +653,15 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
         </div>
       </CardShell>
       </div>
+
+      {/* Specialty sidebar — slide-in panel showing per-consultation timeline.
+          Opens when the doctor clicks the chevron on any specialty header. */}
+      <SpecialtySidebar
+        open={openSidebarIdx >= 0}
+        rec={openRec}
+        patientLabel={patientLine}
+        onClose={() => setOpenSidebarIdx(-1)}
+      />
     </div>
   )
 }

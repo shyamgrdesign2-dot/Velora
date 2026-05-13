@@ -825,6 +825,41 @@ export interface VeloraV0Attribution {
    *  specialties pass the full name ("Dr Pankaj Shah"); for multi-doctor
    *  use a join or summarised form ("Dr Pankaj Shah / Dr Mithun Shah"). */
   doctorsLabel?: string
+  /** Per-consultation timeline shown in the specialty sidebar.
+   *
+   *  When the user clicks the chevron at the end of a specialty header, a
+   *  side panel opens showing every consultation this team has had with the
+   *  patient in date order. Each entry expands to reveal the full Rx for
+   *  that visit (findings + medications + plan). When this array is missing
+   *  or empty, the sidebar renders a "no per-consultation detail captured
+   *  yet" empty state — the chevron still opens the panel so the doctor
+   *  understands the affordance. */
+  consultations?: VeloraV0Consultation[]
+}
+
+/** One visit within a specialty's timeline. Surfaced in the specialty
+ *  sidebar (opened by clicking the chevron on the specialty header). */
+export interface VeloraV0Consultation {
+  /** Display date for the consultation (e.g. "8 May 2025" or "24 Feb 2026"). */
+  date: string
+  /** Visit type — used for the chip on the timeline marker. "OPD" by default;
+   *  "IPD" surfaces a red admission marker for inpatient stays. */
+  visitType?: "OPD" | "IPD" | "ER"
+  /** The treating doctor for this specific visit (may differ from the
+   *  specialty's headline `doctorsLabel` for multi-doctor teams). */
+  doctor: string
+  /** One-line headline summarising what happened at this consultation —
+   *  shown collapsed before the user expands the entry. */
+  headline: string
+  /** Detailed findings recorded at this visit (diagnoses + symptoms +
+   *  examination notes). Shown when the consultation is expanded. */
+  findings?: string
+  /** Medications prescribed AT this visit (not the cumulative ongoing list
+   *  for the specialty). Shown when the consultation is expanded. */
+  medications?: string
+  /** Plan documented at this visit — follow-up date, investigations advised,
+   *  advice given, surgical bookings. */
+  plan?: string
 }
 
 /** One sub-section in the structured Section 1 · Medical history view.

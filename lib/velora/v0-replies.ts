@@ -541,6 +541,24 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Cardiac fitness sign-off** not documented after Cardiology review (27 Apr)",
         "**OSA airway plan** not in record, needed pre-anaesthesia",
       ],
+      consultations: [
+        {
+          date: "11 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Tahiliani",
+          headline: "**T1cN0 stage IA ductal Ca** — first oncology consult after surgical referral",
+          findings: "Right breast carcinoma confirmed on biopsy. pT1cN0 staging on imaging. Mod diff ductal histology. No nodal involvement.",
+          plan: "Surgical resection scheduled. Awaiting pathology before adjuvant therapy decision. Follow-up after surgery.",
+        },
+        {
+          date: "12 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Sandeep Jain",
+          headline: "Second oncology opinion — confirms staging + plan",
+          findings: "Reviewed imaging and biopsy with primary oncologist. Concur with T1cN0 stage IA assignment and resection-first pathway.",
+          plan: "Endorse Dr Tahiliani's surgical plan. Re-engage post-pathology for adjuvant decision.",
+        },
+      ],
     },
     {
       source: { specialty: "Onco-surgery", author: "Dr Pandya", date: "11 May 2026" },
@@ -556,6 +574,32 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Surgery date** not yet entered into the system",
         "**Pre-op renal-dose ceiling** for contrast imaging pending Nephrology",
       ],
+      consultations: [
+        {
+          date: "30 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Dhara Girish Pandya",
+          headline: "Initial surgical assessment",
+          findings: "Pre-op evaluation for right breast resection. Patient counselled on procedure and recovery.",
+          plan: "Coordinate clearances: Cardiology + Nephrology + Pulmonology. Surgery date pending.",
+        },
+        {
+          date: "4 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Dhara Girish Pandya",
+          headline: "Pre-op review — awaiting cardio clearance",
+          findings: "Cardiology has seen patient; report pending sign-off. OSA airway concern flagged.",
+          plan: "Hold date booking until cardiac and airway plans finalised.",
+        },
+        {
+          date: "11 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Dhara Girish Pandya",
+          headline: "Most recent pre-op review · oncology plan now confirmed",
+          findings: "Oncology has confirmed pathway. All clearance steps still in flight.",
+          plan: "Date can be booked once Nephro contrast-protocol clears.",
+        },
+      ],
     },
     {
       source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "27 Apr 2026" },
@@ -570,6 +614,24 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       openLoops: [
         "**Echo report** advised but no result row",
         "**ECG / Trop trend** not in lab table",
+      ],
+      consultations: [
+        {
+          date: "27 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Pre-op cardiac risk evaluation",
+          findings: "Known IHD on chronic regimen. DOE grade III × 4-5 months. BP elevated. Functional capacity uncertain.",
+          plan: "Order resting Echo, functional capacity test. Re-review before surgical clearance.",
+        },
+        {
+          date: "27 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Ketan Vekariya",
+          headline: "Second cardiology opinion — same day cross-cover",
+          findings: "Reviewed regimen and DOE history. Agrees with Dr Roy's workup plan.",
+          plan: "Awaiting Echo results to finalise clearance.",
+        },
       ],
     },
     {
@@ -587,6 +649,25 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**CPAP / sleep study report** not in lab data",
         "**ABG / SpO₂ trend** not captured",
       ],
+      consultations: [
+        {
+          date: "29 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Manoj Singh",
+          headline: "Initial pulmonology + sleep review",
+          findings: "Severe OSA confirmed clinically. Existing CPAP usage not documented in record.",
+          medications: "Foracort inhaler (Budesonide + Formoterol) | Montelukast 10 mg nightly",
+          plan: "Recommend formal sleep study + CPAP titration. Notify anaesthesia of severe-OSA airway risk.",
+        },
+        {
+          date: "1 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Manoj Singh",
+          headline: "Follow-up · airway plan still pending",
+          findings: "No interval change. Sleep study report not yet retrieved.",
+          plan: "Loop anaesthesia in for difficult-airway plan before surgery booking.",
+        },
+      ],
     },
     {
       source: { specialty: "Nephrology", author: "Dr Goplani", date: "29 Apr 2026" },
@@ -601,6 +682,16 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       openLoops: [
         "**Serum creatinine / eGFR**, not in lab table",
         "**Urine PCR / ACR** not in record",
+      ],
+      consultations: [
+        {
+          date: "29 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Kamal Goplani",
+          headline: "Pre-op renal review · acute-on-chronic CKD",
+          findings: "Known CKD with recent acute insult. Renal protection plan needed for upcoming contrast imaging and chemo.",
+          plan: "Pre/post-contrast hydration protocol. Renal-dose review on all current meds. Repeat eGFR + ACR before surgery.",
+        },
       ],
     },
   ],

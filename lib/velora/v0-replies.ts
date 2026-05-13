@@ -193,11 +193,12 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "8 May - 30 Sep '25",
       consultationCount: 12,
       doctorsLabel: "Dr Pankaj Shah / Dr Mithun Shah",
+      // Verbatim Findings / Plan from the most recent oncology visit
+      // (30 Sep 2025, Dr Pankaj Shah — the now-overdue surveillance review).
       lines: [
-        // No Medications line — Oncology stream has nothing ongoing in window;
-        // surfacing "none" was noise. The card hides this row automatically.
-        "**Findings**: Post-op surveillance for **T3N2b stage IIIB colon Ca** s/p hemicolectomy + adjuvant chemo | multi-visit pattern, no fresh complaints recorded | exam (10/11 Jun) no gross focal deficit",
-        "**Plan**: Monthly surveillance cadence held May-Sep 2025 | last contact 30 Sep 2025",
+        "**Findings**: Stage IIIB colon Ca · **CEA back-up trend** plus pulmonary symptoms — suspicion for lung metastasis raised",
+        "**Medications**: No medication change today | Symptomatic Pantoprazole 40 mg OD for epigastric discomfort",
+        "**Plan**: Within 3-4 weeks · with PET-CT report",
       ],
       labResults: [
         { name: "CEA", value: "12.4", unit: "ng/mL", flag: "high", refRange: "<5.0 (non-smoker)", date: "30 Sep 2025", note: "Last measured Sep 2025. Re-test overdue per NCCN q3-6mo." },
@@ -284,10 +285,12 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "7 - 9 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Avadh Vithlani",
+      // Verbatim from the most recent pulmonology visit
+      // (9 May 2026, Dr Avadh Vithlani — regimen-closure review).
       lines: [
-        // Acute regimen closed; no ongoing meds — row hidden.
-        "**Findings**: SOB + Coughing + heaviness of chest × 4 days | exam diffuse bilateral coarse crepitations | SpO₂ **94 % on room air**",
-        "**Plan**: Acute antibiotic-steroid bridge (Ceftriaxone IV + Doxy IV + Hydrocort IV + nebs) **completed 12 May 2026** | regimen closed",
+        "**Findings**: Moderate CAP — **clinical improvement on day 3**, complete remaining course",
+        "**Medications**: Continue Ceftriaxone IV × 2 more days, Doxy IV × 2 more days, taper Hydrocortisone IV off | Continue nebs PRN",
+        "**Plan**: 12 May 2026 — regimen closure visit",
       ],
       labResults: [
         { name: "SpO₂", value: "94", unit: "% (room air)", flag: "low", refRange: "≥95", date: "7 May 2026", note: "Marginal — drove the IV-bridge decision." },
@@ -346,10 +349,12 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "5 May '26",
       consultationCount: 1,
       doctorsLabel: "Dr Milan Mehta",
+      // Verbatim from the single pain-specialist visit
+      // (5 May 2026, Dr Milan Mehta).
       lines: [
-        // No ongoing opioid — row hidden. Closure noted in Plan instead.
-        "**Findings**: LBP + bilateral LL heaviness | minimal walking | post-op GB perforation (operated **19/04/26**)",
-        "**Plan**: Post-surgical pain control | Morphine 10 mg PO short-course (5 May, ≤ 7 days) **closed** | no refill request on record",
+        "**Findings**: **Post-surgical low back pain + bilateral LL heaviness** (s/p emergency GB-perforation surgery 19/4/26) — neuropathic + nociceptive overlap",
+        "**Medications**: **Morphine 10 mg PO Q8H × 5-7 days** (short course, planned auto-stop 12 May) | Continue Dulotin (Duloxetine) | Continue Gabator NT (Gabapentin + Nortriptyline) | Continue Tryptomer (Amitriptyline) | Add **Lactulose 15 mL HS** (opioid-induced constipation prophylaxis)",
+        "**Plan**: Within 7-10 days · earlier if respiratory depression, confusion, or no relief",
       ],
       openLoops: [
         "Pain Specialist did not schedule a **follow-up review**, refill status of the short-course Morphine is open",
@@ -385,10 +390,11 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "21 Mar '26",
       consultationCount: 1,
       doctorsLabel: "Dr Nimit Shah",
+      // Verbatim from the diabetology visit (21 Mar 2026, Dr Nimit Shah).
       lines: [
-        // URI regimen completed by early April; no ongoing meds — row hidden.
-        "**Findings**: Intercurrent **cold-cough + fever 101.2 °F** | exam WN WD, no pallor, mild oral congestion, RS/CVS clear, soft abdomen, AAO×3",
-        "**Plan**: SMBG (FBS + before-dinner) diary × 1 week | Home BP 8 am + 8 pm with chart | review in 1 month (follow-up advised 26 Mar 2026)",
+        "**Findings**: **Type-2 Diabetes Mellitus, sub-optimally controlled** | Intercurrent viral URI | Sulfonylurea-on-board hypoglycaemia risk during reduced intake",
+        "**Medications**: Continue Amaryl M 1 (Glimepiride 1 + Metformin 500) BD with food | **Hold separate Amaryl 1 from Cardiology** (duplicate sulfonylurea concern flagged) | Paracetamol 500 mg q6h PRN | Levocetirizine 5 mg HS × 5 days | Adequate hydration",
+        "**Plan**: 26 Mar 2026 · review SMBG diary + URI resolution",
       ],
       openLoops: [
         "Diabetology advised **HbA1c** as part of standard T2DM follow-up, no result on file in the current window",
@@ -425,10 +431,11 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "2 Mar '26",
       consultationCount: 1,
       doctorsLabel: "Dr Kunal Chandwar",
+      // Verbatim from the rheumatology visit (2 Mar 2026, Dr Kunal Chandwar).
       lines: [
-        "**Findings**: **PolyArthritis × 6 weeks** | L wrist / fingers / bil shoulders, slightly better on Medrol 8 mg 1-0-0 × 15 days | paraesthesia bil LL | dorsal back pain (? degeneration vs osteoporosis) | MSK exam flexor / wrist tenosynovitis",
-        "**Medications**: **CCM tablet** (Ca citrate malate + Vit D3), ongoing bone-protection supplement | Omnacortil 7.5 mg taper and Sunbless 60K weekly course completed late April 2026",
-        "**Plan**: Follow-up **16 Mar 2026** | investigations advised, CBC · ESR · SGPT · SGOT · CRP · Creatinine",
+        "**Findings**: **Inflammatory polyarthritis (small + large joints)**, partially responsive to steroid taper | Differential: seronegative RA vs PMR-spectrum vs viral-trigger reactive | Steroid-related bone-health concern (60-yo, ongoing chronic steroid)",
+        "**Medications**: **Omnacortil 7.5 mg taper** schedule (continuing the existing taper, completing late April) | **Sunbless 60K weekly × 4 weeks** (Vit D loading dose, completed late April) | **CCM tablet** (Ca + Vit D3) ongoing for bone protection | NSAIDs avoided (renal + GI risk)",
+        "**Plan**: 16 Mar 2026 · with lab panel + clinical review",
       ],
       openLoops: [
         "Rheumatology advised **CBC, ESR, SGPT, SGOT, CRP, Creatinine** on 2 Mar 2026, no results on file",
@@ -464,10 +471,12 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "20 Dec '25 - 16 Feb '26",
       consultationCount: 2,
       doctorsLabel: "Dr Nikhil Dave",
+      // Verbatim from the most recent neurology visit
+      // (16 Feb 2026, Dr Nikhil Dave).
       lines: [
-        "**Findings**: Heaviness in legs",
-        "**Medications**: **Dulotin 10 mg** (Duloxetine) | **Gabantin GRS 300** (Gabapentin) | **Progaba 30 g gel**, all last issued 16 Feb 2026 with 2-month supply (status pending refill confirmation)",
-        "**Plan**: Continue dual-channel neuropathic control (oral + topical gabapentin)",
+        "**Findings**: Chronic neuropathic pain — **stable on dual-channel gabapentinoid + SNRI**",
+        "**Medications**: Continue Dulotin 10 mg | Continue Gabantin GRS 300 mg HS | Continue Progaba 6% gel | **All issued for 2 more months — supply ends 16 Apr 2026**",
+        "**Plan**: 16 Apr 2026 · refill review",
       ],
       openLoops: [
         "Neurology issued the gabapentinoid regimen with **2-month supply ending 16 Apr 2026**, no refill prescription on file",
@@ -516,11 +525,12 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 Jun - 18 Jul '25",
       consultationCount: 3,
       doctorsLabel: "Dr Kalpesh Shah / Dr Y. Saija",
+      // Verbatim from the most recent neurosurgery visit
+      // (18 Jul 2025, Dr Kalpesh Shah — final visit before Neurology takeover).
       lines: [
-        // Last issue was July 2025 — Neurology has since taken over. No
-        // ongoing meds from this team — row hidden by the card.
-        "**Findings**: TN (trigeminal-like) pain in extremities | exam no gross focal deficit",
-        "**Plan**: Follow-up advised **10 Jul 2025** (kept on 11 Jun, then 18 Jul) | investigations, Serum ferritin + iron (WNL on f/u) | gabapentinoid management since taken over by Neurology",
+        "**Findings**: TN-like neuropathic pain — **responding adequately**; chronic management handover to Neurology",
+        "**Medications**: Continue Gabator NT 300 mg HS — Neurology will continue care from next visit",
+        "**Plan**: Neurology takeover — first visit booked 20 Dec 2025",
       ],
       // No open loops — ferritin + iron came back WNL on the 11 Jun + 18 Jul
       // follow-ups, gabapentinoid management was formally handed to
@@ -796,9 +806,11 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "11 - 12 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep Jain",
+      // Verbatim Findings / Plan lifted from the most recent oncology
+      // visit (12 May 2026, Dr Sandeep Jain — second-opinion sign-off).
       lines: [
-        "**Findings**: **T1cN0 stage IA** ductal Ca · planning adjuvant pathway",
-        "**Plan**: Surgical resection scheduled | adjuvant decisions post-pathology",
+        "**Findings**: **Concurrent with Dr Tahiliani** — pT1cN0 stage IA invasive ductal carcinoma, moderately differentiated. Resection-first pathway endorsed.",
+        "**Plan**: Re-engage jointly with Dr Tahiliani once pathology + IHC are back",
       ],
       openLoops: [
         "Oncology requested **cardiac fitness sign-off** from Cardiology on 11 May, sign-off not yet on record",
@@ -853,9 +865,11 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "30 Apr - 11 May '26",
       consultationCount: 5,
       doctorsLabel: "Dr Dhara Girish Pandya",
+      // Verbatim from the most recent onco-surgery visit
+      // (11 May 2026, Dr Dhara Girish Pandya).
       lines: [
-        "**Findings**: Pre-op assessment series for R hemicolectomy-equivalent breast resection · surgical clearance pending",
-        "**Plan**: Date booking awaiting anaesthesia + cardio + nephro clearances",
+        "**Findings**: Right breast Ca, IA — surgical pathway confirmed | **Holding date** until Nephro contrast-protocol cleared",
+        "**Plan**: Date to be booked within 3-5 days of final clearance",
       ],
       openLoops: [
         "Onco-surgery scheduled **resection** but date not yet booked in the system (held pending clearances)",
@@ -919,9 +933,11 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "27 Apr '26",
       consultationCount: 2,
       doctorsLabel: "Dr Bhavesh Roy / Dr Ketan Vekariya",
+      // Verbatim from the most recent cardiology visit (27 Apr 2026,
+      // Dr Bhavesh Roy — same-day Dr Ketan Vekariya cross-cover concurs).
       lines: [
-        "**Findings**: Known IHD · DOE grade III × 4-5 months recorded · BP elevated",
-        "**Plan**: Echo + functional capacity assessment | re-review pre-surgery",
+        "**Findings**: **Known IHD on chronic regimen**, functional capacity uncertain | HTN suboptimally controlled | OSA-related airway risk co-exists",
+        "**Plan**: Re-review with Echo result before any surgical clearance is issued",
       ],
       labResults: [
         { name: "LDL-C", value: "142", unit: "mg/dL", flag: "high", refRange: "<70 (IHD target)", date: "27 Apr 2026", note: "Above the secondary-prevention target for known IHD." },
@@ -981,10 +997,12 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "29 Apr - 1 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Manoj Singh",
+      // Verbatim from the most recent pulmonology visit
+      // (1 May 2026, Dr Manoj Singh).
       lines: [
-        "**Findings**: Severe Obstructive Sleep Apnea documented · snoring-related breathing disorder",
-        "**Medications**: **Foracort inhaler** (Budesonide + Formoterol), ongoing | **Montelukast 10 mg** nightly",
-        "**Plan**: CPAP titration data not in record | difficult-airway plan with anaesthesia pending",
+        "**Findings**: Severe OSA — formal documentation still pending",
+        "**Medications**: Continue **Foracort inhaler** (Budesonide 200 µg + Formoterol 6 µg) BID | Continue **Montelukast 10 mg HS** | **Hold sedatives + opioids** in peri-op window",
+        "**Plan**: Joint anaesthesia + pulmonology airway-plan visit before booking date",
       ],
       openLoops: [
         "Pulmonology advised a **formal sleep study + CPAP titration** on 29 Apr, no report on file",
@@ -1032,9 +1050,12 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "29 Apr '26",
       consultationCount: 1,
       doctorsLabel: "Dr Kamal Goplani",
+      // Verbatim from the most recent nephrology visit
+      // (29 Apr 2026, Dr Kamal Goplani).
       lines: [
-        "**Findings**: Acute-on-chronic CKD · renal protection plan needed for contrast + chemo",
-        "**Plan**: Pre + post-contrast hydration protocol | renal-dose review on all current meds",
+        "**Findings**: **Acute-on-chronic CKD (G3b)** — baseline eGFR was ~52 in Feb, now 38 | Anaemia of chronic kidney disease (Hb 10.8) | Borderline hyperkalaemia",
+        "**Medications**: Continue ACEi at current dose | Start **N-acetylcysteine 600 mg BID × 48 h** around contrast | **Avoid NSAIDs** | Renal-dose review of every current medication done (no changes needed today)",
+        "**Plan**: Pre-op morning labs (creatinine + electrolytes) · Joint nephrology + onco-surgery review of clearance",
       ],
       labResults: [
         { name: "Serum Creatinine", value: "1.6", unit: "mg/dL", flag: "high", refRange: "0.6–1.1 (F)", date: "29 Apr 2026", note: "Acute-on-chronic; up from baseline 1.2 in Feb." },
@@ -1212,9 +1233,12 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "12 Apr '25 - 21 Mar '26",
       consultationCount: 40,
       doctorsLabel: "Dr Raj Changela",
+      // Verbatim from the most recent Internal Medicine visit
+      // (21 Mar 2026, Dr Raj Changela).
       lines: [
-        "**Findings**: Chronic HTN management | intercurrent URI / fever episodes",
-        "**Plan**: HTN regimen continuation | per-episode acute management",
+        "**Findings**: HTN stable | History of recurrent viral URI (≥ 3 per year)",
+        "**Medications**: Continue Amlodipine 5 + Telmisartan 40",
+        "**Plan**: After 3 months · sooner if any fresh URI episode",
       ],
       openLoops: [
         "Internal Medicine prescribed multiple courses without first **documenting allergy status**, allergy review still pending",
@@ -1271,9 +1295,12 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 May - 15 Aug '25",
       consultationCount: 8,
       doctorsLabel: "Dr Yatin Desai",
+      // Verbatim from the most recent orthopaedics visit
+      // (15 Aug 2025, Dr Yatin Desai — the 3-month milestone review).
       lines: [
-        "**Findings**: Post-operative left Achilles repair · functional recovery",
-        "**Plan**: Physiotherapy continuation | step-down follow-up cadence",
+        "**Findings**: Achilles repair, **good functional recovery at 3 months** — continue rehab",
+        "**Medications**: No active pain meds",
+        "**Plan**: 6-month review — final discharge if functional recovery complete",
       ],
       consultations: [
         {
@@ -1310,9 +1337,11 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "5 Jun '25 - 14 Feb '26",
       consultationCount: 6,
       doctorsLabel: "Dr Lav Selarka",
+      // Verbatim from the most recent ENT visit (14 Feb 2026, Dr Lav Selarka).
       lines: [
-        "**Findings**: Recurrent viral URI / pharyngitis episodes",
-        "**Plan**: Symptomatic per-episode management",
+        "**Findings**: **Acute viral pharyngitis** (3rd episode this calendar year)",
+        "**Medications**: **Betadine gargles BD × 5 days** | Paracetamol PRN | Levocetirizine 5 mg HS × 5 days | Lozenges PRN",
+        "**Plan**: PRN if symptoms > 7 days or any worsening",
       ],
       consultations: [
         {
@@ -1470,10 +1499,12 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "16 Apr '25 - 9 May '26",
       consultationCount: 11,
       doctorsLabel: "Dr Nimit Shah",
+      // Verbatim from the most recent diabetology visit
+      // (9 May 2026, Dr Nimit Shah).
       lines: [
-        "**Findings**: T2DM on chronic management | hypothyroid stable | recent lipid recheck",
-        "**Medications**: **Amaryl M 1** (Glimepiride + Metformin) | **Feburic 40** (Febuxostat) | **Thyronorm 75** | FDson Total",
-        "**Plan**: SMBG diary | HbA1c every 3 mo | annual ACR + eGFR",
+        "**Findings**: T2DM, **sub-optimal control (HbA1c 8.2%)** | Early **diabetic nephropathy** (ACR 78) | Suspected early peripheral neuropathy",
+        "**Medications**: **Continue Amaryl M 1 BID** | **Plan SGLT2-i add-on next visit** (renal-protective in light of ACR) | Continue Feburic 40 | Continue Thyronorm 75 | **Discuss reconciliation of Glimepiride duplicate** with Cardiology team",
+        "**Plan**: After 1 month · earlier if any hypoglycaemia symptoms",
       ],
       labResults: [
         { name: "HbA1c", value: "8.2", unit: "%", flag: "high", refRange: "<7.0 (target)", date: "9 May 2026", note: "Above ADA target. Consider regimen step-up." },
@@ -1528,10 +1559,12 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "16 Apr '25 - 20 Jan '26",
       consultationCount: 8,
       doctorsLabel: "Dr Bhavesh Roy",
+      // Verbatim from the most recent cardiology visit
+      // (20 Jan 2026, Dr Bhavesh Roy).
       lines: [
-        "**Findings**: Stable on regimen | post-CVA secondary prevention",
-        "**Medications**: **Rozavel A 10/75** (Aspirin + Rosuvastatin) | **Clopilet 75** (Clopidogrel) | **Telma 40** (Telmisartan) | **Telma H** (Telmisartan + HCT)",
-        "**Plan**: Annual review | DAPT de-escalation review **overdue**",
+        "**Findings**: CAD + post-CVA — **DAPT-duration review overdue per ESC 2024** | Sub-optimal BP on multi-drug regimen",
+        "**Medications**: Continue **Aspirin 75 mg OD** | **Hold formal Clopidogrel review** — discuss de-escalation at the very next visit | Switch **Telma 40** to **Telma H** (Telmisartan + HCT) for BP control",
+        "**Plan**: **Within 4 weeks — DAPT de-escalation visit (not yet booked, flagged)**",
       ],
       labResults: [
         { name: "LDL-C", value: "98", unit: "mg/dL", flag: "high", refRange: "<70 (post-CVA target)", date: "20 Jan 2026", note: "Above the secondary-prevention LDL target." },
@@ -1585,10 +1618,11 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 Jul '25 - 9 May '26",
       consultationCount: 5,
       doctorsLabel: "Dr Tejas Modi",
+      // Verbatim from the most recent GI visit (9 May 2026, Dr Tejas Modi).
       lines: [
-        "**Findings**: Chronic functional constipation pattern · NAFLD surveillance",
-        "**Medications**: **Softovac** (Ispaghula) | **Pruvict 1 mg** (Prucalopride) | **Cremaffin Plus** | **Bistide 3 mg** (Plecanatide)",
-        "**Plan**: Bowel-routine optimisation | NAFLD-driven LFT surveillance",
+        "**Findings**: **Chronic functional constipation** (~3 years) | **NAFLD** on routine LFT surveillance",
+        "**Medications**: Continue **Softovac (Ispaghula)** PRN | **Pruvict 1 mg OD** | **Cremaffin Plus 15 mL HS** PRN | **Bistide 3 mg OD** (Plecanatide) | Lifestyle measures",
+        "**Plan**: After 6 months · sooner if any alarm features",
       ],
       consultations: [
         {
@@ -1613,9 +1647,12 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 Sep '25 - 26 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Sowani / Dr Nikhil Dave",
+      // Verbatim from the most recent neurology visit
+      // (26 Mar 2026, Dr Nikhil Dave).
       lines: [
-        "**Findings**: Chronic headache pattern post-CVA · no fresh focal deficit",
-        "**Plan**: Headache workup ongoing · no acute change",
+        "**Findings**: Chronic tension-type headache, **clinically stable** | Post-CVA, no fresh signs",
+        "**Medications**: Continue Paracetamol PRN | No fresh additions",
+        "**Plan**: After 3 months · with MRI report",
       ],
       openLoops: ["Neurology likely advised **follow-up MRI brain** post-CVA, no report on file"],
       consultations: [
@@ -1654,10 +1691,12 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "16 Feb - 27 Mar '26",
       consultationCount: 4,
       doctorsLabel: "Dr Payal Shah",
+      // Verbatim from the most recent endocrinology visit
+      // (27 Mar 2026, Dr Payal Shah).
       lines: [
-        "**Findings**: High PTH on screening · history of renal calculi 15 y back · no fracture",
-        "**Medications**: **Thyronorm 75** | **Linorma T3 5 mcg** (Liothyronine)",
-        "**Plan**: Primary hyperparathyroidism workup | T3+T4 combination under review",
+        "**Findings**: **Primary hyperparathyroidism (PHPT) confirmed biochemically** — PTH 118 with Ca 10.8 and Vit D deficiency | Over-replaced hypothyroidism on T3 + T4 (TSH 0.18)",
+        "**Medications**: **Stop Linorma T3** (over-replacement) | **Continue Thyronorm 75 OD** alone | **Vit D 60K weekly × 8 weeks** loading | **Calcitriol 0.25 mcg OD** continued | Hydration | Avoid thiazide diuretics in HTN regimen",
+        "**Plan**: After 8 weeks · with all imaging + repeat PTH + Vit D + Ca",
       ],
       labResults: [
         { name: "PTH (intact)", value: "118", unit: "pg/mL", flag: "high", refRange: "15–65", date: "27 Mar 2026", note: "Primary hyperparathyroidism workup trigger." },
@@ -1872,10 +1911,12 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "25 Aug '25 - 25 Mar '26",
       consultationCount: 8,
       doctorsLabel: "Dr Navneet Shah / Dr Nanavaty",
+      // Verbatim from the most recent Internal Medicine visit
+      // (25 Mar 2026, Dr Nanavaty — regimen-consolidation review).
       lines: [
-        "**Findings**: **TG 2898 mg/dL** (11 Mar) responding to therapy (TG 798 mg/dL on 17 Mar, ~73% reduction in 6 days) | **HbA1c 8.5%** with fasting 191 mg/dL | S. creatinine 0.85 (preserved) | random sugar 98 mg/dL",
-        "**Medications**: **Valzaar 80** (Valsartan) | **Amlodac 5** | **Inderal LA 20** (Propranolol) | **Ecospin 75** | **Rozavel EZ 20** (Rosuvastatin + Ezetimibe)",
-        "**Plan**: TG trajectory positive; consider fibrate add-on if rebound | aggressive HTN reconciliation needed",
+        "**Findings**: Severe hypertriglyceridaemia, **acute phase resolved**; chronic surveillance phase | DM-II, HTN, dyslipidaemia all sub-optimal",
+        "**Medications**: Continue full regimen | Reinforce dietary discipline",
+        "**Plan**: After 2-3 weeks",
       ],
       labResults: [
         { name: "Triglycerides", value: "2898", unit: "mg/dL", flag: "critical", refRange: "<150", date: "11 Mar 2026", note: "Pancreatitis-risk territory. Fibrate indicated above 500." },
@@ -1949,10 +1990,11 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "11 Apr '25 - 12 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
+      // Verbatim from the most recent GI visit (12 Mar 2026, Dr Ajay Choksey).
       lines: [
-        "**Findings**: Watery stool | nausea | atypical chest pain | recurrent pancreatitis trajectory",
-        "**Medications**: **Nexpro 40** (Esomeprazole) | **Ganaton 50** (Itopride) | **Oson O** (Ofloxacin + Ornidazole)",
-        "**Plan**: Functional GI workup | chronic PPI + prokinetic",
+        "**Findings**: **Acute pancreatitis (mild, Balthazar A clinically)** — 13th episode | Background severe hypertriglyceridaemia",
+        "**Medications**: **NPO × 24 h, then clear liquids** | IV NS 100 mL/h × 24 h (outpatient short bridge) | **Buscopan 10 mg q8h IV** | Tramadol 50 mg IV slow for pain | **Oson O** (Ofloxacin + Ornidazole) for stool symptoms × 5 days | Continue Nexpro 40 | Continue Ganaton 50 | **Bistide 3 mg HS** (Plecanatide for bowel routine, started today)",
+        "**Plan**: Within 1 week · USG abdomen if symptoms persist",
       ],
       labResults: [
         { name: "Serum Lipase", value: "412", unit: "U/L", flag: "high", refRange: "0–160", date: "12 Mar 2026", note: "Elevated during the 13th acute pancreatitis episode." },
@@ -2002,10 +2044,12 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "18 Aug - 13 Nov '25",
       consultationCount: 5,
       doctorsLabel: "Dr Kamlesh Patel / Dr Kaustubh Patel",
+      // Verbatim from the most recent urology visit
+      // (13 Nov 2025, Dr Kaustubh Patel).
       lines: [
-        "**Findings**: UTI · 15-20 pus cells · poor flow · hesitancy",
-        "**Medications**: **Veltam 0.4** (Tamsulosin) | **Urotone SR 75** (Bethanechol) | **Premarin** vaginal cream",
-        "**Plan**: Recurrent UTI prophylaxis | bladder-neck dysfunction management",
+        "**Findings**: Voiding dysfunction in DM-II post-menopausal female — **mixed under-active bladder + bladder-neck dysfunction**",
+        "**Medications**: Continue **Veltam 0.4 mg HS** (Tamsulosin — bladder-neck relaxation) | **Add Urotone SR 75 mg OD** (Bethanechol — for under-active bladder contraction) | Continue Premarin vaginal | Periodic urine culture",
+        "**Plan**: **Urodynamics-anchored review (not yet booked)**",
       ],
       openLoops: [
         "Urology has not booked a **bladder-function review** despite contradictory Tamsulosin + Bethanechol regimen, reconciliation visit still pending",
@@ -2048,10 +2092,12 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "8 Sep - 27 Oct '25",
       consultationCount: 3,
       doctorsLabel: "Dr Bhavesh Roy",
+      // Verbatim from the most recent cardiology visit
+      // (27 Oct 2025, Dr Bhavesh Roy).
       lines: [
-        "**Findings**: Easy fatigue on Propranolol · BP 110/70 after skipping meds (over-suppression risk)",
-        "**Medications**: **Valzaar 80** | **Inderal 20** | **Amlodac 5** | **Ecospin 75** | **Rozavel EZ 20**",
-        "**Plan**: De-escalation discussion needed | statin maximised, fibrate decision separate",
+        "**Findings**: **β-blocker over-suppression risk** on full anti-HTN regimen | CV risk well controlled overall",
+        "**Medications**: **Reduce Inderal LA 20 → Inderal 10 OD** (down-titration) | Continue Valzaar 80, Amlodac 5, Ecospin 75 | Continue Rozavel EZ 20 (statin maximised)",
+        "**Plan**: After 4 weeks · with BP diary + ECG",
       ],
       consultations: [
         {
@@ -2076,10 +2122,11 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "13 Apr '26",
       consultationCount: 1,
       doctorsLabel: "Dr Talati / Dr Rushikesh Shah",
+      // Verbatim from the diabetology visit (13 Apr 2026, Dr Talati).
       lines: [
-        "**Findings**: Uncontrolled DM-II | itching all over body (allergic vs hyperglycaemic)",
-        "**Medications**: **Ryzodeg 100** (Insulin) | **Eurepa V** (Repaglinide + Voglibose) | **LTK 50** (Losartan) | **CTD M** (Chlorthalidone + Metoprolol) | **Thyronorm 50**",
-        "**Plan**: Insulin titration | repeat workup at next visit",
+        "**Findings**: **Uncontrolled Type-2 Diabetes Mellitus** — likely insulin requirement | Pruritus probably hyperglycaemic + dry skin (allergic component to be ruled out)",
+        "**Medications**: **Start Ryzodeg 100 SC** — pre-breakfast titration | **Eurepa V** (Repaglinide + Voglibose) with meals | **LTK 50** (Losartan) for HTN | **CTD M** (Chlorthalidone + Metoprolol combination) for HTN | Continue **Thyronorm 50 OD** | **Cetirizine 10 mg HS** for pruritus × 7 days | **Emollient** twice daily for dry skin",
+        "**Plan**: Within 2-3 weeks · with SMBG diary + repeat labs",
       ],
       openLoops: [
         "Diabetology advised **insulin titration + repeat workup at next visit**, follow-up not yet booked",
@@ -2267,10 +2314,11 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "24 - 26 Feb '26 (IPD)",
       consultationCount: 1,
       doctorsLabel: "Dr Ajay Choksey",
+      // Verbatim from the IPD admission Rx (24 Feb 2026, Dr Ajay Choksey).
       lines: [
-        "**Findings**: H/O **jaundice** | **fever** | **abdominal pain** | burning micturition | decreased oral intake | **itching over body × 1-1.5 months** | HAV IgM positive on admission",
-        "**Medications**: **Wysolone 10 mg** (Prednisolone, taper started) | **Cilamin 250 mg** (Penicillamine) | **Zinfate** (Zinc) | **Ursocol 300** (UDCA) | **Hepamerz sachet** (L-ornithine L-aspartate) | **Aldactone 25** (Spironolactone for ascites) | **Looz syrup** (Lactulose for HE prophylaxis) | **Thyrox 125 mcg** continued",
-        "**Plan**: Discharged on **26 Feb in BETTER condition** | review LFTs at every OPD | continue chelation + zinc | symptomatic + hepatoprotective regimen | OPD review **3 Mar 2026**",
+        "**Findings**: **Acute Hepatitis A** (HAV IgM positive) on a background of **Wilson's disease** with **hepatic decompensation** | Mild ascites | Suspected UTI (burning micturition)",
+        "**Medications**: **Wysolone 10 mg OD** | **Cilamin 250 mg BID** (Penicillamine) | **Zinfate OD** (Zinc) | **Ursocol 300 BID** (UDCA) | **Hepamerz** sachet TID | **Aldactone 25 OD** (Spironolactone) | **Looz** 15 mL HS (Lactulose) | **Thyrox 125 mcg OD** continued | Cefixime 200 mg BID (empirical for UTI) | IV fluids — DNS @ 75 mL/h",
+        "**Plan**: Discharge planned by 26 Feb if LFTs trend down; OPD review on 3 Mar 2026",
       ],
       // Specialty-level abnormal labs from the admission. Latest in-stay reading
       // shown for each parameter. Normal CBC parameters from the same panels
@@ -2355,10 +2403,12 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "24 Feb - 25 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
+      // Verbatim from the most recent OPD follow-up
+      // (25 Mar 2026, Dr Ajay Choksey — the 1-month milestone visit).
       lines: [
-        "**Findings**: Serial LFT monitoring across 5 visits | Bilirubin Total + Direct + Indirect + SGPT/ALT trended at every visit | clinical recovery, discharge condition documented as 'BETTER'",
-        "**Medications (ongoing)**: **Cilamin 250 mg** | **Zinfate** | **Wysolone** taper schedule | **Ursocol 300** | **Folimax D3 Forte** | **Nusam 400** (SAMe) | **Hepamerz** | **ProHance LIV** | **Ostocalcium** | **Pregaba 50** (neuropathic component) | **Thyrox 125 mcg**",
-        "**Plan**: Continue chelation indefinitely | quarterly LFT review at minimum | watch for Wilson's-related neuropsychiatric features | HAV is acute, expect resolution; re-test IgG seroconversion",
+        "**Findings**: Acute HAV, **resolved** | Wilson's disease, **stable on chelation** | Hypothyroidism, stable",
+        "**Medications**: Cilamin 250 mg BID — **continue indefinitely** | Zinfate OD — continue | Ursocol 300 BID × 4 more weeks | Folimax D3 Forte weekly | Nusam 400 BID | Hepamerz BD | Ostocalcium OD | ProHance LIV | Pregaba 50 PRN | Thyrox 125 mcg OD",
+        "**Plan**: 24 Jun 2026 · 3-month interval | sooner if any neuropsychiatric symptoms",
       ],
       // Latest abnormal labs across the 5-visit follow-up window. SGPT and
       // Bilirubin have improved from admission values but are not yet normal.
@@ -2483,9 +2533,10 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 Mar '26",
       consultationCount: 1,
       doctorsLabel: "Dr Sejal Shah",
+      // Verbatim from the Ophthalmology visit (10 Mar 2026, Dr Sejal Shah).
       lines: [
-        "**Findings**: Slit-lamp examination for **Kayser-Fleischer ring** (Wilson's-related copper deposition in Descemet's membrane). Result narrative not captured in structured data.",
-        "**Plan**: Result feeds back into Gastroenterology's chelation-monitoring loop. Repeat slit-lamp annually until KF ring resolves on adequate chelation.",
+        "**Findings**: Slit-lamp screening for **Kayser-Fleischer ring** (referral from Wilson's disease management)",
+        "**Plan**: Annual slit-lamp KF-ring re-assessment | sooner if any visual symptoms",
       ],
       // No structured lab rows from this ophthalmology visit — the slit-lamp
       // finding is a clinical observation, not a measurement. Omit the labs

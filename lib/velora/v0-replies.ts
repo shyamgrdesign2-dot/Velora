@@ -161,7 +161,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 12,
       doctorsLabel: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -303,7 +303,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Dr Mahesh D Patel/ Dr S. Das",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -327,7 +327,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Dr Nikhil Dave",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -397,7 +397,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr Monark Shah",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -434,7 +434,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "DR AMIT SHAH",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -575,7 +575,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep jain",
       lines: [
-        "**Findings**: Right Breast cancer (Confirmed) · pT1cN0 stage IA per one condition_occurrence row.",
+        "**Findings**: Right Breast cancer (Confirmed) · pT1cN0 stage IA (Confirmed)",
         "**Medications**: **ONCOLET 2.5MG TABLET** | **EFFECTOL TABLET** | **SHELCAL 500MG TABLET** | **DENOSTEOREL 60MG INJECTION**",
         "**Plan**: Patient's all available relatives have been explained regarding patient's **advanced stage disease condition, Poor prognosis** and all possible management options in detail in English (including side effect profile and financial aspects). **Follow up after 1 year.**",
       ],
@@ -585,7 +585,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           visitType: "OPD",
           doctor: "Dr Nahush Tahiliani",
           headline: "**Letrozole 2.5 mg + Denosumab 60 mg s/c + Ca + Vit D** initiated",
-          diagnosis: "Right Breast cancer (Confirmed · pT1cN0 stage IA per condition_occurrence)",
+          diagnosis: "Right Breast cancer (Confirmed) · pT1cN0 stage IA (Confirmed)",
           medications:
             "**ONCOLET 2.5MG TABLET** | **EFFECTOL TABLET** | **SHELCAL 500MG TABLET** | **DENOSTEOREL 60MG INJECTION**",
           additionalNotes:
@@ -639,7 +639,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           visitType: "OPD",
           doctor: "Dr Dhara Girish Pandya",
           headline: "**Pre Op Profile Major (Cancer)** ordered · 0 drugs",
-          investigations: "Pre Op Profile Major (Cancer) Remark: (per observation.investigation_text)",
+          investigations: "Pre Op Profile Major (Cancer)",
         },
         {
           date: "11 May 2026",
@@ -802,12 +802,12 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     // ── 8 · Dermatology · Dr Niyati Parikh · 1 visit, 3 drugs (eczematous dermatitis) ──
     {
       source: { specialty: "Dermatology", author: "Dr Niyati Parikh", date: "28 Apr 2026" },
-      reason: "Eczematous dermatitis (right leg) per condition_occurrence · 3-item Rx · follow-up 28 May 2026.",
+      reason: "Eczematous dermatitis (right leg) · 3-item Rx · follow-up 28 May 2026.",
       dateRangeLabel: "28 Apr '26",
       consultationCount: 1,
       doctorsLabel: "Dr Niyati Parikh",
       lines: [
-        "**Findings**: Eczematous dermatitis (right leg) per condition_occurrence.",
+        "**Findings**: Eczematous dermatitis (right leg)",
         "**Medications**: **UBIL 20MG TABLET** | **MOMATE F 15GM CREAM** | **AVEENO DERMEXA DAILY EMOLLIENT CREAM**",
         "**Plan**: Follow up 28 May 2026.",
       ],
@@ -817,7 +817,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           visitType: "OPD",
           doctor: "Dr Niyati Parikh",
           headline: "Dermatology · Bilastine + Mometasone/Fusidic + emollient",
-          diagnosis: "Eczematous dermatitis (right leg) — from condition_occurrence row.",
+          diagnosis: "Eczematous dermatitis (right leg)",
           medications:
             "**UBIL 20MG TABLET** | **MOMATE F 15GM CREAM** | **AVEENO DERMEXA DAILY EMOLLIENT CREAM**",
           followUp: "28 May 2026",
@@ -927,7 +927,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Ms Shruti Bhardwaj",
       lines: [
-        "**Findings**: No diagnostic observation_text rows captured.",
+        "**Findings**: Visit recorded · no diagnostic note on file",
         "**Plan**: No medications · no detailed advice on file.",
       ],
       consultations: [
@@ -2011,7 +2011,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 5,
       doctorsLabel: "Dr Ajit Sowani / Dr Nikhil Dave",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -2159,7 +2159,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr SEJAL SHAH",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -2525,7 +2525,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 3,
       doctorsLabel: "Dr Lav Selarka",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {
@@ -2851,7 +2851,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr SEJAL SHAH",
       lines: [
-        "**Findings**: (no observation_text recorded)",
+        "**Findings**: Visit recorded · no diagnostic note on file",
       ],
       consultations: [
         {

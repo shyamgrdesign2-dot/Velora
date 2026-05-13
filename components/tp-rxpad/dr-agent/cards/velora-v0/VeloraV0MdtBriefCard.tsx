@@ -880,30 +880,73 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   up to the heading. Renders just under the section bar. */}
               <SpecialtyContextBanner rec={rec} />
               <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[10px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
-                {rec.lines.map((line, i) => {
-                  const labelMatch = line.match(/^\*\*([^*]+)\*\*:\s*(.*)$/)
-                  const label = labelMatch?.[1]
-                  const content = labelMatch?.[2] ?? line
-                  // Hide a medications row entirely when there's nothing
-                  // ongoing.
-                  if (label && /medications?/i.test(label) && /^no ongoing\b/i.test(content)) {
-                    return null
-                  }
-                  return (
-                    // Inline-flow paragraph: the label chip floats at the
-                    // start, content wraps after it. No bullet dot — the chip
-                    // is the visual anchor (mirrors the medical-history
-                    // section's rendering style).
-                    <p key={i} className="min-w-0">
-                      {label && (
-                        <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                          {label}
-                        </span>
-                      )}
-                      <HighlightLine text={content} />
-                    </p>
+                {/* Group lines by label (Findings / Medications / Plan)
+                    and render ONE chip per category with bullet pointers
+                    below — when a specialty has notes from multiple
+                    doctors, the chip stays a single anchor and each
+                    doctor's note reads as a sub-bullet underneath. */}
+                {(() => {
+                  type Row = { label: string | undefined; content: string }
+                  const rows: Row[] = rec.lines.map((line) => {
+                    const m = line.match(/^\*\*([^*]+)\*\*:\s*(.*)$/)
+                    return { label: m?.[1], content: m?.[2] ?? line }
+                  })
+                  // Filter out "Medications: No ongoing …" rows entirely.
+                  const filtered = rows.filter(
+                    (r) => !(r.label && /medications?/i.test(r.label) && /^no ongoing\b/i.test(r.content)),
                   )
-                })}
+                  // Group consecutive rows by label. Unlabelled rows
+                  // attach to whichever group they happen to be next to,
+                  // so multi-row content under a single label stays
+                  // contiguous.
+                  type Group = { label: string | undefined; items: string[] }
+                  const groups: Group[] = []
+                  for (const r of filtered) {
+                    const last = groups[groups.length - 1]
+                    if (last && last.label === r.label) {
+                      last.items.push(r.content)
+                    } else {
+                      groups.push({ label: r.label, items: [r.content] })
+                    }
+                  }
+                  return groups.map((g, gi) => {
+                    // Single-item group → inline-flow paragraph (chip
+                    // hugs the content, no bullet dot — keeps short rows
+                    // compact). Multi-item group → chip above, bullets
+                    // below.
+                    if (g.items.length === 1) {
+                      return (
+                        <p key={gi} className="min-w-0">
+                          {g.label && (
+                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                              {g.label}
+                            </span>
+                          )}
+                          <HighlightLine text={g.items[0]} />
+                        </p>
+                      )
+                    }
+                    return (
+                      <div key={gi} className="flex flex-col gap-[4px]">
+                        {g.label && (
+                          <span className="inline-flex w-fit items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+                            {g.label}
+                          </span>
+                        )}
+                        <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px]">
+                          {g.items.map((it, ii) => (
+                            <li key={ii} className="flex gap-[6px]">
+                              <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+                              <span className="min-w-0">
+                                <HighlightLine text={it} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  })
+                })()}
                 {/* Lab results — fourth pointer alongside Findings / Medications / Plan.
                     Renders only when the specialty has abnormal labs (or a
                     normal-rollup count) to show. Policy: every abnormal lab

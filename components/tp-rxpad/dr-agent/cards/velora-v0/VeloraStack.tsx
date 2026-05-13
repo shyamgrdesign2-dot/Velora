@@ -13,30 +13,75 @@ import { FloatingTooltip } from "./highlight"
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Tiny pill used to surface a cited guideline body inline (e.g. "ACC/AHA 2023 §6.2").
- *  When `description` or `fetches` are supplied, a small book icon appears next to
- *  the chip and hovering opens a tooltip explaining what the guideline body is and
- *  which fields it drives in this panel — a different shape from the source eye-icon
- *  so the two don't get confused. */
+ *
+ *  Hover opens a four-block tooltip designed to build a doctor's confidence
+ *  that the guideline citation is grounded in *their* patient — not a generic
+ *  textbook reference. The four blocks are:
+ *
+ *    ① Guideline    Body + year + section + (when set) the readable
+ *                    long-form name so a junior doctor or non-specialist
+ *                    doesn't need to look up "AASLD" or "NCCN".
+ *    ② What it is   One-line plain-English description of the guideline's
+ *                    scope ("NCCN Colon Cancer surveillance guideline").
+ *    ③ Why we        The patient-specific trigger — the chart finding that
+ *      picked this   activated this guideline (e.g. "Patient on DAPT × 10
+ *                    months post-CVA — ESC recommends de-escalation review
+ *                    beyond month 12"). This is the trust-building block.
+ *    ④ What we       Which fields in the current panel are derived from
+ *      show from it  this guideline.
+ *
+ *  A confidence pill in the header ("Established", "Supportive",
+ *  "Exploratory") lets the doctor calibrate trust before they act on the
+ *  synthesis. Established = directly maps to a published recommendation;
+ *  Supportive = inferred from the guideline's principles; Exploratory =
+ *  guidance is partial / consensus-based.
+ *
+ *  A different shape from the source eye-icon used elsewhere, so the two
+ *  don't get confused. */
 export function GuidelineChip({
   body,
   year,
   section,
   description,
   fetches,
+  whyPicked,
+  confidence,
+  readableBody,
   size = "sm",
 }: {
   body: string
   year?: string
   section?: string
-  /** What this guideline body is — one short sentence. */
   description?: string
-  /** Which fields this guideline drives in the current panel. */
   fetches?: string
+  whyPicked?: string
+  confidence?: "established" | "supportive" | "exploratory"
+  readableBody?: string
   size?: "sm" | "xs"
 }) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLSpanElement>(null)
-  const hoverable = !!(description || fetches)
+  const hoverable = !!(description || fetches || whyPicked || readableBody)
+
+  // Confidence-pill style — green for established / blue for supportive /
+  // amber for exploratory. Reads as a soft "how confident is Velora" tag,
+  // not a clinical urgency signal.
+  const confidenceClass =
+    confidence === "established"
+      ? "bg-tp-success-100 text-tp-success-800"
+      : confidence === "supportive"
+        ? "bg-tp-blue-100 text-tp-blue-800"
+        : confidence === "exploratory"
+          ? "bg-tp-warning-100 text-tp-warning-800"
+          : ""
+  const confidenceLabel =
+    confidence === "established"
+      ? "Established"
+      : confidence === "supportive"
+        ? "Supportive"
+        : confidence === "exploratory"
+          ? "Exploratory"
+          : ""
 
   return (
     <span
@@ -60,7 +105,7 @@ export function GuidelineChip({
       </span>
       {hoverable && (
         <span
-          aria-label="What this guideline is"
+          aria-label="Why this guideline applies"
           className="inline-flex cursor-pointer items-center text-tp-violet-600 hover:text-tp-violet-800"
         >
           <InfoCircle size={12} variant="Linear" />
@@ -70,24 +115,66 @@ export function GuidelineChip({
         open={hoverable && open}
         triggerRef={triggerRef}
         placement="top-right"
-        width={280}
-        className="rounded-[6px] bg-tp-slate-800 px-[10px] py-[8px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-lg"
+        width={320}
+        className="rounded-[6px] bg-tp-slate-800 px-[12px] py-[10px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-xl"
       >
-        <span className="block text-tp-slate-300">
-          <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Guideline</span>
-          <br />
-          <span className="text-white">{body}{year ? ` ${year}` : ""}{section ? ` ${section}` : ""}</span>
+        {/* ── Header row · guideline citation + (optional) confidence pill ── */}
+        <span className="flex items-start justify-between gap-[8px]">
+          <span className="block text-tp-slate-300">
+            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Guideline</span>
+            <br />
+            <span className="font-semibold text-white">
+              {body}
+              {year ? ` · ${year}` : ""}
+              {section ? ` · ${section}` : ""}
+            </span>
+            {readableBody && (
+              <>
+                <br />
+                <span className="text-[10.5px] text-tp-slate-400">{readableBody}</span>
+              </>
+            )}
+          </span>
+          {confidence && (
+            <span
+              className={cn(
+                "shrink-0 rounded-[3px] px-[5px] py-[1px] text-[9px] font-bold uppercase tracking-[0.06em]",
+                confidenceClass,
+              )}
+            >
+              {confidenceLabel}
+            </span>
+          )}
         </span>
+
+        {/* ── What this guideline is (plain-English scope) ── */}
         {description && (
-          <span className="mt-[6px] block border-t border-tp-slate-700 pt-[6px] text-tp-slate-300">
-            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">What it is</span>
+          <span className="mt-[8px] block border-t border-tp-slate-700 pt-[8px]">
+            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+              What this guideline is
+            </span>
             <br />
             <span className="text-white">{description}</span>
           </span>
         )}
+
+        {/* ── Why we picked this (patient-specific trigger — the trust block) ── */}
+        {whyPicked && (
+          <span className="mt-[8px] block border-t border-tp-slate-700 pt-[8px]">
+            <span className="font-semibold uppercase tracking-[0.06em] text-tp-violet-300">
+              Why it applies to this patient
+            </span>
+            <br />
+            <span className="text-white">{whyPicked}</span>
+          </span>
+        )}
+
+        {/* ── What we show from it (the field mapping) ── */}
         {fetches && (
-          <span className="mt-[6px] block border-t border-tp-slate-700 pt-[6px] text-tp-slate-300">
-            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Drives in this panel</span>
+          <span className="mt-[8px] block border-t border-tp-slate-700 pt-[8px]">
+            <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+              What we show from it
+            </span>
             <br />
             <span className="text-white">{fetches}</span>
           </span>

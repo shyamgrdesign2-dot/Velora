@@ -8,7 +8,15 @@ import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
 import { GuidelineChip } from "./VeloraStack"
 import { FloatingTooltip, HighlightLine, InfoTip, SourceInfoTip, shortDate } from "./highlight"
-import type { VeloraV0MdtBriefData, VeloraV0Attribution, VeloraV0MedicalHistoryGroup, VeloraV0Synthesis } from "../../types"
+import type {
+  VeloraV0MdtBriefData,
+  VeloraV0Attribution,
+  VeloraV0MedicalHistoryGroup,
+  VeloraV0Synthesis,
+  VeloraV0Consultation,
+  VeloraV0LabResult,
+  VeloraV0DischargeSummary,
+} from "../../types"
 
 /**
  * Cross-consultation brief — Intent ① (flagship). Two CardShells:
@@ -88,6 +96,43 @@ function compactDoctorsLabel(raw: string): string {
     .join(" / ")
 }
 
+/**
+ * SpecialtyContextBanner — quiet inline identity line at the top of every
+ * specialty body.
+ *
+ * No background, no border, no highlight — just a single bracketed line
+ * with pipe dividers, the same "structural punctuation" visual language
+ * the body PipeDividers use. Reads as a caption under the section heading,
+ * not as a decorated panel.
+ *
+ * Format:
+ *   (Dr Name  |  N visits  |  date range)
+ *
+ * Renders nothing when no structured doctor / visit / range info exists.
+ */
+function SpecialtyContextBanner({ rec }: { rec: VeloraV0Attribution }) {
+  const doctorLabel = rec.doctorsLabel ? compactDoctorsLabel(rec.doctorsLabel) : null
+  const visitCount = typeof rec.consultationCount === "number" ? rec.consultationCount : null
+  const dateRange = rec.dateRangeLabel ?? null
+  const segments: string[] = []
+  if (doctorLabel) segments.push(doctorLabel)
+  if (visitCount !== null) segments.push(`${visitCount} visit${visitCount === 1 ? "" : "s"}`)
+  if (dateRange) segments.push(dateRange)
+  if (segments.length === 0) return null
+  return (
+    <div className="ml-[8px] mt-[1px] text-[12px] leading-[1.45] text-tp-slate-500">
+      <span className="text-tp-slate-400">(</span>
+      {segments.map((s, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <span className="mx-[7px] text-tp-slate-400">|</span>}
+          <span>{s}</span>
+        </React.Fragment>
+      ))}
+      <span className="text-tp-slate-400">)</span>
+    </div>
+  )
+}
+
 function HeaderTrailing({
   rec,
   onOpenSidebar,
@@ -95,48 +140,157 @@ function HeaderTrailing({
   rec: VeloraV0Attribution
   onOpenSidebar: () => void
 }) {
-  // Compact bracketed trailing: ( date | N visits | first doctor +N ) →
-  //
-  // The parens anchor the metadata visually so the eye reads it as a self-
-  // contained tag, leaving the chevron clearly outside as the click target.
-  // Lighter slate-300 pipes between segments so the dividers recede and the
-  // values carry the eye.
-  //
-  // Multi-doctor specialty labels are compacted to "Dr First +N" — the full
-  // doctor list lives in the sidebar that the chevron opens.
-  // Segments ordered DOCTOR → VISITS → DATE per design call (doctor first
-  // because that's the most-scanned identity; visit count anchors how much
-  // engagement; date last because it's the least time-sensitive read).
-  const hasStructured = rec.dateRangeLabel || rec.doctorsLabel || typeof rec.consultationCount === "number"
-  const segments: string[] = []
-  if (hasStructured) {
-    if (rec.doctorsLabel) segments.push(compactDoctorsLabel(rec.doctorsLabel))
-    if (typeof rec.consultationCount === "number") segments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
-    if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
-  } else {
-    segments.push(shortDate(rec.source.date))
-  }
+  // Header trailing — now just the chevron click target. The doctor name,
+  // visit count and date range render as a bracketed caption inside the
+  // body (SpecialtyContextBanner). The chevron is the affordance.
   return (
     <button
       type="button"
       onClick={onOpenSidebar}
-      className="flex shrink-0 items-center gap-[5px] rounded-[4px] px-[6px] py-[2px] text-[12px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
+      className="flex shrink-0 items-center rounded-[4px] p-[3px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
       aria-label={`Open ${rec.source.specialty} consultation timeline`}
     >
-      {/* Parens + dividers all at slate-500 so the "structural punctuation"
-          matches the in-body PipeDivider and reads as one design layer. */}
-      <span className="flex items-center">
-        <span className="text-tp-slate-500">(</span>
-        {segments.map((s, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
-            <span>{s}</span>
-          </React.Fragment>
-        ))}
-        <span className="text-tp-slate-500">)</span>
-      </span>
-      <ArrowRight2 size={14} variant="Linear" />
+      <ArrowRight2 size={16} variant="Bold" />
     </button>
+  )
+}
+
+/** Small label+content paragraph used by both Rx expansion and the discharge
+ *  summary blocks. Keeps the visual style uniform with the main specialty
+ *  card body (inline-flow + chip label, no bullet dot). */
+function RxRow({ label, content }: { label: string; content: string }) {
+  return (
+    <p className="text-[12.5px] leading-[1.55] text-tp-slate-700">
+      <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+        {label}
+      </span>
+      <HighlightLine text={content} />
+    </p>
+  )
+}
+
+/** Lab-results block inside a consultation expansion. Same policy as the
+ *  specialty-card-level renderer (abnormal only by default), but rendered
+ *  compactly so multiple visits fit in the sidebar. */
+function ConsultationLabsRow({ labs, hiddenNormalCount }: { labs: VeloraV0LabResult[]; hiddenNormalCount?: number }) {
+  const visible = sortLabs(labs.filter((l) => l.flag !== "normal"))
+  if (visible.length === 0 && !hiddenNormalCount) return null
+  return (
+    <p className="text-[12.5px] leading-[1.55] text-tp-slate-700">
+      <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+        Lab results
+      </span>
+      {visible.map((lab, i) => (
+        <React.Fragment key={`${lab.name}-${i}`}>
+          {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
+          <LabChip lab={lab} />
+        </React.Fragment>
+      ))}
+      {hiddenNormalCount && hiddenNormalCount > 0 ? (
+        <span className="ml-[6px] text-[11.5px] text-tp-slate-500">
+          + {hiddenNormalCount} other parameter{hiddenNormalCount === 1 ? "" : "s"} within range
+        </span>
+      ) : null}
+    </p>
+  )
+}
+
+/** Discharge-summary block — rendered only when an IPD consultation carries
+ *  a `dischargeSummary` payload. Structured into the standard 7 sub-blocks
+ *  (admission line, final dx, presenting complaints, hospital course,
+ *  discharge condition / exam / advice / warning signs / functional). Each
+ *  sub-block is omitted when empty. */
+function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
+  return (
+    <div className="mt-[4px] flex flex-col gap-[7px] rounded-[8px] border border-tp-error-200/80 bg-tp-error-50/40 px-[10px] py-[9px]">
+      <div className="flex items-center gap-[5px] text-[10.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+        <Flag size={11} variant="Bulk" />
+        <span>Discharge summary</span>
+      </div>
+      {ds.admissionLine && (
+        <p className="text-[11.5px] leading-[1.5] text-tp-slate-600">{ds.admissionLine}</p>
+      )}
+      <RxRow label="Final diagnosis" content={ds.finalDiagnosis} />
+      {ds.presentingComplaints && <RxRow label="Presenting" content={ds.presentingComplaints} />}
+      <RxRow label="Hospital course" content={ds.hospitalCourse} />
+      {ds.dischargeCondition && <RxRow label="Condition" content={ds.dischargeCondition} />}
+      {ds.dischargeExam && <RxRow label="Exam at discharge" content={ds.dischargeExam} />}
+      {ds.dischargeAdvice && ds.dischargeAdvice.length > 0 && (
+        <div>
+          <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+            Advice
+          </span>
+          <ul className="ml-[2px] mt-[3px] flex flex-col gap-[2px] pl-[8px] text-[12.5px] leading-[1.5] text-tp-slate-700">
+            {ds.dischargeAdvice.map((a, i) => (
+              <li key={i} className="flex gap-[6px]">
+                <span className="mt-[7px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+                <span><HighlightLine text={a} /></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {ds.warningSigns && ds.warningSigns.length > 0 && (
+        <div>
+          <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-error-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-error-700">
+            Warning signs
+          </span>
+          <ul className="ml-[2px] mt-[3px] flex flex-col gap-[2px] pl-[8px] text-[12.5px] leading-[1.5] text-tp-slate-700">
+            {ds.warningSigns.map((w, i) => (
+              <li key={i} className="flex gap-[6px]">
+                <span className="mt-[7px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-error-400" />
+                <span><HighlightLine text={w} /></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {ds.functionalAssessment && <RxRow label="Functional" content={ds.functionalAssessment} />}
+    </div>
+  )
+}
+
+/** ConsultationExpansion — the body that appears when a sidebar timeline row
+ *  is expanded. Renders every Rx field the consultation populated, plus any
+ *  labs and (for IPD) the discharge summary. Mirrors the main specialty
+ *  card's inline-chip rhythm so the doctor sees one consistent shape. */
+function ConsultationExpansion({ consultation }: { consultation: VeloraV0Consultation }) {
+  const c = consultation
+  // Collect rows in canonical Rx order. Empty fields are skipped.
+  const rows: Array<{ label: string; content: string }> = []
+  if (c.symptoms) rows.push({ label: "Symptoms", content: c.symptoms })
+  if (c.examination) rows.push({ label: "Examination", content: c.examination })
+  if (c.diagnosis) rows.push({ label: "Diagnosis", content: c.diagnosis })
+  if (c.investigations) rows.push({ label: "Investigations", content: c.investigations })
+  if (c.medications) rows.push({ label: "Medications", content: c.medications })
+  if (c.advice) rows.push({ label: "Advice", content: c.advice })
+  if (c.followUp) rows.push({ label: "Follow-up", content: c.followUp })
+  if (c.surgery) rows.push({ label: "Surgery", content: c.surgery })
+  if (c.vaccinations) rows.push({ label: "Vaccinations", content: c.vaccinations })
+  if (c.additionalNotes) rows.push({ label: "Additional notes", content: c.additionalNotes })
+  // Legacy fallbacks — render only if no rich Rx fields populated.
+  if (rows.length === 0 && c.findings) rows.push({ label: "Findings", content: c.findings })
+  if (rows.length === 0 && c.plan) rows.push({ label: "Plan", content: c.plan })
+
+  const hasLabs = !!(c.labResults && c.labResults.length > 0) || !!c.hiddenNormalCount
+  const hasDischarge = !!c.dischargeSummary
+  const isEmpty = rows.length === 0 && !hasLabs && !hasDischarge
+
+  return (
+    <div className="mb-[6px] ml-[2px] mt-[2px] flex flex-col gap-[6px] rounded-[8px] border border-tp-slate-200 bg-tp-slate-50/60 px-[12px] py-[10px]">
+      {rows.map((r, i) => (
+        <RxRow key={i} label={r.label} content={r.content} />
+      ))}
+      {hasLabs && (
+        <ConsultationLabsRow labs={c.labResults ?? []} hiddenNormalCount={c.hiddenNormalCount} />
+      )}
+      {hasDischarge && <DischargeSummaryBlock ds={c.dischargeSummary!} />}
+      {isEmpty && (
+        <p className="text-[12px] italic leading-[1.5] text-tp-slate-500">
+          No further detail captured for this visit.
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -237,10 +391,14 @@ function SpecialtySidebar({
                           </span>
                         )}
                         <span className="text-[11.5px] text-tp-slate-500">· {c.doctor}</span>
-                        <span className="ml-auto text-tp-slate-400">
+                        <span className="ml-auto text-tp-slate-500">
+                          {/* Bold variant of ArrowRight2 + larger size gives the
+                              chevron a chunkier stroke so the affordance is
+                              obvious; slate-500 over slate-400 keeps it visible
+                              against the row hover state. */}
                           <ArrowRight2
-                            size={14}
-                            variant="Linear"
+                            size={16}
+                            variant="Bold"
                             style={{ transform: isExpanded ? "rotate(90deg)" : "none", transition: "transform 150ms ease" }}
                           />
                         </span>
@@ -250,37 +408,7 @@ function SpecialtySidebar({
                       </div>
                     </button>
                     {isExpanded && (
-                      <div className="mb-[6px] ml-[2px] mt-[2px] flex flex-col gap-[6px] rounded-[8px] border border-tp-slate-200 bg-tp-slate-50/60 px-[12px] py-[10px]">
-                        {c.findings && (
-                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
-                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                              Findings
-                            </span>
-                            <HighlightLine text={c.findings} />
-                          </p>
-                        )}
-                        {c.medications && (
-                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
-                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                              Medications
-                            </span>
-                            <HighlightLine text={c.medications} />
-                          </p>
-                        )}
-                        {c.plan && (
-                          <p className="text-[12.5px] leading-[1.5] text-tp-slate-700">
-                            <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                              Plan
-                            </span>
-                            <HighlightLine text={c.plan} />
-                          </p>
-                        )}
-                        {!c.findings && !c.medications && !c.plan && (
-                          <p className="text-[12px] italic leading-[1.5] text-tp-slate-500">
-                            No further detail captured for this visit.
-                          </p>
-                        )}
-                      </div>
+                      <ConsultationExpansion consultation={c} />
                     )}
                   </li>
                 )
@@ -325,8 +453,9 @@ function MedicalHistorySubheadingTag({
 }: {
   group: VeloraV0MedicalHistoryGroup
 }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLSpanElement>(null)
+  // Tooltip removed — sources + reasoning now consolidate into a single
+  // MedicalHistorySectionTooltip on the section heading above, so the
+  // body chips stay clean. Tone palette preserved.
   const tone = group.tone ?? "neutral"
   const toneClass =
     tone === "primary"
@@ -334,62 +463,253 @@ function MedicalHistorySubheadingTag({
       : tone === "positive"
         ? "bg-tp-violet-50 text-tp-violet-700"
         : "bg-tp-slate-100 text-tp-slate-700"
-  const hasTip = (group.sources && group.sources.length > 0) || !!group.reasoning
-  // Cap visible source rows so the tooltip doesn't grow unbounded.
-  const MAX_VISIBLE = 6
-  const visibleSources = group.sources?.slice(0, MAX_VISIBLE) ?? []
-  const overflow = (group.sources?.length ?? 0) - visibleSources.length
+  return (
+    <span
+      className={`mr-[6px] inline-flex shrink-0 items-center rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
+    >
+      {group.title}
+    </span>
+  )
+}
+
+/**
+ * MedicalHistorySectionTooltip — single ⓘ trigger in the Medical-history
+ * SectionSummaryBar's trailing slot. Aggregates Sources + reasoning across
+ * every group into one tooltip, so the doctor sees the audit trail once
+ * for the whole section instead of one tooltip per chip below.
+ */
+function MedicalHistorySectionTooltip({
+  groups,
+}: {
+  groups: VeloraV0MedicalHistoryGroup[]
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  const hasAny = groups.some(
+    (g) => (g.sources && g.sources.length > 0) || !!g.reasoning,
+  )
+  if (!hasAny) return null
   return (
     <>
       <span
         ref={ref}
-        className={`mr-[6px] inline-flex shrink-0 items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass} ${hasTip ? "cursor-help" : ""}`}
-        onMouseEnter={() => hasTip && setOpen(true)}
+        className="inline-flex cursor-help items-center text-tp-slate-500 hover:text-tp-slate-700"
+        onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        onFocus={() => hasTip && setOpen(true)}
+        onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        tabIndex={hasTip ? 0 : -1}
+        tabIndex={0}
+        aria-label="Sources for medical history"
       >
-        <span>{group.title}</span>
-        {hasTip && <InfoCircle size={16} variant="Linear" />}
+        <InfoCircle size={14} variant="Linear" />
       </span>
-      {hasTip && (
-        <FloatingTooltip
-          open={open}
-          triggerRef={ref}
-          placement="top-center"
-          width={320}
-          className="rounded-[6px] bg-tp-slate-800 px-[10px] py-[8px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-lg"
+      <FloatingTooltip
+        open={open}
+        triggerRef={ref}
+        placement="top-right"
+        width={340}
+        className="rounded-[6px] bg-tp-slate-800 px-[12px] py-[10px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-xl"
+      >
+        <span className="block font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+          Where this comes from
+        </span>
+        {/* Scrollable source list — every contributing visit is listed in
+            full. When the combined block exceeds ~280 px the inner div
+            scrolls; the tooltip outer height stays bounded so it never
+            grows off-screen. */}
+        <span
+          className="mt-[6px] block max-h-[280px] overflow-y-auto pr-[4px]"
+          style={{ scrollbarColor: "#64748B transparent", scrollbarWidth: "thin" }}
         >
-          {visibleSources.length > 0 && (
-            <span className="block">
-              <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
-                Sources ({group.sources?.length ?? 0})
-              </span>
-              <span className="mt-[4px] block">
-                {visibleSources.map((s, i) => (
-                  <span key={i} className="block text-tp-slate-100">
-                    • {s.doctor} · {s.date}
+          {groups.map((g, gi) => {
+            const sourceCount = g.sources?.length ?? 0
+            if (sourceCount === 0 && !g.reasoning) return null
+            return (
+              <span
+                key={gi}
+                className={`block ${gi > 0 ? "mt-[8px] border-t border-tp-slate-700 pt-[8px]" : ""}`}
+              >
+                <span className="block font-semibold text-white">{g.title}</span>
+                {sourceCount > 0 && (
+                  <span className="mt-[2px] block text-tp-slate-300">
+                    {g.sources!.map((s, i) => (
+                      <span key={i} className="block">
+                        • {s.doctor} · {s.date}
+                      </span>
+                    ))}
                   </span>
-                ))}
-                {overflow > 0 && (
-                  <span className="block text-tp-slate-400">
-                    + {overflow} more consultation{overflow === 1 ? "" : "s"}
+                )}
+                {g.reasoning && (
+                  <span className="mt-[3px] block italic text-tp-slate-300">
+                    {g.reasoning}
                   </span>
                 )}
               </span>
-            </span>
-          )}
-          {group.reasoning && (
-            <span className={`block ${visibleSources.length > 0 ? "mt-[6px] border-t border-tp-slate-700 pt-[6px]" : ""}`}>
-              <span className="font-semibold uppercase tracking-[0.06em] text-tp-slate-400">Why this matters</span>
-              <br />
-              <span className="text-white">{group.reasoning}</span>
-            </span>
-          )}
-        </FloatingTooltip>
-      )}
+            )
+          })}
+        </span>
+      </FloatingTooltip>
     </>
+  )
+}
+
+/**
+ * SpecialtySectionTooltip — info-icon trigger on each specialty's section
+ * heading. Lists the visits Velora drew this section's synthesis from
+ * (doctor + date for each consultation), plus the team's window-level
+ * `reason` sentence when set. Drives the same trust contract as the
+ * Medical-history one: every section's data is auditable inline.
+ */
+function SpecialtySectionTooltip({ rec }: { rec: VeloraV0Attribution }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  const consultations = rec.consultations ?? []
+  const totalVisits =
+    typeof rec.consultationCount === "number" ? rec.consultationCount : consultations.length
+  if (consultations.length === 0 && !rec.reason) return null
+  // Show ALL contributing visits — never truncate. Long lists scroll
+  // inside the tooltip via overflow-y-auto on the inner container.
+  const visible = consultations
+  const overflow = totalVisits - visible.length
+  return (
+    <>
+      <span
+        ref={ref}
+        className="inline-flex cursor-help items-center text-tp-slate-500 hover:text-tp-slate-700"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        tabIndex={0}
+        aria-label={`Sources for ${rec.source.specialty}`}
+      >
+        <InfoCircle size={14} variant="Linear" />
+      </span>
+      <FloatingTooltip
+        open={open}
+        triggerRef={ref}
+        placement="top-right"
+        width={320}
+        className="rounded-[6px] bg-tp-slate-800 px-[12px] py-[10px] text-left text-[11px] font-normal leading-[1.5] text-white shadow-xl"
+      >
+        <span className="block font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+          Where this comes from
+        </span>
+        <span className="mt-[2px] block font-semibold text-white">
+          {rec.source.specialty} · {totalVisits} visit{totalVisits === 1 ? "" : "s"}
+        </span>
+        {visible.length > 0 && (
+          // Scrollable source list — full list, no truncation. Caps the
+          // visual height around 220 px so the tooltip never grows
+          // off-screen on a long timeline.
+          <span
+            className="mt-[6px] block max-h-[220px] overflow-y-auto pr-[4px] text-tp-slate-300"
+            style={{ scrollbarColor: "#64748B transparent", scrollbarWidth: "thin" }}
+          >
+            {visible.map((c, i) => (
+              <span key={i} className="block">
+                • {c.doctor} · {c.date}
+              </span>
+            ))}
+            {overflow > 0 && (
+              <span className="block text-tp-slate-400">
+                + {overflow} more visit{overflow === 1 ? "" : "s"} (not detailed yet)
+              </span>
+            )}
+          </span>
+        )}
+        {rec.reason && (
+          <span className="mt-[6px] block border-t border-tp-slate-700 pt-[6px] italic text-tp-slate-300">
+            {rec.reason}
+          </span>
+        )}
+      </FloatingTooltip>
+    </>
+  )
+}
+
+/** Sort lab results in display order: critical → high → low → moderate-other,
+ *  then newest first by date when dates are present (string comparison is fine
+ *  because dates render in fixed short form). */
+function sortLabs(labs: VeloraV0LabResult[]): VeloraV0LabResult[] {
+  const flagRank: Record<VeloraV0LabResult["flag"], number> = {
+    critical: 0,
+    high: 1,
+    low: 2,
+    normal: 3,
+  }
+  return [...labs].sort((a, b) => {
+    const r = flagRank[a.flag] - flagRank[b.flag]
+    if (r !== 0) return r
+    if (a.date && b.date && a.date !== b.date) return a.date < b.date ? 1 : -1
+    return 0
+  })
+}
+
+/** One lab result chip — name (with optional info tooltip), value with
+ *  FlagArrow, unit and optional date suffix. Renders inline so multiple labs
+ *  flow as comma-separated chips across the row. */
+function LabChip({ lab }: { lab: VeloraV0LabResult }) {
+  const isAbnormal = lab.flag !== "normal"
+  const valueClass = isAbnormal ? "text-tp-error-600" : "text-tp-slate-700"
+  const arrowFlag: "high" | "low" | "critical" | null =
+    lab.flag === "high" || lab.flag === "critical" || lab.flag === "low" ? lab.flag : null
+  // Compose the tooltip text: refRange + any note. Keep it terse.
+  const tipBits: string[] = []
+  if (lab.refRange) tipBits.push(`Ref: ${lab.refRange}`)
+  if (lab.note) tipBits.push(lab.note)
+  const tip = tipBits.join(" · ")
+  return (
+    <span className="inline-flex items-baseline gap-[3px] whitespace-nowrap">
+      <span className="font-medium text-tp-slate-600">{lab.name}</span>
+      {tip && <InfoTip text={tip} />}
+      <span className="mr-[2px] text-tp-slate-300">:</span>
+      <span className={`inline-flex items-baseline gap-[2px] font-semibold ${valueClass}`}>
+        {arrowFlag && <FlagArrow flag={arrowFlag} />}
+        <span>
+          {lab.value}
+          {lab.unit ? ` ${lab.unit}` : ""}
+        </span>
+      </span>
+      {lab.date && <span className="ml-[2px] text-[11px] text-tp-slate-400">({shortDate(lab.date)})</span>}
+    </span>
+  )
+}
+
+/** Renders the "Lab results" row inside a specialty card body. Matches the
+ *  Findings / Medications / Plan layout (inline label chip + flowing content)
+ *  so the four pointers read as one consistent family.
+ *
+ *  Policy reminder (kept inline so the renderer is self-documenting): we
+ *  surface every ABNORMAL lab the specialty's work touches. Normal-range
+ *  parameters from the same panel are rolled up via `hiddenNormalCount` and
+ *  rendered as "+ N within range" so the doctor knows the panel was complete. */
+function LabResultsBlock({
+  labs,
+  hiddenNormalCount,
+}: {
+  labs: VeloraV0LabResult[]
+  hiddenNormalCount?: number
+}) {
+  const visible = sortLabs(labs.filter((l) => l.flag !== "normal"))
+  if (visible.length === 0 && !hiddenNormalCount) return null
+  return (
+    <p className="min-w-0">
+      <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+        Lab results
+      </span>
+      {visible.map((lab, i) => (
+        <React.Fragment key={`${lab.name}-${i}`}>
+          {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
+          <LabChip lab={lab} />
+        </React.Fragment>
+      ))}
+      {hiddenNormalCount && hiddenNormalCount > 0 ? (
+        <span className="ml-[6px] text-[11.5px] text-tp-slate-500">
+          + {hiddenNormalCount} other parameter{hiddenNormalCount === 1 ? "" : "s"} within range
+        </span>
+      ) : null}
+    </p>
   )
 }
 
@@ -472,7 +792,14 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               Shankar mock) when `medicalHistory` is not provided. */}
           {data.medicalHistory && data.medicalHistory.length > 0 ? (
             <div data-mdt-anchor="medical-history" className="flex flex-col gap-[4px]">
-              <SectionSummaryBar label="Medical history" icon="medical-service" />
+              {/* Section heading carries ONE ⓘ that aggregates Sources +
+                  reasoning across every Medical-history group. The chips
+                  below are clean — no per-row tooltips. */}
+              <SectionSummaryBar
+                label="Medical history"
+                icon="medical-service"
+                trailing={<MedicalHistorySectionTooltip groups={data.medicalHistory} />}
+              />
               {/* Each sub-section: tone-aware tag chip + one pipe-divided bullet.
                   The ⓘ on the tag opens a tooltip listing every OMOP consultation
                   feeding the group, plus the reasoning for why it's surfaced.
@@ -522,10 +849,19 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           {data.specialties.map((rec, idx) => (
             <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "first-specialty" : undefined}>
               <div data-mdt-anchor={idx === 0 ? "specialty-bar" : undefined}>
+                {/* Trailing slot carries the source ⓘ (audit trail of which
+                    visits this section synthesises from) AND the sidebar
+                    chevron. Two affordances, distinct shapes — info vs
+                    arrow — so the doctor reads them as separate actions. */}
                 <SectionSummaryBar
                   label={rec.source.specialty}
                   icon="medical-service"
-                  trailing={<HeaderTrailing rec={rec} onOpenSidebar={() => setOpenSidebarIdx(idx)} />}
+                  trailing={
+                    <span className="flex shrink-0 items-center gap-[6px]">
+                      <SpecialtySectionTooltip rec={rec} />
+                      <HeaderTrailing rec={rec} onOpenSidebar={() => setOpenSidebarIdx(idx)} />
+                    </span>
+                  }
                 />
               </div>
               {/* Body — Findings / Medications / Plan as bulleted rows.
@@ -538,6 +874,11 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   (The provenance paragraph that used to live above this body
                   is gone — its date-range / doctor / count content now lives
                   in the section heading's trailing slot.) */}
+              {/* Doctor / visit-count / date-range wallet banner — restates
+                  the team's identity inside the body so a doctor scanning
+                  Findings → Medications → Plan doesn't have to track back
+                  up to the heading. Renders just under the section bar. */}
+              <SpecialtyContextBanner rec={rec} />
               <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[10px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
                 {rec.lines.map((line, i) => {
                   const labelMatch = line.match(/^\*\*([^*]+)\*\*:\s*(.*)$/)
@@ -563,6 +904,17 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                     </p>
                   )
                 })}
+                {/* Lab results — fourth pointer alongside Findings / Medications / Plan.
+                    Renders only when the specialty has abnormal labs (or a
+                    normal-rollup count) to show. Policy: every abnormal lab
+                    in this team's scope, ordered critical → high → low,
+                    newest first inside the same flag. */}
+                {rec.labResults && rec.labResults.length > 0 && (
+                  <LabResultsBlock
+                    labs={rec.labResults}
+                    hiddenNormalCount={rec.hiddenNormalLabCount}
+                  />
+                )}
               </div>
               {/* Open-loops disclosure — the anti-data-loss layer. Shows
                   what's *captured upstream but not surfaced* in this card,

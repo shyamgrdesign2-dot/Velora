@@ -785,6 +785,24 @@ export interface VeloraV0Guideline {
    *  in the chip tooltip. Example: "Stroke-risk score, anticoag indication,
    *  preferred DOAC for renal impairment." */
   fetches?: string
+  /** *Why* Velora applied this specific guideline to THIS patient. The
+   *  patient-specific trigger — the condition / lab value / medication
+   *  combination in this patient's chart that activated this guideline.
+   *  Surfaced as the "Why we picked this" block in the chip tooltip, so a
+   *  doctor reading the chip knows the synthesis is anchored in their
+   *  patient's actual data, not a generic citation. Example:
+   *  "Patient is on Aspirin + Clopidogrel × 10 months post-CVA — ESC
+   *  recommends DAPT de-escalation review beyond month 12." */
+  whyPicked?: string
+  /** What confidence level Velora attaches to this application. Surfaced as
+   *  a small badge in the tooltip header. Helps the doctor calibrate trust
+   *  before acting. */
+  confidence?: "established" | "supportive" | "exploratory"
+  /** Plain-English version of the body name for the layman/junior-doctor
+   *  reader. Example: body="NCCN" → readableBody="National Comprehensive
+   *  Cancer Network (US oncology guideline body)". Optional — when omitted,
+   *  the tooltip just shows `body`. */
+  readableBody?: string
 }
 
 export interface VeloraV0Attribution {
@@ -835,10 +853,101 @@ export interface VeloraV0Attribution {
    *  yet" empty state — the chevron still opens the panel so the doctor
    *  understands the affordance. */
   consultations?: VeloraV0Consultation[]
+  /** Aggregate "lab results that matter for this team" — surfaced inline in
+   *  the specialty card alongside Findings / Medications / Plan.
+   *
+   *  Selection policy (documented in `WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`
+   *  § Lab results):
+   *    1. Default behaviour: every ABNORMAL lab whose interpretation falls
+   *       inside this team's clinical scope renders here. ("Abnormal" =
+   *       flag !== "normal", classified against the signed reference range.)
+   *    2. Latest-value-wins: each parameter appears at most once; if it was
+   *       drawn repeatedly the most recent reading is shown.
+   *    3. Ordering: critical → high → low → moderate. Inside the same flag,
+   *       newest first.
+   *    4. Normal-panel rollup: if abnormal results came out of a CBC / KFT /
+   *       LFT / lipid panel etc., the in-range parameters from the same panel
+   *       are not listed individually — `hiddenNormalLabCount` carries the
+   *       roll-up count, rendered as "+ N parameters within range".
+   *
+   *  When this array is empty the card omits the Lab results row entirely
+   *  (no "no labs on file" filler) — the per-consultation expansion in the
+   *  sidebar still shows any visit-level labs if they exist. */
+  labResults?: VeloraV0LabResult[]
+  /** Roll-up of normal-range parameters from the same panels the abnormal
+   *  results above came from. Renders as a small caption beneath the labs
+   *  list ("+ N parameters within range"). */
+  hiddenNormalLabCount?: number
+}
+
+/** A single lab parameter result, with abnormality direction.
+ *
+ *  Surfaced both at the specialty-attribution level (aggregated "what abnormal
+ *  labs has this team's work touched") and at the per-consultation level
+ *  (what labs were drawn / reported AT this visit).
+ *
+ *  Policy for which labs surface in the brief:
+ *    · Default = show ALL ABNORMAL results (flag !== "normal")
+ *    · Normal lab results from the same panel are summarised as
+ *      "+N other parameters within range" (rolled up via `hiddenNormalCount`
+ *      on the parent panel — not on the LabResult itself).
+ *    · Sorting precedence inside a list: critical → high/low → moderate.
+ *    · One result per parameter even when repeated across visits; the latest
+ *      reading wins. (Trend visualisation is a separate intent card.)
+ *
+ *  Wrapping a lab as "normal" is still allowed (e.g. a guideline-anchored
+ *  panel that wants to confirm an in-range value is intentional) — the
+ *  default renderer just filters them out unless `showNormal` is set on
+ *  the parent panel. */
+export interface VeloraV0LabResult {
+  /** Display label, e.g. "HbA1c", "SGPT", "eGFR". */
+  name: string
+  /** Latest reading, formatted as a string (carries unit-free numeric token). */
+  value: string
+  /** Display unit, e.g. "%", "U/L", "mL/min/1.73 m²". */
+  unit?: string
+  /** Direction relative to the signed reference range. */
+  flag: "high" | "low" | "critical" | "normal"
+  /** Signed reference range / target, e.g. "<7.0", "13.0–17.0", "≥90". */
+  refRange?: string
+  /** Date the value was drawn — short form ("4 May '26"). */
+  date?: string
+  /** Optional one-line note explaining why this lab is here (e.g. cited
+   *  guideline target, expected trajectory). Surfaces in an InfoTip. */
+  note?: string
+}
+
+/** A discharge-summary payload attached to an IPD consultation. Renders the
+ *  standard 7-block discharge structure in the sidebar expansion. Optional
+ *  fields are omitted from the UI when empty. */
+export interface VeloraV0DischargeSummary {
+  /** "Admitted 12 Mar 2026 · Discharged 15 Mar 2026 · 3 days · Ward 4 / B-12". */
+  admissionLine?: string
+  /** "Acute Hepatitis A · Wilson's disease (newly confirmed)". */
+  finalDiagnosis: string
+  /** Free-text presenting complaints at admission. */
+  presentingComplaints?: string
+  /** Hospital-course narrative (~2-4 short sentences). */
+  hospitalCourse: string
+  /** "Stable, ambulating, tolerating oral feeds." */
+  dischargeCondition?: string
+  /** Examination at discharge — short bullet-prose ("Afebrile · HR 84 · BP 110/72 · No icterus"). */
+  dischargeExam?: string
+  /** Discharge advice (diet, restrictions, monitoring). */
+  dischargeAdvice?: string[]
+  /** "Recurrence of jaundice, persistent vomiting, fever > 100.4°F …". */
+  warningSigns?: string[]
+  /** Functional / nutritional assessment at discharge. */
+  functionalAssessment?: string
 }
 
 /** One visit within a specialty's timeline. Surfaced in the specialty
- *  sidebar (opened by clicking the chevron on the specialty header). */
+ *  sidebar (opened by clicking the chevron on the specialty header).
+ *
+ *  Mirrors the standard Rx structure (the same pointers a doctor fills in
+ *  the Rx pad: Symptoms → Examination → Diagnosis → Investigations →
+ *  Medications → Advice → Follow-up). When a field is empty, that row
+ *  simply doesn't render — no "n/a" filler. */
 export interface VeloraV0Consultation {
   /** Display date for the consultation (e.g. "8 May 2025" or "24 Feb 2026"). */
   date: string
@@ -851,15 +960,52 @@ export interface VeloraV0Consultation {
   /** One-line headline summarising what happened at this consultation —
    *  shown collapsed before the user expands the entry. */
   headline: string
-  /** Detailed findings recorded at this visit (diagnoses + symptoms +
-   *  examination notes). Shown when the consultation is expanded. */
-  findings?: string
+
+  // ── Rich Rx fields (rendered as inline-labelled rows on expand) ──
+  /** Symptoms recorded at this visit. */
+  symptoms?: string
+  /** Examination findings at this visit. */
+  examination?: string
+  /** Diagnosis / impression documented at this visit. */
+  diagnosis?: string
+  /** Investigations advised at this visit (free-text — orders, not results). */
+  investigations?: string
   /** Medications prescribed AT this visit (not the cumulative ongoing list
-   *  for the specialty). Shown when the consultation is expanded. */
+   *  for the specialty). */
   medications?: string
-  /** Plan documented at this visit — follow-up date, investigations advised,
-   *  advice given, surgical bookings. */
+  /** Advice given (diet, activity, monitoring). */
+  advice?: string
+  /** Follow-up date / instructions. */
+  followUp?: string
+  /** Surgical / procedural booking made at this visit. */
+  surgery?: string
+  /** Vaccinations administered or planned. */
+  vaccinations?: string
+  /** Any other free-text the doctor recorded that doesn't fit the standard
+   *  Rx pointers (relevant medical-history additions, social context). */
+  additionalNotes?: string
+  /** Lab results either drawn at this visit or reported at this visit. The
+   *  card renders abnormal results inline; normal-panel rollups are summarised
+   *  via `hiddenNormalCount`. */
+  labResults?: VeloraV0LabResult[]
+  /** Count of normal-range parameters from panels that ran at this visit but
+   *  weren't surfaced individually. Renders as "+ N other parameters within
+   *  range" beneath the abnormal labs. */
+  hiddenNormalCount?: number
+
+  // ── Legacy combined fields — used by older mocks before the rich Rx
+  //    fields shipped. Renderer falls back to these when the new fields are
+  //    not populated. ──
+  /** @deprecated Prefer `symptoms` + `examination` + `diagnosis`. */
+  findings?: string
+  /** @deprecated Prefer `followUp` + `investigations` + `advice` + `surgery`. */
   plan?: string
+
+  // ── Discharge summary (IPD only) ──
+  /** Set on `visitType === "IPD"` admissions. When present, the sidebar
+   *  expansion renders the discharge-summary structure in addition to the
+   *  Rx pointers above. */
+  dischargeSummary?: VeloraV0DischargeSummary
 }
 
 /** One sub-section in the structured Section 1 · Medical history view.

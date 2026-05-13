@@ -45,6 +45,7 @@ Every labeled element below is a link to its spec table further down.
 ║   │     🩺 FINDINGS     Pipe-divided content              § 4.2      │ ║
 ║   │     💊 MEDICATIONS  Ongoing only · hides when empty   § 4.3      │ ║
 ║   │     📅 PLAN         Follow-up + investigations        § 4.4      │ ║
+║   │     🧪 LAB RESULTS  Abnormal-only · + N within range  § 4.45     │ ║
 ║   │                                                                   │ ║
 ║   │     ┌─  🚩 Open loops on this specialty  ──────────────  § 4.5 ─┐ │ ║
 ║   │     │   • Captured upstream but not shown                       │ │ ║
@@ -80,6 +81,7 @@ Jump to:
   - 4.2&nbsp;·&nbsp;[Findings](#42--findings-)&nbsp;🩺
   - 4.3&nbsp;·&nbsp;[Medications](#43--medications-)&nbsp;💊
   - 4.4&nbsp;·&nbsp;[Plan](#44--plan-)&nbsp;📅
+  - 4.45&nbsp;·&nbsp;[Lab results](#445--lab-results-)&nbsp;🧪
   - 4.5&nbsp;·&nbsp;[Open loops](#45--open-loops-)&nbsp;🚩
   - 4.6&nbsp;·&nbsp;[Sidebar](#46--specialty-sidebar)
 - §&nbsp;5&nbsp;·&nbsp;[Where they collide (Stack 2)](#5--where-they-collide-stack-2)
@@ -271,6 +273,77 @@ One card per active specialty team. Cards render in priority order
 
 [↑ back to wireframe](#1--the-whole-card-at-a-glance)
 
+### 4.45 · Lab results 🧪
+
+The fourth pointer alongside Findings / Medications / Plan. Surfaces the lab
+results this specialty's clinical work touches, **without overwhelming the
+doctor with normal-range parameters they don't need to scan**.
+
+> [!IMPORTANT]
+> **Default policy.** Velora shows **only abnormal lab results** in this row.
+> "Abnormal" = the value falls outside the signed reference range
+> (high / low / critical). Normal-range parameters from the same panel are
+> rolled up into a single trailing caption (e.g. *"+ 11 other parameters
+> within range"*) so the doctor knows the panel was complete without having
+> to scan twelve in-range numbers.
+
+#### Why this default
+
+A single CBC panel returns 15+ parameters; a metabolic panel adds another
+14; LFTs another 8. Surfacing each line for each specialty would balloon
+every card past readable length and bury the one critical value that
+actually changes the doctor's decision.
+
+Filtering to abnormal-only:
+
+- **Sharpens the read.** Every result on screen is a result the doctor
+  should care about. Nothing flagged here is "noise".
+- **Respects panel integrity.** The roll-up caption confirms the panel
+  ran cleanly, so the doctor doesn't wonder "did they forget X?".
+- **Mirrors clinical scanning.** When a doctor reads a paper LFT report,
+  their eye goes to the flagged values first. The card matches that
+  scanning pattern.
+
+#### Spec
+
+| Row | Spec |
+|---|---|
+| 🎯&nbsp;**What** | One inline-flow row listing every abnormal lab parameter that this specialty's work has touched, with value · unit · direction-arrow · reference range tooltip. |
+| 📦&nbsp;**Where from** | `measurement` rows (type_concept_id 44818702 for labs, 44818701 for vitals) joined to visits where `provider.specialty = this card`. The classifier compares each value against the signed reference range and tags it `high` / `low` / `critical` / `normal`. Only non-normal rows make it into the displayed list. |
+| 🎨&nbsp;**Format** | `Lab results: {Name}: {↑/↓} **{value} {unit}** \| {Name}: ↑ **{value}**` — same pipe-divider layout as the other pointer rows. Reference range hides behind an info-tip on each parameter name. |
+| 🚫&nbsp;**Hide rule** | Row omits entirely when there are zero abnormal labs **and** zero rolled-up normal-panel parameters. We don't render `Lab results: none on file` — that's noise. |
+| 🪂&nbsp;**Fallback** | If structured `measurement` rows don't exist for this specialty (data team hasn't ingested labs from this team's notes yet) the row simply doesn't render. Acknowledged data-pipeline gap, not silent failure. |
+| 💡&nbsp;**Example** | `[LAB RESULTS]  HbA1c: ↑ **8.2 %** \| FPG: ↑ **168 mg/dL** \| Urine ACR: ↑ **78 mg/g** + 8 other parameters within range` |
+
+#### Selection rules (in priority order)
+
+1. **Abnormality first.** Only labs with `flag !== "normal"` render.
+2. **Latest reading wins.** When the same parameter has multiple values
+   across visits, the most recent one displays. Trend visualisation is a
+   separate intent card (`velora_v0_trends`).
+3. **Sort order.** Within the row: critical → high → low → moderate.
+   Inside the same flag, newest first.
+4. **Normal-panel rollup.** In-range parameters from the same panel
+   (CBC, KFT, LFT, lipid panel, etc.) collapse into a single
+   `+ N parameters within range` caption.
+5. **One parameter per specialty card.** If both Cardiology and Diabetology
+   touched the same LDL value, it shows on whichever team owns the
+   clinical decision (statin = Cardiology). The other team's card omits it
+   to avoid duplication.
+
+#### Where labs appear in the card
+
+- **Specialty card body** (this section) — aggregate abnormal labs the
+  team's work has touched.
+- **Sidebar timeline → expanded consultation** — per-visit labs drawn or
+  reported at that specific encounter. Same abnormal-only default, scoped
+  to one visit.
+- **Discharge summary** (IPD only) — labs included in the discharge
+  narrative's hospital-course block, embedded in the structured discharge
+  block rather than as a separate row.
+
+[↑ back to wireframe](#1--the-whole-card-at-a-glance)
+
 ### 4.5 · Open loops 🚩
 
 Amber-tinted block under each specialty body. **Only renders when at
@@ -347,7 +420,9 @@ from the right. Contents:
 | **Header** | Specialty name + patient identity + close button. |
 | **Timeline** | Vertical list of consultations with date markers. IPD visits get a red dot + `IPD` badge; OPD slate. |
 | **Collapsed entry** | `{date} · {OPD/IPD badge} · {doctor} · one-line headline` |
-| **Expanded entry** | Findings + Medications + Plan for that specific visit, rendered with inline-chip labels matching the main card's body style. |
+| **Expanded entry** | Full Rx for that visit — every pointer the doctor wrote: **Symptoms · Examination · Diagnosis · Investigations · Medications · Advice · Follow-up · Surgery · Vaccinations · Additional notes · Lab results**. Each field renders as an inline-chip label + flowing content (matching the main card's body style). Empty fields are skipped — no `n/a` filler. |
+| **Discharge summary (IPD only)** | When the visit is an admission and a `dischargeSummary` is on the record, the expansion also renders the standard 7-block discharge structure beneath the Rx fields: admission line, final diagnosis, presenting complaints, hospital course, discharge condition + exam, discharge advice bullets, warning signs (red-tinted) and functional assessment. |
+| **Per-visit labs** | Visit-level abnormal labs render alongside the Rx fields using the same selection policy as § 4.45. Roll-up caption (*+ N within range*) is preserved. |
 | 🪂&nbsp;**Empty state** | When `consultations[]` is missing or empty: a friendly *"no per-consultation detail captured yet"* note. The chevron's affordance is still discoverable, just honest about the data state. |
 
 [↑ back to wireframe](#1--the-whole-card-at-a-glance)
@@ -383,6 +458,54 @@ attention.
 | 🎯&nbsp;**What** | Structured tables applying named clinical guidelines to the patient's data. One row per guideline-specified metric, the patient's computed value, and a tone marker. |
 | 📦&nbsp;**Where from** | Computed from `measurement` + `condition_occurrence` + `drug_exposure`. The guideline determines which inputs the panel needs (NCCN surveillance → months since last oncology + CEA result; Beers Criteria → sedative-class drug count). |
 | 🎨&nbsp;**Format** | Section heading with guideline chip on the right · body is a 3-5 row mini-table: `Label : Value (tone)` · optional `ref` field per row carries the derivation logic in a tooltip. |
+
+#### 5.3.1 · The guideline chip tooltip 📚
+
+Every guideline chip — both inside DDI / coordination-gap cards and at the
+top of every synthesis panel — opens a four-block tooltip on hover. The
+tooltip is the single most important trust-building surface in Stack 2:
+it answers the doctor's natural reaction to a citation ("why are you
+showing me this — and why for my patient?") *before* they act.
+
+| Block | What it carries | Why it's there |
+|---|---|---|
+| 1.&nbsp;🏷️&nbsp;**Guideline citation** | Body + year + section (e.g. `NCCN · 2024 · Colon Ca v.2.2024 §SURV-2`) plus a `readableBody` long-form name when the acronym is unfamiliar. | A junior doctor or non-specialist shouldn't have to look up "AASLD" or "AACE". |
+| 2.&nbsp;📖&nbsp;**What this guideline is** | One layman-friendly sentence describing the guideline's clinical scope. | Anchors what kind of decision-tool this is, before any patient-specific reasoning. |
+| 3.&nbsp;🎯&nbsp;**Why it applies to this patient** | The *patient-specific* trigger — the diagnosis / lab value / drug combination from THIS chart that activated this guideline. The trust block. | Stops the chip from reading as a generic textbook citation. The doctor sees the application is grounded in their patient. |
+| 4.&nbsp;🧩&nbsp;**What we show from it** | Which fields in the current panel are derived from this guideline. | Closes the loop — "here is the citation, here is why it applies to your patient, and here is exactly what you're seeing because of it." |
+
+A small confidence pill in the tooltip header lets the doctor calibrate
+trust before acting:
+
+| Pill | Meaning |
+|---|---|
+| 🟢 **Established** | Maps directly to a published, named recommendation. Most chips. |
+| 🔵 **Supportive** | Inferred from the guideline's principles, not a specific numbered recommendation. |
+| 🟡 **Exploratory** | Guidance is partial / consensus-based — read with judgement. |
+
+#### 5.3.2 · Worked example
+
+When a doctor hovers `NCCN 2024 Colon Ca v.2.2024 §SURV-2` on Mr Patel's
+brief, the tooltip reads (verbatim from the live mock):
+
+> **Guideline**
+> NCCN · 2024 · Colon Ca v.2.2024 §SURV-1, SURV-2
+> National Comprehensive Cancer Network — the US oncology body whose surveillance protocol is the standard most Indian oncology teams also follow.
+> &nbsp;
+> **What this guideline is**
+> Sets the surveillance schedule for colon-cancer patients after curative resection — when to draw the next CEA, when to image, when to scope.
+> &nbsp;
+> **Why it applies to this patient**
+> Mr Patel had stage IIIB colon cancer (T3N2b) resected, with a documented lung-metastasis suspicion. NCCN §SURV-2 mandates CEA every 3-6 months for 5 years and CT C/A/P every 6-12 months for 3 years. His last oncology contact was 30 Sep 2025 — beyond the longest acceptable interval.
+> &nbsp;
+> **What we show from it**
+> How overdue his next surveillance visit is, whether his last CEA result is on file, and whether his last imaging is.
+
+The doctor reads three things before any clinical action: (1) what the
+guideline is, (2) why it applies to *this patient*, (3) what derived
+values are on screen because of it. Each fragment maps to a populated
+field on the `VeloraV0Guideline` shape — `description`, `whyPicked`,
+`fetches` respectively.
 
 ### 5.4 · Pending MDT items 📋
 

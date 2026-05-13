@@ -52,698 +52,384 @@ function subSuggestionsFor(parent: VeloraParentIntent, n: number = 2) {
  *   docs/velora-patients/P2-suresh-patel-843373981236.md
  *   docs/OMOP_MAPPING_DOCUMENTATION (from /Users/shyamsundar/Documents/Archive.zip)
  */
+// ═════════════════════════════════════════════════════════════════════════
+// SURESH_PATEL_BRIEF_MOCK  ·  person_id 843373981236 · M · 60y
+// ─────────────────────────────────────────────────────────────────────────
+// Rebuilt VERBATIM from the OMOP CDM export. Every drug name comes from
+// drug_exposure.drug_source_value (deduped per visit by brand + composition).
+// Every diagnosis / symptom / exam / advice / follow-up sentence comes from
+// observation.value_as_string. Co-morbidities pulled from condition_occurrence
+// (Active / Confirmed rows only).
+// ═════════════════════════════════════════════════════════════════════════
 export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
-  patientName: "Mr Suresh Patel",
-  patientMeta: "M, 60y · 843373981236",
+  patientName: "Suresh Patel",
+  patientMeta: "M, 60y",
   patientGender: "M",
   patientAge: 60,
-  patientMobile: "+91 98333 83625",
+  patientMobile: "+91 98765 81236",
   patientId: "843373981236",
-  // Section 1 · Medical history — structured groups, sourced from OMOP
-  // condition_occurrence with the row counts shown inline so the doctor
-  // can see how many independent records back each claim.
   medicalHistory: [
-    // Section 1 · Medical history. Per-group:
-    //   • title       — short label shown in the tone-tinted tag
-    //   • tone        — primary (red) / neutral (slate) / positive (green ✓)
-    //   • items       — pipe-divided content shown as one bullet via HighlightLine
-    //   • sources     — list of OMOP consultations backing the group; shown in
-    //                   the ⓘ tooltip on the tag (doctor + date per row)
-    //   • reasoning   — short "why this matters" prose under the source list
-    //
-    // Order is deliberate per product call:
-    //   ① Primary problem  ② Co-morbidities  ③ Surgical history
-    //   ④ Allergies         ⑤ Family / Social
-    //
-    // Acute episodes (CAP / HAP / May 2026 respiratory event) intentionally
-    // omitted from medical history — they belong on the patient timeline view
-    // (Intent ②), not in the chronic-context section that drives prescribing
-    // decisions. Surfacing them here muddied the read.
-    {
-      title: "Primary problem",
-      tone: "primary",
-      items: [
-        { text: "**Carcinoma of hepatic flexure of colon** (T3N2b stage IIIB, moderately differentiated adenocarcinoma)" },
-        { text: "**Metastatic disease** (lung metastasis most likely)" },
-      ],
-      sources: [
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "8 May 2025" },
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "12 Jun 2025" },
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "10 Jul 2025" },
-        { doctor: "Dr Mithun Shah (Oncology)", date: "30 Sep 2025" },
-        { doctor: "Dr Mahesh D Patel (Onco-surgery)", date: "4 Apr 2025" },
-        { doctor: "Dr Vishal Desai (Internal Medicine)", date: "10 Feb 2025" },
-      ],
-      reasoning:
-        "Six independent consultations across Oncology, Onco-surgery, and Internal Medicine record the colon-Ca diagnosis with consistent staging (T3N2b stage IIIB, moderately differentiated adenocarcinoma). Lung metastasis was first flagged on the 30 Sep 2025 Oncology review; the recurrence signal is what should now drive active restaging.",
-    },
     {
       title: "Co-morbidities",
       tone: "neutral",
       items: [
-        { text: "**Type-2 Diabetes Mellitus** (Active)" },
-        { text: "**Hypertension** (Active)" },
+        { text: "**DM** (Active)" },
+        { text: "**HTN** (Active)" },
         { text: "**Hypothyroidism** (Active)" },
-        { text: "**Iron-deficiency anaemia** (Active)" },
-        { text: "**Diabetic neuropathy** (Active)" },
-        { text: "**Seronegative inflammatory arthritis** (Active)" },
-        { text: "**MID CBD stricture** (Active)" },
+        { text: "**Iron Deficiency** (Active)" },
+        { text: "**P/w Diabetic neuropathy** (Active)" },
+        { text: "**Seronegetive inflammatory arthritis** (Active)" },
+        { text: "**Carcinoma Colon** (Active)" },
+        { text: "**MID CBD Stricture** (Active)" },
+        { text: "**Ca hepatic flexure** (Active)" },
+        { text: "**S/p 6 Cycle Of Adjuvant Chemo** (Active)" },
+        { text: "**Metastatic Disease** (Active)" },
+        { text: "**Community acquired pneumonia** (Active)" },
+        { text: "**Hospital Acquired Pneumonia** (Active)" },
+        { text: "**Lung metastasis most likely** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "8 May 2025" },
-        { doctor: "Dr Nikhil Dave (Neurology)", date: "20 Dec 2025" },
-        { doctor: "Dr Kunal Chandwar (Rheumatology)", date: "2 Mar 2026" },
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "21 Mar 2026" },
-        { doctor: "Dr Monark Shah (E.N.T.)", date: "20 Mar 2026" },
-        { doctor: "Dr Avadh Vithlani (Pulmonology)", date: "7 May 2026" },
-      ],
-      reasoning:
-        "T2DM · HTN · Hypothyroidism · Iron deficiency · Diabetic neuropathy each appear in 5-7 independent consultations across the care team as Active status, high-confidence chronic disease stack. Seronegative arthritis (Rheumatology, 1 visit) and MID CBD stricture (2 visits) have weaker evidence but are clinically relevant to upcoming surgical / oncology decisions.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE status IN (Active, Confirmed).",
     },
     {
       title: "Surgical history",
       tone: "neutral",
       items: [
-        { text: "**Robotic-assisted Right Hemicolectomy** (30 Sep 2024)" },
-        { text: "**Adjuvant chemotherapy** (6 cycles, completed)" },
+        { text: "**Ca Hepatic Flexure, Rt hemicolectomy 30/9/2024, Mod diff adenoca, T3N2b Ca Hepatic Flexure, Robotic assisted Rt hemicolectomy 30/9/2024, Mod diff adenoca, T3N2b, LVI +nt, Nodes 14/30, ENE +nt Colonic stent on 24/9/2024 Total Wt. loss @ 10kg F/h no malignancy HTN, DM, Hypothyroidism on Rx** (Active)" },
+        { text: "**Ca Hepatic Flexure, Rt hemicolectomy 30/9/2024, Mod diff adenoca, T3N2b** (Active)" },
+        { text: "**Robotic Assisted Right Hemicolectomy On 30/9/24** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Mahesh D Patel (Onco-surgery)", date: "4 Apr 2025" },
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "8 May 2025" },
-        { doctor: "Dr Mithun Shah (Oncology)", date: "30 Sep 2025" },
-        { doctor: "Dr Milan Mehta (Pain Specialist)", date: "5 May 2026" },
-        { doctor: "Dr Vishal Desai (Internal Medicine)", date: "10 Feb 2025" },
-        { doctor: "Dr Tejas Modi (Gastroenterology)", date: "20 Mar 2026" },
-      ],
-      reasoning:
-        "Right Hemicolectomy on 30 Sep 2024 and 6 cycles of adjuvant chemotherapy are referenced as historical surgical context across 6 specialty visits. The procedure itself predates the current consultations, so no inpatient admission record exists; surgical history reconstructed from consultation notes.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
       items: [
-        { text: "No known **drug allergy** (verified ×6)" },
-        { text: "No known **food allergy** (verified ×7)" },
+        { text: "**No known drug allergy** (Active)" },
+        { text: "**No known food allergy** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "8 May 2025" },
-        { doctor: "Dr Nikhil Dave (Neurology)", date: "20 Dec 2025" },
-        { doctor: "Dr Kunal Chandwar (Rheumatology)", date: "2 Mar 2026" },
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "21 Mar 2026" },
-        { doctor: "Dr Avadh Vithlani (Pulmonology)", date: "7 May 2026" },
-      ],
-      reasoning:
-        "Allergy review documented as Active on 6-7 separate specialty visits, all returning \"No known drug allergy\" and \"No known food allergy\". The explicit-negative pattern across this many independent reviews is a strong absence-of-allergy signal, not a data gap. Safe to prescribe contrast / antibiotics / NSAIDs without further allergy screening.",
-    },
-    {
-      title: "Family / Social history",
-      tone: "positive",
-      items: [
-        { text: "No significant family history" },
-        { text: "No significant social history" },
-      ],
-      sources: [
-        { doctor: "Dr Pankaj Shah (Oncology)", date: "8 May 2025" },
-        { doctor: "Dr Kunal Chandwar (Rheumatology)", date: "2 Mar 2026" },
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "21 Mar 2026" },
-        { doctor: "Dr Avadh Vithlani (Pulmonology)", date: "7 May 2026" },
-        { doctor: "Dr Tejas Modi (Gastroenterology)", date: "20 Mar 2026" },
-        { doctor: "Dr Vishal Desai (Internal Medicine)", date: "10 Feb 2025" },
-      ],
-      reasoning:
-        "Family and social history reviewed and documented as \"no significant / applicable findings\" on 6-7 visits. The colon-Ca diagnosis therefore appears to be sporadic rather than hereditary, relevant when counselling about screening for first-degree relatives.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
     },
   ],
-  // No legacy flat headlines list — the structured `medicalHistory` above
-  // is the canonical source. Kept undefined intentionally.
-  windowDays: 466, // 10 Feb 2025 → 21 Mar 2026 observation window
+  windowDays: 454,
   specialties: [
-    // Section 2 · Specialty consultations. Each card shows Findings →
-    // Medications → Plan, with provenance (visit count + date range + doctor)
-    // and open-loops disclosure (what's captured upstream but not shown here,
-    // plus guideline-anchored gaps).
     {
-      source: {
-        specialty: "Oncology",
-        author: "Dr Pankaj Shah / Dr Mithun Shah",
-        date: "30 Sep 2025",
-      },
-      reason:
-        "Primary problem · 12 surveillance visits with the oncology team across May-Sep 2025. Selected as the lead specialty because the colon-cancer history drives every other team's decisions.",
-      dateRangeLabel: "8 May - 30 Sep '25",
+      source: { specialty: "Oncology", author: "Dr PANKAJ SHAH /Dr MITHUN SHAH", date: "19 Mar 2026" },
+      reason: "Verbatim from OMOP · 12 visits across the consultation window.",
+      dateRangeLabel: "8 May 2025 - 19 Mar 2026",
       consultationCount: 12,
-      doctorsLabel: "Dr Pankaj Shah / Dr Mithun Shah",
-      // Verbatim across BOTH oncologists' representative visits — Dr Pankaj
-      // Shah ran the post-adjuvant and most-recent reviews, Dr Mithun Shah
-      // ran the mid-window review. Each opinion is attributed inline.
+      doctorsLabel: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
       lines: [
-        "**Findings**: **Dr Pankaj Shah (8 May '25)**: T3N2b stage IIIB colon Ca s/p hemicolectomy + adjuvant FOLFOX. Currently in surveillance phase.",
-        "**Findings**: **Dr Mithun Shah (11 Jun '25)**: Stage IIIB colon Ca, surveillance phase — **no evidence of recurrence at this review**.",
-        "**Findings**: **Dr Pankaj Shah (30 Sep '25)**: Stage IIIB colon Ca · **CEA back-up trend** plus pulmonary symptoms — suspicion for lung metastasis raised.",
-        "**Medications**: **Dr Pankaj Shah (8 May '25)**: No active oncology Rx | Continue supportive supplements | Iron supplementation continued for chemo-related anaemia.",
-        "**Medications**: **Dr Mithun Shah (11 Jun '25)**: Continue supportive only.",
-        "**Medications**: **Dr Pankaj Shah (30 Sep '25)**: No medication change today | Symptomatic Pantoprazole 40 mg OD for epigastric discomfort.",
-        "**Plan**: **Dr Pankaj Shah (8 May '25)**: 8 Jun 2025 · with CEA + imaging.",
-        "**Plan**: **Dr Mithun Shah (11 Jun '25)**: 8 Jul 2025.",
-        "**Plan**: **Dr Pankaj Shah (30 Sep '25)**: Within 3-4 weeks · with PET-CT report. (**Not booked — open loop**)",
+        "**Findings**: (no observation_text recorded)",
       ],
-      labResults: [
-        { name: "CEA", value: "12.4", unit: "ng/mL", flag: "high", refRange: "<5.0 (non-smoker)", date: "30 Sep 2025", note: "Last measured Sep 2025. Re-test overdue per NCCN q3-6mo." },
-        { name: "Haemoglobin", value: "10.6", unit: "g/dL", flag: "low", refRange: "13.5–17.5 (M)", date: "30 Sep 2025", note: "Anaemia of chronic disease vs chemo-related." },
-        { name: "Albumin", value: "3.2", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "30 Sep 2025" },
-      ],
-      hiddenNormalLabCount: 12,
-      openLoops: [
-        "Oncology advised the next **surveillance visit** within 3-6 months of 30 Sep 2025, no visit booked since",
-        "Oncology advised **CEA tumour marker** on 4 Apr 2025, no result on file",
-        "Oncology advised **PET-CT** on 4 Apr 2025, no result on file",
-      ],
-      // Three representative consultations from the 12-visit surveillance
-      // series (8 May, 11 Jun, 30 Sep 2025) — the first review post-adjuvant,
-      // a mid-window visit, and the most-recent (now-overdue) one.
       consultations: [
         {
           date: "8 May 2025",
           visitType: "OPD",
-          doctor: "Dr Pankaj Shah",
-          headline: "**Post-adjuvant surveillance review #1** — first follow-up after chemo completion",
-          symptoms: "No fresh complaints | Appetite recovering | Mild fatigue, improving | No fresh GI symptoms",
-          examination: "Performance status ECOG 1 · Abdomen soft, scar healthy · No palpable mass · No peripheral lymphadenopathy",
-          diagnosis: "**T3N2b stage IIIB colon Ca (sigmoid)**, s/p hemicolectomy + adjuvant FOLFOX. Currently in surveillance phase.",
-          investigations: "CEA · CBC · LFT · KFT · CT C/A/P planned in 6 weeks",
-          medications: "No active oncology Rx | Continue supportive supplements | Iron supplementation continued for chemo-related anaemia",
-          advice: "High-fibre low-residue diet | Daily walking 30 min | Report any rectal bleeding, weight loss, or fresh GI complaints immediately",
-          followUp: "8 Jun 2025 · with CEA + imaging",
-          labResults: [
-            { name: "CEA", value: "6.8", unit: "ng/mL", flag: "high", refRange: "<5.0", date: "8 May 2025", note: "Down from immediate post-op 9.2; trajectory favourable." },
-            { name: "Haemoglobin", value: "9.8", unit: "g/dL", flag: "low", refRange: "13.5–17.5 (M)", date: "8 May 2025", note: "Chemo-induced anaemia, improving." },
-          ],
-          hiddenNormalCount: 14,
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
         {
-          date: "11 Jun 2025",
+          date: "20 May 2025",
           visitType: "OPD",
-          doctor: "Dr Mithun Shah",
-          headline: "Mid-window surveillance — patient stable, no concerning findings",
-          symptoms: "Asymptomatic | Energy back to baseline | Tolerating regular diet",
-          examination: "ECOG 0 · Abdomen unchanged · No focal deficit on screening neuro exam | No new lymphadenopathy",
-          diagnosis: "Stage IIIB colon Ca, surveillance phase — **no evidence of recurrence at this review**",
-          investigations: "Repeat CEA · CBC · LFT",
-          medications: "Continue supportive only",
-          advice: "Continue surveillance cadence | Bowel diary | Monitor weight",
-          followUp: "8 Jul 2025",
-          labResults: [
-            { name: "CEA", value: "4.2", unit: "ng/mL", flag: "normal", refRange: "<5.0", date: "11 Jun 2025", note: "Back within normal range — strong recovery signal." },
-            { name: "Haemoglobin", value: "11.6", unit: "g/dL", flag: "low", refRange: "13.5–17.5 (M)", date: "11 Jun 2025" },
-          ],
-          hiddenNormalCount: 16,
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
+        },
+        {
+          date: "3 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
+        },
+        {
+          date: "30 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
+        },
+        {
+          date: "25 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
         {
           date: "30 Sep 2025",
           visitType: "OPD",
-          doctor: "Dr Pankaj Shah",
-          headline: "**Most recent surveillance visit** — re-staging concern raised, CEA elevated",
-          symptoms: "Vague upper-abdominal discomfort × 2 weeks | Mild cough, no haemoptysis | Weight stable | No fresh GI bleed",
-          examination: "ECOG 1 · Abdomen soft, mild epigastric tenderness · Chest: occasional right-base crepts",
-          diagnosis: "Stage IIIB colon Ca · **CEA back-up trend** plus pulmonary symptoms — suspicion for lung metastasis raised",
-          investigations: "**PET-CT ordered urgently** | CEA repeat | CT chest plain · LFT · CBC",
-          medications: "No medication change today | Symptomatic Pantoprazole 40 mg OD for epigastric discomfort",
-          advice: "Strict imaging compliance · expedite scan booking within 2 weeks · escalate if any haemoptysis / acute pain · vaccinate for influenza given surveillance phase",
-          followUp: "Within 3-4 weeks · with PET-CT report",
-          labResults: [
-            { name: "CEA", value: "12.4", unit: "ng/mL", flag: "high", refRange: "<5.0", date: "30 Sep 2025", note: "Triple the upper limit — restaging trigger." },
-            { name: "Haemoglobin", value: "10.6", unit: "g/dL", flag: "low", refRange: "13.5–17.5 (M)", date: "30 Sep 2025" },
-            { name: "Albumin", value: "3.2", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "30 Sep 2025" },
-          ],
-          hiddenNormalCount: 12,
-          additionalNotes:
-            "**Critical open loop**: PET-CT was ordered at this visit but no result row exists. The next surveillance visit was never booked. The 6-month gap since this date is the strongest single signal in this brief.",
-        },
-      ],
-    },
-    {
-      source: {
-        specialty: "Pulmonology",
-        author: "Dr Avadh Vithlani",
-        date: "9 May 2026",
-      },
-      reason:
-        "Most recent acute event in the record, SOB + cough + chest heaviness × 4 days with IV-grade regimen administered OPD. Worth surfacing first to any new clinician.",
-      dateRangeLabel: "7 - 9 May '26",
-      consultationCount: 2,
-      doctorsLabel: "Dr Avadh Vithlani",
-      // Verbatim from the most recent pulmonology visit
-      // (9 May 2026, Dr Avadh Vithlani — regimen-closure review).
-      lines: [
-        "**Findings**: Moderate CAP — **clinical improvement on day 3**, complete remaining course",
-        "**Medications**: Continue Ceftriaxone IV × 2 more days, Doxy IV × 2 more days, taper Hydrocortisone IV off | Continue nebs PRN",
-        "**Plan**: 12 May 2026 — regimen closure visit",
-      ],
-      labResults: [
-        { name: "SpO₂", value: "94", unit: "% (room air)", flag: "low", refRange: "≥95", date: "7 May 2026", note: "Marginal — drove the IV-bridge decision." },
-        { name: "WBC", value: "13.8", unit: "×10³/µL", flag: "high", refRange: "4.0–11.0", date: "7 May 2026" },
-        { name: "CRP", value: "48", unit: "mg/L", flag: "high", refRange: "<10", date: "7 May 2026" },
-      ],
-      hiddenNormalLabCount: 6,
-      openLoops: [
-        "Pulmonology likely advised **CXR + sputum culture** before starting IV antibiotics, no result on file",
-      ],
-      consultations: [
-        {
-          date: "7 May 2026",
-          visitType: "OPD",
-          doctor: "Dr Avadh Vithlani",
-          headline: "Acute **SOB + cough + chest heaviness × 4 days** — IV-grade ambulatory regimen initiated",
-          symptoms: "Shortness of breath × 4 days, worsening last 24 h | Productive cough, scant whitish sputum | Heaviness over chest, no frank pain | Low-grade fever × 2 days | No frank haemoptysis",
-          examination: "Tachypnoeic, RR 24 | HR 102 | SpO₂ 94 % room air, 97 % on 2 L nasal | **Diffuse bilateral coarse crepts**, more right-base | No accessory muscle use | No pedal oedema | Throat normal",
-          diagnosis: "**Community-acquired pneumonia, moderate severity** (CURB-65 1) on a background of stage IIIB colon Ca surveillance — consider opportunistic respiratory infection",
-          investigations: "CXR PA · Sputum gram stain + culture · CBC · CRP · ABG · Pulse oximetry monitoring · Procalcitonin",
-          medications: "**Ceftriaxone 2 g IV OD × 5 days** | **Doxycycline 100 mg IV BD × 5 days** | **Hydrocortisone 100 mg IV q12h × 3 days** (atypical-coverage burst) | Nebulised Budesonide + Salbutamol q6h | Paracetamol 500 mg PRN | Maintain hydration",
-          advice: "Bed rest at home with daily review · Pulse oximeter monitoring at home (call if SpO₂ < 92 %) · Vaccinate against pneumococcal + influenza after recovery · Avoid crowded places × 4 weeks",
-          followUp: "9 May 2026 (next day) · 12 May 2026 to close regimen",
-          labResults: [
-            { name: "SpO₂", value: "94", unit: "% (room air)", flag: "low", refRange: "≥95", date: "7 May 2026", note: "Marginal — drove the IV-bridge decision." },
-            { name: "WBC", value: "13.8", unit: "×10³/µL", flag: "high", refRange: "4.0–11.0", date: "7 May 2026" },
-            { name: "CRP", value: "48", unit: "mg/L", flag: "high", refRange: "<10", date: "7 May 2026" },
-          ],
-          hiddenNormalCount: 8,
-          additionalNotes:
-            "**Open loop**: this visit was coded OPD but the regimen (IV antibiotics + IV steroid burst) is typically inpatient-level care. Worth reconciling with IPD pipeline.",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
         {
-          date: "9 May 2026",
+          date: "1 Oct 2025",
           visitType: "OPD",
-          doctor: "Dr Avadh Vithlani",
-          headline: "48-hour review — clinically improving on IV regimen",
-          symptoms: "SOB easing | Cough less productive | Fever resolved last 24 h | Appetite returning",
-          examination: "Afebrile · RR 18 · HR 88 · SpO₂ 97 % room air | Right-base crepts much reduced | Chest exam otherwise clear",
-          diagnosis: "Moderate CAP — **clinical improvement on day 3**, complete remaining course",
-          investigations: "Repeat CBC + CRP at end of regimen",
-          medications: "Continue Ceftriaxone IV × 2 more days, Doxy IV × 2 more days, taper Hydrocortisone IV off | Continue nebs PRN",
-          advice: "Continue home rest · Re-test CRP at regimen close · Outpatient follow-up if any deterioration",
-          followUp: "12 May 2026 — regimen closure visit",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
-      ],
-    },
-    {
-      source: {
-        specialty: "Pain Specialist",
-        author: "Dr Milan Mehta",
-        date: "5 May 2026",
-      },
-      reason:
-        "New addition to the active drug regimen this month, **Morphine** introduced into a patient already on SNRI + TCA + Gabapentin. High-severity coordination signal.",
-      dateRangeLabel: "5 May '26",
-      consultationCount: 1,
-      doctorsLabel: "Dr Milan Mehta",
-      // Verbatim from the single pain-specialist visit
-      // (5 May 2026, Dr Milan Mehta).
-      lines: [
-        "**Findings**: **Post-surgical low back pain + bilateral LL heaviness** (s/p emergency GB-perforation surgery 19/4/26) — neuropathic + nociceptive overlap",
-        "**Medications**: **Morphine 10 mg PO Q8H × 5-7 days** (short course, planned auto-stop 12 May) | Continue Dulotin (Duloxetine) | Continue Gabator NT (Gabapentin + Nortriptyline) | Continue Tryptomer (Amitriptyline) | Add **Lactulose 15 mL HS** (opioid-induced constipation prophylaxis)",
-        "**Plan**: Within 7-10 days · earlier if respiratory depression, confusion, or no relief",
-      ],
-      openLoops: [
-        "Pain Specialist did not schedule a **follow-up review**, refill status of the short-course Morphine is open",
-      ],
-      consultations: [
         {
-          date: "5 May 2026",
+          date: "20 Nov 2025",
           visitType: "OPD",
-          doctor: "Dr Milan Mehta",
-          headline: "Post-GB-perforation pain — **Morphine 10 mg PO** initiated for short-course relief",
-          symptoms: "Low back pain × 3 weeks, worse on movement | Bilateral lower-limb heaviness | Walking limited to ~50 m | Sleep disturbed by pain | No bladder / bowel involvement",
-          examination: "Vitals stable | Lumbar spine: paraspinal tenderness L4-L5 | SLR mildly positive bilaterally at 60° | No saddle anaesthesia | Power 5/5 distally | Bowel sounds normal",
-          diagnosis: "**Post-surgical low back pain + bilateral LL heaviness** (s/p emergency GB-perforation surgery 19/4/26) — neuropathic + nociceptive overlap",
-          investigations: "No fresh imaging today | Existing MRI lumbar spine (March 2026) reviewed — degenerative changes only | Renal function checked given opioid plan",
-          medications:
-            "**Morphine 10 mg PO Q8H × 5-7 days** (short course, planned auto-stop 12 May) | Continue Dulotin (Duloxetine) | Continue Gabator NT (Gabapentin + Nortriptyline) | Continue Tryptomer (Amitriptyline) | Add **Lactulose 15 mL HS** (opioid-induced constipation prophylaxis)",
-          advice:
-            "**Do NOT drive while on Morphine** | Take with food | Watch for excessive sedation given existing SNRI + 2 TCAs | Hydration | Discontinue Morphine in ≤ 7 days; come back if pain persists",
-          followUp: "Within 7-10 days · earlier if respiratory depression, confusion, or no relief",
-          additionalNotes:
-            "**Cumulative sedative burden flagged**: patient already on SNRI + 2 TCAs + gabapentinoid before this opioid was added. Falls under Beers criteria for adults ≥60. Short course chosen to limit exposure; no refill anticipated.",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
-      ],
-    },
-    {
-      source: {
-        specialty: "Diabetology",
-        author: "Dr Nimit Shah",
-        date: "21 Mar 2026",
-      },
-      reason:
-        "Anchors the DM management arm. Most recent visit also documents an intercurrent infection treated within the diabetic context.",
-      dateRangeLabel: "21 Mar '26",
-      consultationCount: 1,
-      doctorsLabel: "Dr Nimit Shah",
-      // Verbatim from the diabetology visit (21 Mar 2026, Dr Nimit Shah).
-      lines: [
-        "**Findings**: **Type-2 Diabetes Mellitus, sub-optimally controlled** | Intercurrent viral URI | Sulfonylurea-on-board hypoglycaemia risk during reduced intake",
-        "**Medications**: Continue Amaryl M 1 (Glimepiride 1 + Metformin 500) BD with food | **Hold separate Amaryl 1 from Cardiology** (duplicate sulfonylurea concern flagged) | Paracetamol 500 mg q6h PRN | Levocetirizine 5 mg HS × 5 days | Adequate hydration",
-        "**Plan**: 26 Mar 2026 · review SMBG diary + URI resolution",
-      ],
-      openLoops: [
-        "Diabetology advised **HbA1c** as part of standard T2DM follow-up, no result on file in the current window",
-        "Diabetology scheduled **follow-up on 26 Mar 2026**, visit not yet recorded",
-      ],
-      consultations: [
         {
-          date: "21 Mar 2026",
+          date: "16 Feb 2026",
           visitType: "OPD",
-          doctor: "Dr Nimit Shah",
-          headline: "T2DM review with intercurrent **upper respiratory infection** (fever 101.2 °F)",
-          symptoms: "Cold-cough × 3 days | Fever spike to 101.2 °F yesterday | Mild headache | No SOB | Glycaemic diary not maintained recently",
-          examination: "T 100.4 °F at visit | HR 88 | BP 132/84 | WN WD, no pallor | Mild oral congestion | RS clear, CVS S1S2 normal, soft abdomen | AAO×3 | Sugar in clinic — random 198 mg/dL",
-          diagnosis: "**Type-2 Diabetes Mellitus, sub-optimally controlled** | Intercurrent viral URI | Sulfonylurea-on-board hypoglycaemia risk during reduced intake",
-          investigations: "HbA1c · FBS · PPBS · Urine R/M · CBC | If fever persists > 5 days, consider Dengue + Malaria + Typhi",
-          medications:
-            "Continue Amaryl M 1 (Glimepiride 1 + Metformin 500) BD with food | **Hold separate Amaryl 1 from Cardiology** (duplicate sulfonylurea concern flagged) | Paracetamol 500 mg q6h PRN | Levocetirizine 5 mg HS × 5 days | Adequate hydration",
-          advice:
-            "**SMBG (FBS + before-dinner) daily × 1 week** then bring chart | Home BP 8 am + 8 pm with chart | Eat small frequent meals during illness | Stop Glimepiride if appetite is poor — risk of silent hypoglycaemia (also on β-blocker masking)",
-          followUp: "26 Mar 2026 · review SMBG diary + URI resolution",
-          additionalNotes:
-            "Recognised the Cardiology-side Amaryl 1 duplicate today; written request placed for cross-team reconciliation. Patient counselled on the duplicate and asked NOT to take both.",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
-      ],
-    },
-    {
-      source: {
-        specialty: "Rheumatology",
-        author: "Dr Kunal Chandwar",
-        date: "2 Mar 2026",
-      },
-      reason:
-        "Polyarthritis on chronic steroid, bone-health implications layer onto the existing co-morbidity stack.",
-      dateRangeLabel: "2 Mar '26",
-      consultationCount: 1,
-      doctorsLabel: "Dr Kunal Chandwar",
-      // Verbatim from the rheumatology visit (2 Mar 2026, Dr Kunal Chandwar).
-      lines: [
-        "**Findings**: **Inflammatory polyarthritis (small + large joints)**, partially responsive to steroid taper | Differential: seronegative RA vs PMR-spectrum vs viral-trigger reactive | Steroid-related bone-health concern (60-yo, ongoing chronic steroid)",
-        "**Medications**: **Omnacortil 7.5 mg taper** schedule (continuing the existing taper, completing late April) | **Sunbless 60K weekly × 4 weeks** (Vit D loading dose, completed late April) | **CCM tablet** (Ca + Vit D3) ongoing for bone protection | NSAIDs avoided (renal + GI risk)",
-        "**Plan**: 16 Mar 2026 · with lab panel + clinical review",
-      ],
-      openLoops: [
-        "Rheumatology advised **CBC, ESR, SGPT, SGOT, CRP, Creatinine** on 2 Mar 2026, no results on file",
-        "Rheumatology scheduled **follow-up on 16 Mar 2026**, visit not yet recorded",
-      ],
-      consultations: [
         {
           date: "2 Mar 2026",
           visitType: "OPD",
-          doctor: "Dr Kunal Chandwar",
-          headline: "**Polyarthritis × 6 weeks** review — partial response on tapered steroid",
-          symptoms: "Joint pain × 6 weeks: L wrist · fingers · bilateral shoulders | Mildly better on Medrol 8 mg × 15 days | Paraesthesia bilateral lower limbs | Dorsal back pain (? degeneration vs osteoporosis) | No morning stiffness > 60 min | No skin rash",
-          examination: "MSK: **Flexor + wrist tenosynovitis** | Shoulder ROM mildly limited | No synovitis at MCPs | Neuro: distal sensory blunting LL, reflexes preserved",
-          diagnosis:
-            "**Inflammatory polyarthritis (small + large joints)**, partially responsive to steroid taper | Differential: seronegative RA vs PMR-spectrum vs viral-trigger reactive | Steroid-related bone-health concern (60-yo, ongoing chronic steroid)",
-          investigations: "**CBC · ESR · SGPT · SGOT · CRP · Creatinine** (panel ordered today) | RF · anti-CCP · ANA at next visit if persistent | DEXA scan in 4 weeks",
-          medications:
-            "**Omnacortil 7.5 mg taper** schedule (continuing the existing taper, completing late April) | **Sunbless 60K weekly × 4 weeks** (Vit D loading dose, completed late April) | **CCM tablet** (Ca + Vit D3) ongoing for bone protection | NSAIDs avoided (renal + GI risk)",
-          advice:
-            "Bone-protective diet | Sun exposure 15 min/day | Watch for fresh joint involvement | Notify if any vision changes, weight loss, scalp tenderness (PMR red flags) | Report compression-spine pain immediately",
-          followUp: "16 Mar 2026 · with lab panel + clinical review",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
+        },
+        {
+          date: "13 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
+        },
+        {
+          date: "19 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
+          headline: "Consultation by Dr PANKAJ SHAH /Dr MITHUN SHAH",
         },
       ],
     },
     {
-      source: {
-        specialty: "Neurology",
-        author: "Dr Nikhil Dave",
-        date: "16 Feb 2026",
-      },
-      reason:
-        "Co-prescribes gabapentin family alongside the neurosurgery team, primary cross-team coordination signal.",
-      dateRangeLabel: "20 Dec '25 - 16 Feb '26",
+      source: { specialty: "Neurosurgery", author: "DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA", date: "18 Jul 2025" },
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "10 Jun 2025 - 18 Jul 2025",
+      consultationCount: 3,
+      doctorsLabel: "DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA",
+      lines: [
+        "**Medications**: **Palmiges Capsule** | **Gabator Nt 300MG Tablet** | **Mbtron Plus Tablet** | **Agoty Tablet** | **Dulotin 10MG Tablet** | **Pantodac 40MG 10**",
+      ],
+      consultations: [
+        {
+          date: "10 Jun 2025",
+          visitType: "OPD",
+          doctor: "DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA",
+          headline: "Palmiges Capsule regimen prescribed",
+          medications: "**Palmiges Capsule**",
+        },
+        {
+          date: "11 Jun 2025",
+          visitType: "OPD",
+          doctor: "DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA",
+          headline: "Palmiges Capsule regimen prescribed",
+          medications: "**Palmiges Capsule** | **Gabator Nt 300MG Tablet** | **Mbtron Plus Tablet** | **Agoty Tablet** | **Dulotin 10MG Tablet** | **Pantodac 40MG 10**",
+        },
+        {
+          date: "18 Jul 2025",
+          visitType: "OPD",
+          doctor: "DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA",
+          headline: "Palmiges Capsule regimen prescribed",
+          medications: "**Palmiges Capsule** | **Gabator Nt 300MG Tablet** | **Mbtron Plus Tablet** | **Agoty Tablet** | **Dulotin 10MG Tablet** | **Pantodac 40MG 10**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Gastroenterology", author: "Dr Nilay Mehta / Dr Tejas Modi", date: "20 Mar 2026" },
+      reason: "Verbatim from OMOP · 2 visits across the consultation window.",
+      dateRangeLabel: "10 Feb 2025 - 20 Mar 2026",
+      consultationCount: 2,
+      doctorsLabel: "Dr Nilay Mehta / Dr Tejas Modi",
+      lines: [
+        "**Medications**: **Pantodac 40MG Tablet** | **Udiliv 300MG Tablet** | **Dolo 650MG Tablet** | **Magnex Forte 3Gm Injection**",
+      ],
+      consultations: [
+        {
+          date: "10 Feb 2025",
+          visitType: "OPD",
+          doctor: "Dr Tejas Modi",
+          headline: "Consultation by Dr Tejas Modi",
+        },
+        {
+          date: "20 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Nilay Mehta",
+          headline: "Pantodac 40MG Tablet regimen prescribed",
+          medications: "**Pantodac 40MG Tablet** | **Udiliv 300MG Tablet** | **Dolo 650MG Tablet** | **Magnex Forte 3Gm Injection**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Onco-surgery", author: "Dr Mahesh D Patel/ Dr S. Das", date: "19 Apr 2025" },
+      reason: "Verbatim from OMOP · 2 visits across the consultation window.",
+      dateRangeLabel: "4 Apr 2025 - 19 Apr 2025",
+      consultationCount: 2,
+      doctorsLabel: "Dr Mahesh D Patel/ Dr S. Das",
+      lines: [
+        "**Findings**: (no observation_text recorded)",
+      ],
+      consultations: [
+        {
+          date: "4 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr Mahesh D Patel/ Dr S. Das",
+          headline: "Consultation by Dr Mahesh D Patel/ Dr S. Das",
+        },
+        {
+          date: "19 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr Mahesh D Patel/ Dr S. Das",
+          headline: "Consultation by Dr Mahesh D Patel/ Dr S. Das",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Neurology", author: "Dr Nikhil Dave", date: "16 Feb 2026" },
+      reason: "Verbatim from OMOP · 2 visits across the consultation window.",
+      dateRangeLabel: "20 Dec 2025 - 16 Feb 2026",
       consultationCount: 2,
       doctorsLabel: "Dr Nikhil Dave",
-      // Verbatim from the most recent neurology visit
-      // (16 Feb 2026, Dr Nikhil Dave).
       lines: [
-        "**Findings**: Chronic neuropathic pain — **stable on dual-channel gabapentinoid + SNRI**",
-        "**Medications**: Continue Dulotin 10 mg | Continue Gabantin GRS 300 mg HS | Continue Progaba 6% gel | **All issued for 2 more months — supply ends 16 Apr 2026**",
-        "**Plan**: 16 Apr 2026 · refill review",
-      ],
-      openLoops: [
-        "Neurology issued the gabapentinoid regimen with **2-month supply ending 16 Apr 2026**, no refill prescription on file",
+        "**Findings**: (no observation_text recorded)",
       ],
       consultations: [
         {
           date: "20 Dec 2025",
           visitType: "OPD",
           doctor: "Dr Nikhil Dave",
-          headline: "Initial neurology takeover — **gabapentinoid management** assumed from Neurosurgery",
-          symptoms: "Heaviness in legs ongoing × months | No fresh paraesthesia escalation | Sleep affected by leg discomfort | No bladder / bowel involvement",
-          examination: "Vitals stable | LL: distal sensory blunting | Reflexes preserved | Power 5/5 | No long-tract signs | Tinel / Phalen negative at wrists",
-          diagnosis: "Chronic neuropathic pain (lower limb predominant), benefit from existing gabapentinoid · No fresh focal deficit",
-          investigations: "No fresh imaging today | Continue with current bloodwork cadence",
-          medications:
-            "**Dulotin 10 mg OD** (Duloxetine — SNRI) | **Gabantin GRS 300 mg HS** (Gabapentin sustained-release) | **Progaba 6% topical gel** to affected LL areas BD | Issued 2-month supply",
-          advice: "Take Gabantin with food | Watch for daytime drowsiness | Avoid driving when first titrating | Notify if any swelling, weight gain or mood changes",
-          followUp: "16 Feb 2026 · with refill review + symptom diary",
+          headline: "Dulotin 10MG Tablet regimen prescribed",
+          medications: "**Dulotin 10MG Tablet** | **Gabantin Grs 300MG Tablet** | **Benalgis 100MG Tablet** | **Progaba 30Gm Gel**",
         },
         {
           date: "16 Feb 2026",
           visitType: "OPD",
           doctor: "Dr Nikhil Dave",
-          headline: "2-month review · regimen continued, **2-month supply re-issued**",
-          symptoms: "LL heaviness improved subjectively ~40 % | Sleep better | No fresh paraesthesia | No mood changes",
-          examination: "Unchanged from December review · vitals stable",
-          diagnosis: "Chronic neuropathic pain — **stable on dual-channel gabapentinoid + SNRI**",
-          investigations: "Renal function check (gabapentin renal dosing) | No fresh imaging",
-          medications:
-            "Continue Dulotin 10 mg | Continue Gabantin GRS 300 mg HS | Continue Progaba 6% gel | **All issued for 2 more months — supply ends 16 Apr 2026**",
-          advice: "Same as previous visit | **Important: re-book before 16 Apr for refill** to avoid abrupt withdrawal",
-          followUp: "16 Apr 2026 · refill review",
-          additionalNotes:
-            "**Open loop**: as of today no refill prescription appears in the record. The 2-month supply ends 16 Apr 2026 — abrupt gabapentin discontinuation risks withdrawal symptoms.",
+          headline: "Consultation by Dr Nikhil Dave",
         },
       ],
     },
     {
-      source: {
-        specialty: "Neurosurgery",
-        author: "Dr Kalpesh Shah / Dr Yagneshkumar Saija",
-        date: "18 Jul 2025",
-      },
-      reason:
-        "Earliest specialty to address the neuropathic-pain arm; sets the gabapentin baseline that Neurology later layers on.",
-      dateRangeLabel: "10 Jun - 18 Jul '25",
-      consultationCount: 3,
-      doctorsLabel: "Dr Kalpesh Shah / Dr Y. Saija",
-      // Verbatim across all three neurosurgery visits — Dr Kalpesh Shah
-      // ran the initial + final visits; Dr Saija ran the next-day review.
+      source: { specialty: "Pulmonology", author: "Dr Avadh Vithlani", date: "9 May 2026" },
+      reason: "Verbatim from OMOP · 2 visits across the consultation window.",
+      dateRangeLabel: "7 May 2026 - 9 May 2026",
+      consultationCount: 2,
+      doctorsLabel: "Dr Avadh Vithlani",
       lines: [
-        "**Findings**: **Dr Kalpesh Shah (10 Jun '25)**: Atypical neuropathic-pain pattern, **TN-like in distribution but peripheral location** — investigate for nutritional / metabolic substrate.",
-        "**Findings**: **Dr Saija (11 Jun '25)**: TN-like extremity pain, **early response to gabapentinoid + low-dose TCA**.",
-        "**Findings**: **Dr Kalpesh Shah (18 Jul '25)**: TN-like neuropathic pain — **responding adequately**; chronic management handover to Neurology.",
-        "**Medications**: **Dr Kalpesh Shah (10 Jun '25)**: **Gabator NT 300 mg HS** (Gabapentin 300 + Nortriptyline 10) — start dose | Bone-health supplements continued.",
-        "**Medications**: **Dr Saija (11 Jun '25)**: Continue Gabator NT 300 mg HS.",
-        "**Medications**: **Dr Kalpesh Shah (18 Jul '25)**: Continue Gabator NT 300 mg HS — Neurology will continue care from next visit.",
-        "**Plan**: **Dr Kalpesh Shah (10 Jun '25)**: 11 Jun 2025 (next-day review).",
-        "**Plan**: **Dr Saija (11 Jun '25)**: 10 Jul 2025.",
-        "**Plan**: **Dr Kalpesh Shah (18 Jul '25)**: Neurology takeover — first visit booked 20 Dec 2025.",
+        "**Medications**: **Ceftriaxone injection** | **Doxy 100 mg  inj** | **INJ Hydrocort 100 MG IV 12 Hourly** | **Duolin Ld Respule** | **Budecort 0.5Mg Respules**",
       ],
-      // No open loops — ferritin + iron came back WNL on the 11 Jun + 18 Jul
-      // follow-ups, gabapentinoid management was formally handed to
-      // Neurology. Every action this team planned has closed.
       consultations: [
         {
-          date: "10 Jun 2025",
+          date: "7 May 2026",
           visitType: "OPD",
-          doctor: "Dr Kalpesh Shah",
-          headline: "Initial neurosurgery consult — **TN-like extremity pain** workup initiated",
-          symptoms: "TN (trigeminal-like) pain in extremities × ~8 weeks | Lancinating quality | Triggered by touch | Sleep disturbed",
-          examination: "No cranial-nerve deficit | LL: distal sensory blunting | Reflexes preserved | No motor weakness | No saddle anaesthesia",
-          diagnosis: "Atypical neuropathic-pain pattern, **TN-like in distribution but peripheral location** — investigate for nutritional / metabolic substrate",
-          investigations: "**Serum ferritin** · **Serum iron** · B12 · TSH · HbA1c (DM screen)",
-          medications: "**Gabator NT 300 mg HS** (Gabapentin 300 + Nortriptyline 10) — start dose | Bone-health supplements continued",
-          advice: "Sleep hygiene | Watch for dizziness on standing (TCA component of Gabator) | Hydration | Return if any motor weakness or bladder symptoms",
-          followUp: "11 Jun 2025 (next-day review)",
+          doctor: "Dr Avadh Vithlani",
+          headline: "Ceftriaxone injection regimen prescribed",
+          medications: "**Ceftriaxone injection** | **Doxy 100 mg  inj** | **INJ Hydrocort 100 MG IV 12 Hourly** | **Duolin Ld Respule** | **Budecort 0.5Mg Respules**",
         },
         {
-          date: "11 Jun 2025",
+          date: "9 May 2026",
           visitType: "OPD",
-          doctor: "Dr Yagneshkumar Saija",
-          headline: "Next-day review · pain pattern stable on initial Gabator NT",
-          symptoms: "Mild reduction in lancinating quality | Tolerating Gabator with no daytime drowsiness | Sleep slightly better",
-          examination: "Unchanged from yesterday | Vitals stable",
-          diagnosis: "TN-like extremity pain, **early response to gabapentinoid + low-dose TCA**",
-          investigations: "Lab panel sent yesterday awaited",
-          medications: "Continue Gabator NT 300 mg HS",
-          advice: "Continue current regimen | Bring lab results at next visit",
-          followUp: "10 Jul 2025",
+          doctor: "Dr Avadh Vithlani",
+          headline: "Ceftriaxone injection regimen prescribed",
+          medications: "**Ceftriaxone injection** | **Doxy 100 mg  inj** | **INJ Hydrocort 100 MG IV 12 Hourly** | **Duolin Ld Respule** | **Budecort 0.5Mg Respules**",
         },
+      ],
+    },
+    {
+      source: { specialty: "Clinical Immunology and Rheumatology", author: "Dr Kunal Chandwar", date: "2 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "2 Mar 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr Kunal Chandwar",
+      lines: [
+        "**Medications**: **Omnacortil 7.5Mg** | **Ccm Tablet** | **Sunbless 60K Capsule**",
+      ],
+      consultations: [
         {
-          date: "18 Jul 2025",
+          date: "2 Mar 2026",
           visitType: "OPD",
-          doctor: "Dr Kalpesh Shah",
-          headline: "**Final neurosurgery visit** — labs WNL, regimen handed to Neurology for chronic management",
-          symptoms: "Pain frequency ~50% reduced on Gabator | No fresh symptoms | Bowel / bladder normal",
-          examination: "Vitals stable | Distal sensory blunting unchanged | No long-tract signs",
-          diagnosis: "TN-like neuropathic pain — **responding adequately**; chronic management handover to Neurology",
-          investigations: "**Serum ferritin + iron WNL** | B12, TSH, HbA1c WNL — no nutritional or metabolic contributor",
-          medications: "Continue Gabator NT 300 mg HS — Neurology will continue care from next visit",
-          advice: "Booking made with Neurology for ongoing gabapentinoid management | Discharge from neurosurgery follow-up loop unless fresh signs",
-          followUp: "Neurology takeover — first visit booked 20 Dec 2025",
-          additionalNotes:
-            "Clean handover: all planned investigations resulted (ferritin + iron WNL), follow-ups kept (10 Jun → 11 Jun → 18 Jul), management formally transferred. No open loops on this team.",
+          doctor: "Dr Kunal Chandwar",
+          headline: "Omnacortil 7.5Mg regimen prescribed",
+          medications: "**Omnacortil 7.5Mg** | **Ccm Tablet** | **Sunbless 60K Capsule**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "E.N.T.", author: "Dr Monark Shah", date: "20 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "20 Mar 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr Monark Shah",
+      lines: [
+        "**Findings**: (no observation_text recorded)",
+      ],
+      consultations: [
+        {
+          date: "20 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Monark Shah",
+          headline: "Consultation by Dr Monark Shah",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Diabetology", author: "Dr NIMIT SHAH", date: "21 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "21 Mar 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr NIMIT SHAH",
+      lines: [
+        "**Medications**: **Pantodac 40MG Tablet** | **Azee 500MG Tablet** | **Magnex Forte 3Gm Injection** | **Medrol 4MG Tablet** | **Allegra 120MG Tablet** | **Orotons Oromucosal Spray** | **Zincovit Tablet** | **Zedex 100ML Syrup** | **Udiliv 300MG Tablet** | **Ultracet Tablet** | **Gluconorm G 1 Tablet** | **Ltk 50MG Tablet** | **Dolo 650MG Tablet**",
+      ],
+      consultations: [
+        {
+          date: "21 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Pantodac 40MG Tablet regimen prescribed",
+          medications: "**Pantodac 40MG Tablet** | **Azee 500MG Tablet** | **Magnex Forte 3Gm Injection** | **Medrol 4MG Tablet** | **Allegra 120MG Tablet** | **Orotons Oromucosal Spray** | **Zincovit Tablet** | **Zedex 100ML Syrup** | **Udiliv 300MG Tablet** | **Ultracet Tablet** | **Gluconorm G 1 Tablet** | **Ltk 50MG Tablet** | **Dolo 650MG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Surgical Gastroenterology", author: "DR AMIT SHAH", date: "4 May 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "4 May 2026",
+      consultationCount: 1,
+      doctorsLabel: "DR AMIT SHAH",
+      lines: [
+        "**Findings**: (no observation_text recorded)",
+      ],
+      consultations: [
+        {
+          date: "4 May 2026",
+          visitType: "OPD",
+          doctor: "DR AMIT SHAH",
+          headline: "Consultation by DR AMIT SHAH",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Pain Specialist", author: "Dr Milan Mehta", date: "5 May 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "5 May 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr Milan Mehta",
+      lines: [
+        "**Medications**: **Morphine 10MG Tablet**",
+      ],
+      consultations: [
+        {
+          date: "5 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Milan Mehta",
+          headline: "Morphine 10MG Tablet regimen prescribed",
+          medications: "**Morphine 10MG Tablet**",
         },
       ],
     },
   ],
-  // Section 3 · Where they collide — DDIs + coordination gaps, anchored to
-  // real guideline rules. Powers the existing collisions panel.
-  collisions: [
-    {
-      kind: "coordination-gap",
-      title: "**Oncology surveillance overdue**, 6+ months since last contact",
-      points: [
-        "Last oncology contact **30 Sep 2025**. Next NCCN-recommended window: **Mar 2026 at latest**.",
-        "Patient has documented **lung metastasis most likely** in condition_occurrence, trajectory should be active staging, not lapsed surveillance.",
-        "**CEA** last ordered 4 Apr 2025, no result row. **PET-CT** ordered same date, no result row.",
-      ],
-      rule: {
-        body: "NCCN",
-        year: "2024",
-        section: "Colon Ca v.2.2024 §SURV-1, SURV-2",
-        readableBody: "National Comprehensive Cancer Network — the US oncology body whose surveillance protocol is the standard most Indian oncology teams also follow.",
-        description: "Sets the surveillance schedule for colon-cancer patients after curative resection — when to draw the next CEA, when to image, when to scope.",
-        whyPicked: "Mr Patel had stage IIIB colon cancer (T3N2b) resected, with a documented lung-metastasis suspicion. NCCN §SURV-2 mandates CEA every 3-6 months for 5 years and CT C/A/P every 6-12 months for 3 years. His last oncology contact was 30 Sep 2025 — beyond the longest acceptable interval.",
-        fetches: "How overdue his next surveillance visit is, whether his last CEA result is on file, and whether his last imaging is.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "ddi",
-      title: "**Morphine** added to neuropathic stack",
-      points: [
-        "Pain Specialist (5 May 2026): **Morphine 10 mg PO**.",
-        "Patient already on Dulotin (SNRI) + Gabator NT (Gabapentin + Nortriptyline TCA) + Tryptomer (Amitriptyline TCA).",
-        "Respiratory depression + serotonin-syndrome risk in a 60-yo on chronic steroids.",
-      ],
-      rule: {
-        body: "Beers Criteria",
-        year: "2023",
-        section: "§Sedative + opioid in ≥60y",
-        readableBody: "American Geriatrics Society's published list of medications to avoid or use with caution in adults aged 60+.",
-        description: "Catalogues drugs that carry a higher risk profile in older adults — opioids, anticholinergics, sedatives — and the combinations that compound that risk.",
-        whyPicked: "Mr Patel is 60, on chronic steroids and already running an SNRI + two TCAs + a gabapentinoid. A new opioid (Morphine 10 mg PO, 5 May 2026) added to that stack falls inside the Beers warning for cumulative sedation + respiratory-depression risk + serotonin-syndrome overlap.",
-        fetches: "Which sedating agents are currently active, and the TCA + SNRI overlap that the Beers list flags.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "ddi",
-      title: "**Gabapentin double-dosing** across Neuro + Neurosurgery",
-      points: [
-        "Neurosurgery (10 Jun 2025): **Gabator NT 300 mg** (Gabapentin 300 + Nortriptyline 10).",
-        "Neurology (20 Dec 2025): **Gabantin GRS 300** (Gabapentin 300) + **Progaba gel 6%** (Gabapentin topical).",
-        "Same active ingredient from two teams, no shared reconciliation visible in the record.",
-      ],
-      rule: {
-        body: "NICE",
-        year: "2024",
-        section: "CG173 §Neuropathic Pain",
-        readableBody: "National Institute for Health and Care Excellence — UK national clinical-practice guideline body.",
-        description: "Specifies that neuropathic-pain control should be a single-agent gabapentinoid titrated to effect, not two gabapentinoids prescribed by different teams.",
-        whyPicked: "Two separate teams have Mr Patel on Gabapentin — Neurosurgery prescribed Gabator NT 300 mg (Gabapentin + Nortriptyline) on 10 Jun 2025, then Neurology added Gabantin GRS 300 (Gabapentin) plus topical Progaba 6% gel on 20 Dec 2025. No reconciliation visit appears in the record between the two prescriptions. NICE flags this exact duplication pattern.",
-        fetches: "The duplicate gabapentinoid prescriptions and which two teams own each.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "coordination-gap",
-      title: "**IV-grade pulmonology care coded as OPD** · 7-9 May 2026",
-      points: [
-        "Ceftriaxone IV + Hydrocort 100 mg IV q12h + Doxy IV + nebulised steroid burst.",
-        "This is normally inpatient-level care, either misclassified as OPD or genuine ambulatory IV burst.",
-        "Either way, worth confirming with the IPD pipeline.",
-      ],
-      rule: {
-        body: "BTS",
-        year: "2023",
-        section: "Community-Acquired Pneumonia",
-        readableBody: "British Thoracic Society — UK respiratory-medicine body whose CAP guideline is widely adopted globally.",
-        description: "Defines the severity score (CURB-65) at which a CAP patient should be managed as inpatient on IV antibiotics rather than discharged with oral ones.",
-        whyPicked: "Mr Patel received Ceftriaxone IV + Hydrocort 100 mg IV q12h + Doxy IV + nebulised steroid burst between 7-9 May 2026, but the visit was coded as OPD. That mix of IV antibiotics + steroids matches BTS severity thresholds for inpatient management, so the OPD coding is likely a classification gap worth confirming with the IPD pipeline.",
-        fetches: "Whether this episode's medication mix matches BTS inpatient-CAP criteria.",
-        confidence: "supportive",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "Re-engage oncology surveillance · book CEA + PET-CT before next chemo decision.",
-    "Reconcile gabapentinoids, single-agent rule per NICE CG173.",
-    "Verify IPD classification of the 7-9 May 2026 pulmonology episode.",
-    "Bone-mineral-density on chronic steroid + post-op + Vit D supplementation.",
-  ],
-  // Section 4 · Guideline anchors — guideline-anchored synthesis panels that
-  // reuse the existing Stack 2 design. Each panel cites the rule it applies.
-  syntheses: [
-    {
-      panelTitle: "NCCN colon-cancer surveillance status",
-      guideline: {
-        body: "NCCN",
-        year: "2024",
-        readableBody: "National Comprehensive Cancer Network — the most-cited international oncology guideline body.",
-        description: "Sets when a curatively-resected colon-cancer patient should be re-seen by oncology, when CEA should be re-drawn, and when imaging should be re-done.",
-        whyPicked: "Mr Patel had stage IIIB (T3N2b) colon Ca resected with adjuvant chemo and a documented lung-metastasis suspicion. The strongest single signal in his record is that his last oncology contact was 30 Sep 2025 — past the longest acceptable NCCN re-contact window.",
-        fetches: "Time since his last oncology visit, whether CEA + restaging imaging results are on file, and the next scope due-date.",
-        confidence: "established",
-      },
-      rows: [
-        {
-          label: "Months since last oncology contact",
-          value: "≥6",
-          ref: "Computed from MAX(visit_occurrence.visit_start_date WHERE specialty=Oncology) → today. NCCN §SURV-2 expects q3-6 mo.",
-          tone: "alert",
-        },
-        {
-          label: "CEA result on file",
-          value: "None in window",
-          ref: "Search measurement WHERE source matches /CEA|carcinoembryonic/ → 0 rows. Last advised 4 Apr 2025.",
-          tone: "alert",
-        },
-        {
-          label: "Imaging restaging",
-          value: "PET-CT ordered, no result",
-          ref: "observation.investigation_text on 4 Apr 2025 references PET-CT. No lab row matches.",
-          tone: "alert",
-        },
-      ],
-      note: "Triggered by condition_occurrence WHERE source matches Ca Hepatic Flexure + Lung metastasis most likely. NCCN surveillance is the strongest single signal in this patient's brief.",
-    },
-    {
-      panelTitle: "Polypharmacy · sedative + opioid burden",
-      guideline: {
-        body: "Beers",
-        year: "2023",
-        readableBody: "American Geriatrics Society Beers Criteria — the published list of medications and combinations that carry elevated risk in adults 60+.",
-        description: "Catalogues sedative + opioid combinations that compound respiratory and cognitive risk in older adults, plus serotonergic combinations (TCA + SNRI) that need separate flagging.",
-        whyPicked: "Mr Patel is 60, on chronic steroids, and his current active list combines Morphine + Gabator NT (with Nortriptyline TCA) + Dulotin (Duloxetine SNRI) + Tryptomer (Amitriptyline TCA). Three Beers triggers fire on this stack at once — sedation, respiratory depression, and serotonin-syndrome.",
-        fetches: "Each Beers trigger active on his current medications and the agents driving it.",
-        confidence: "established",
-      },
-      rows: [
-        {
-          label: "Active sedating agents",
-          value: "Morphine + Gabator NT + Dulotin + Tryptomer",
-          ref: "prescription records currently active (end_date ≥ today) joined by drug class.",
-          tone: "alert",
-        },
-        {
-          label: "TCA × SNRI overlap",
-          value: "Yes (Amitriptyline + Duloxetine)",
-          ref: "Tryptomer (TCA) co-prescribed with Dulotin (SNRI). Serotonergic stack flag.",
-          tone: "warn",
-        },
-      ],
-      note: "Triggered by drug_exposure pattern across Pain Specialist + Neurosurgery + Neurology. The morphine addition on 5 May 2026 is the tipping signal.",
-    },
-  ],
-  freshness: "OMOP-synced · the consultation period 10 Feb 2025 → 21 Mar 2026",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation · last refresh just now",
 }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -1201,11 +887,13 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
   freshness: "OMOP-synced · verbatim from drug_exposure + observation rows · last refresh just now",
 }
 // ═════════════════════════════════════════════════════════════════════════
-// ASHA_KRISHNAN_BRIEF_MOCK  ·  P3 · person_id 375391871728 · F · 57
+// ASHA_KRISHNAN_BRIEF_MOCK  ·  person_id 375391871728 · F · 57y
 // ─────────────────────────────────────────────────────────────────────────
-// Scenario: very narrow specialty footprint (4 providers over 59 visits).
-// Intentionally a SPARSE brief — demonstrates the design's behaviour when
-// there isn't a multi-team complexity to surface.
+// Rebuilt VERBATIM from the OMOP CDM export. Every drug name comes from
+// drug_exposure.drug_source_value (deduped per visit by brand + composition).
+// Every diagnosis / symptom / exam / advice / follow-up sentence comes from
+// observation.value_as_string. Co-morbidities pulled from condition_occurrence
+// (Active / Confirmed rows only).
 // ═════════════════════════════════════════════════════════════════════════
 export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientName: "Asha Krishnan",
@@ -1216,234 +904,690 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientId: "375391871728",
   medicalHistory: [
     {
-      title: "Primary problem",
-      tone: "primary",
-      items: [{ text: "**Hypertension** (chronic, anchor diagnosis)" }],
-      sources: [
-        { doctor: "Dr Raj Changela (Internal Medicine)", date: "12 Apr 2025" },
-        { doctor: "Dr Raj Changela (Internal Medicine)", date: "8 Sep 2025" },
-        { doctor: "Dr Raj Changela (Internal Medicine)", date: "21 Mar 2026" },
-      ],
-      reasoning: "Hypertension is the chronic anchor diagnosis. The rest of the record is intercurrent acute events.",
-    },
-    {
       title: "Co-morbidities",
       tone: "neutral",
-      items: [{ text: "No additional chronic conditions on record" }],
+      items: [
+        { text: "**Acute Viral Fever** (Active)" },
+        { text: "**Hypertension** (Active)" },
+      ],
       sources: [],
-      reasoning: "Apart from hypertension, no other chronic conditions have been documented in this patient's consultations.",
+      reasoning: "Pulled from condition_occurrence WHERE status IN (Active, Confirmed).",
     },
     {
       title: "Surgical history",
       tone: "neutral",
-      items: [{ text: "**Left tendoachilles repair** (prior to current consultations)" }],
-      sources: [
-        { doctor: "Dr Yatin Desai (Orthopaedics)", date: "10 May 2025" },
-        { doctor: "Dr Yatin Desai (Orthopaedics)", date: "15 Aug 2025" },
+      items: [
+        { text: "**Operated Case Of Left Tendoachilles Repair.** (Active)" },
       ],
-      reasoning: "Surgery happened before the current consultation period. Only post-op follow-up under Dr Yatin Desai is recorded in the current record.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
     },
-    // Acute episodes (recurrent viral URI / fever) intentionally NOT carried
-    // in Medical history — those are intercurrent events, not chronic history.
-    // The 6-episode pattern surfaces in the ENT + Internal Medicine specialty
-    // sections instead, which is where episodic events belong.
     {
       title: "Allergies & safety",
       tone: "neutral",
-      items: [{ text: "Allergy review not on file (prescriptions made without documented status)" }],
+      items: [
+        { text: "Allergy review not explicitly verified" },
+      ],
       sources: [],
-      reasoning: "Every prescription in this patient's record was issued without an allergy entry. Highest-priority gap to close.",
+      reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
     },
   ],
-  windowDays: 380,
+  windowDays: 382,
   specialties: [
     {
-      source: { specialty: "Internal Medicine", author: "Dr Raj Changela", date: "21 Mar 2026" },
-      reason: "Anchor team, 40 visits with Dr Raj Changela across the window.",
-      dateRangeLabel: "12 Apr '25 - 21 Mar '26",
-      consultationCount: 40,
-      doctorsLabel: "Dr Raj Changela",
-      // Verbatim from the most recent Internal Medicine visit
-      // (21 Mar 2026, Dr Raj Changela).
+      source: { specialty: "Plastic Surgery", author: "Dr Girish Amlani", date: "30 Apr 2026" },
+      reason: "Verbatim from OMOP · 45 visits across the consultation window.",
+      dateRangeLabel: "9 May 2025 - 30 Apr 2026",
+      consultationCount: 45,
+      doctorsLabel: "Dr Girish Amlani",
       lines: [
-        "**Findings**: HTN stable | History of recurrent viral URI (≥ 3 per year)",
-        "**Medications**: Continue Amlodipine 5 + Telmisartan 40",
-        "**Plan**: After 3 months · sooner if any fresh URI episode",
-      ],
-      openLoops: [
-        "Internal Medicine prescribed multiple courses without first **documenting allergy status**, allergy review still pending",
-      ],
-      // Three representative visits across the 40-visit window — an HTN
-      // baseline review, a viral-fever episode, and the most-recent visit.
-      consultations: [
-        {
-          date: "12 Apr 2025",
-          visitType: "OPD",
-          doctor: "Dr Raj Changela",
-          headline: "Routine **HTN baseline review** — regimen continuation",
-          symptoms: "No active complaints | BP diary maintained at home | Adherent to meds | Mild headache occasionally on hot days",
-          examination: "BP 138/86 (3-reading average) | HR 78 | BMI 26.4 | Cardio-respiratory exam normal | No pedal oedema | Fundus not examined today",
-          diagnosis: "**Essential Hypertension**, stage 1 — adequately controlled on current regimen",
-          investigations: "Renal function · Electrolytes · Lipid profile · ECG (annual cadence)",
-          medications: "**Amlodipine 5 mg OD** continued | **Telmisartan 40 mg OD** continued | No new additions",
-          advice: "DASH-style diet | < 5 g salt/day | Daily walking 30 min | Home BP twice weekly | Return immediately if BP > 160/100 or any chest discomfort",
-          followUp: "After 3 months · or sooner if symptoms",
-          additionalNotes: "**No allergy review documented at this visit** — gap noted at brief level.",
-        },
-        {
-          date: "8 Sep 2025",
-          visitType: "OPD",
-          doctor: "Dr Raj Changela",
-          headline: "**Viral fever** episode — 5th URI of the year",
-          symptoms: "Fever 100.8 °F × 2 days | Sore throat | Mild cough | Body aches | No SOB | No GI symptoms",
-          examination: "T 100.4 °F | HR 92 | BP 128/82 | Throat congested, no exudate | Chest clear | No lymphadenopathy",
-          diagnosis: "**Acute viral URI** | Background HTN, stable",
-          investigations: "Symptomatic if fever > 5 days → CBC, Dengue NS1 + IgM, Malaria smear",
-          medications: "**Paracetamol 500 mg q6h PRN** | **Levocetirizine 5 mg HS × 5 days** | **Cough syrup** dextromethorphan-based | Adequate hydration | Salt-water gargles BD",
-          advice: "Bed rest × 2-3 days | Return if fever > 5 days, breathlessness, or any haemoptysis",
-          followUp: "PRN if no improvement in 5 days",
-          additionalNotes: "**Repeat allergy review pending**: no entry in record despite this being the 5th URI episode this year.",
-        },
-        {
-          date: "21 Mar 2026",
-          visitType: "OPD",
-          doctor: "Dr Raj Changela",
-          headline: "Most recent visit · HTN review + recurrent-URI counselling",
-          symptoms: "No active fever | HTN diary continued | Slight fatigue post latest URI episode",
-          examination: "BP 132/82 | HR 76 | No fresh findings on systems review",
-          diagnosis: "HTN stable | History of recurrent viral URI (≥ 3 per year)",
-          investigations: "Repeat CBC · ESR · CRP · Immunoglobulin profile if frequency persists",
-          medications: "Continue Amlodipine 5 + Telmisartan 40",
-          advice: "Annual influenza vaccination | Vitamin D 60K monthly × 3 months (if deficient on screen) | Avoid crowded indoor spaces during flu season",
-          followUp: "After 3 months · sooner if any fresh URI episode",
-        },
-      ],
-    },
-    {
-      source: { specialty: "Orthopaedics", author: "Dr Yatin Desai", date: "15 Aug 2025" },
-      reason: "Post Achilles-repair follow-up series under Dr Yatin Desai.",
-      dateRangeLabel: "10 May - 15 Aug '25",
-      consultationCount: 8,
-      doctorsLabel: "Dr Yatin Desai",
-      // Verbatim from the most recent orthopaedics visit
-      // (15 Aug 2025, Dr Yatin Desai — the 3-month milestone review).
-      lines: [
-        "**Findings**: Achilles repair, **good functional recovery at 3 months** — continue rehab",
-        "**Medications**: No active pain meds",
-        "**Plan**: 6-month review — final discharge if functional recovery complete",
+        "**Findings**: Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+        "**Medications**: **Sulbacin Tablet**",
+        "**Plan**: 7 May 2026",
       ],
       consultations: [
         {
-          date: "10 May 2025",
+          date: "9 May 2025",
           visitType: "OPD",
-          doctor: "Dr Yatin Desai",
-          headline: "**Immediate post-op review** — Left Achilles repair, suture inspection (week 2)",
-          symptoms: "Mild discomfort at operative site | Limited ankle dorsiflexion | No fever | No fresh swelling",
-          examination: "Operative wound clean, dry, no discharge | Sutures intact | Distal pulses palpable | No erythema | Cast intact",
-          diagnosis: "Status post **Left Achilles tendon repair**, healing as expected — week 2",
-          investigations: "Wound inspection only today",
-          medications: "Paracetamol 500 mg PRN for pain | Pantoprazole 40 mg OD × 2 weeks | No NSAIDs",
-          advice: "Non-weight-bearing × 4 more weeks | Cast care education | Watch for fever, calf swelling (DVT) | Daily quad isometrics",
-          followUp: "Week 4 — suture removal + cast change",
+          doctor: "Dr Girish Amlani",
+          headline: "Ceftum 500MG Tablet regimen prescribed",
+          symptoms: "Follow up operated case of left tendoachillies repair. | Last Swab culture till now no growth. | Wound healed well",
+          medications: "**Ceftum 500MG Tablet**",
+          followUp: "12 May 2025",
         },
         {
-          date: "15 Aug 2025",
+          date: "14 May 2025",
           visitType: "OPD",
-          doctor: "Dr Yatin Desai",
-          headline: "**3-month milestone (week 12)** — progressive weight bearing + physio review",
-          symptoms: "Comfortable | Walking with mild ankle stiffness | No pain at rest | Stair climbing limited",
-          examination: "Operative scar well-healed | Mild ankle dorsiflexion deficit | Strength 4+/5 plantarflexion | Calf girth slightly reduced",
-          diagnosis: "Achilles repair, **good functional recovery at 3 months** — continue rehab",
-          investigations: "No fresh imaging today",
-          medications: "No active pain meds",
-          advice: "**Progressive weight bearing** as tolerated | Continue physio 2-3 sessions/week | Heel-raise exercises × 30 reps BD | Return to non-impact sport at 6 months",
-          followUp: "6-month review — final discharge if functional recovery complete",
+          doctor: "Dr Girish Amlani",
+          headline: "Ceftum 500MG Tablet regimen prescribed",
+          symptoms: "Follow up operated case of left tendoachillies repair. | Last Swab culture till now no growth.",
+          examination: "Wound healed well",
+          medications: "**Ceftum 500MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "16 May 2025",
+        },
+        {
+          date: "16 May 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Follow up operated case of left tendoachillies repair. | Last Swab culture till now no gro",
+          symptoms: "Follow up operated case of left tendoachillies repair. | Last Swab culture till now no growth.",
+          examination: "Wound healed well",
+          advice: "Minor dressing done",
+          followUp: "19 May 2025",
+        },
+        {
+          date: "19 May 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Follow up operated case of left tendoachillies repair.",
+          symptoms: "Follow up operated case of left tendoachillies repair.",
+          examination: "Wound healed well",
+          advice: "Minor dressing done",
+          followUp: "21 May 2025",
+        },
+        {
+          date: "22 May 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          advice: "Minor dressing done",
+          followUp: "24 May 2025",
+        },
+        {
+          date: "27 May 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          advice: "Minor dressing done",
+          followUp: "30 May 2025",
+        },
+        {
+          date: "30 May 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          advice: "Minor dressing done",
+          followUp: "3 Jun 2025",
+        },
+        {
+          date: "4 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          advice: "Minor dressing done",
+          followUp: "6 Jun 2025",
+        },
+        {
+          date: "10 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "17 Jun 2025",
+        },
+        {
+          date: "19 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "24 Jun 2025",
+        },
+        {
+          date: "21 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "24 Jun 2025",
+        },
+        {
+          date: "24 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "30 Jun 2025",
+        },
+        {
+          date: "26 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "3 Jul 2025",
+        },
+        {
+          date: "21 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "29 Jul 2025",
+        },
+        {
+          date: "25 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "29 Jul 2025",
+        },
+        {
+          date: "31 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet** | **Neosporin 10Gm Powder** | **Betadine 10Gm Powder**",
+          advice: "Minor dressing done",
+          followUp: "5 Aug 2025",
+        },
+        {
+          date: "4 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet** | **Neosporin 10Gm Powder** | **Betadine 10Gm Powder**",
+          advice: "Minor dressing done",
+          followUp: "7 Aug 2025",
+        },
+        {
+          date: "6 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          advice: "Minor dressing done",
+          followUp: "8 Aug 2025",
+        },
+        {
+          date: "13 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "19 Aug 2025",
+        },
+        {
+          date: "18 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "25 Aug 2025",
+        },
+        {
+          date: "27 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "1 Sep 2025",
+        },
+        {
+          date: "1 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "4 Sep 2025",
+        },
+        {
+          date: "10 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Zifi Cv 200MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Zifi Cv 200MG Tablet** | **Betadine 10Gm Powder**",
+          advice: "Minor dressing done",
+          followUp: "15 Sep 2025",
+        },
+        {
+          date: "18 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Moxif 400MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Moxif 400MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "20 Sep 2025",
+        },
+        {
+          date: "20 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Moxif 400MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Moxif 400MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "23 Sep 2025",
+        },
+        {
+          date: "24 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Moxif 400MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Moxif 400MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "29 Sep 2025",
+        },
+        {
+          date: "29 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Moxif 400MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Moxif 400MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "4 Oct 2025",
+        },
+        {
+          date: "6 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Moxif 400MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Moxif 400MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "11 Oct 2025",
+        },
+        {
+          date: "6 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "11 Oct 2025",
+        },
+        {
+          date: "13 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "17 Oct 2025",
+        },
+        {
+          date: "25 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "1 Nov 2025",
+        },
+        {
+          date: "31 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "5 Nov 2025",
+        },
+        {
+          date: "7 Nov 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "14 Nov 2025",
+        },
+        {
+          date: "15 Nov 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "25 Nov 2025",
+        },
+        {
+          date: "26 Nov 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "6 Dec 2025",
+        },
+        {
+          date: "2 Dec 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "9 Dec 2025",
+        },
+        {
+          date: "29 Dec 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "5 Jan 2026",
+        },
+        {
+          date: "31 Dec 2025",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "7 Jan 2026",
+        },
+        {
+          date: "18 Feb 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "23 Feb 2026",
+        },
+        {
+          date: "27 Feb 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Doxy 100MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies",
+          examination: "wound healed well",
+          medications: "**Doxy 100MG Tablet** | **Gabapin Nt 100MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "11 Mar 2026",
+        },
+        {
+          date: "6 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Zifi Cv 200MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          examination: "Flank Pus Discharge Present, Swab Taken & sent for Culture",
+          investigations: "Culture & Sensitivity - Swab Remark: Left Tendoachillies Region",
+          medications: "**Zifi Cv 200MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "7 Apr 2026",
+        },
+        {
+          date: "7 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Zifi Cv 200MG Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          examination: "Flank Pus Discharge Present, Swab Taken & sent for Culture",
+          medications: "**Zifi Cv 200MG Tablet**",
+          advice: "Minor dressing done",
+          followUp: "8 Apr 2026",
+        },
+        {
+          date: "9 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          symptoms: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          examination: "Swab culture Noted- No Growth",
+          advice: "Minor dressing done",
+          followUp: "11 Apr 2026",
+        },
+        {
+          date: "27 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "8 May 2026",
+        },
+        {
+          date: "30 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Girish Amlani",
+          headline: "Sulbacin Tablet regimen prescribed",
+          symptoms: "Operated case of Left Tendoachillies | Swelling & Pus Discharge+",
+          medications: "**Sulbacin Tablet**",
+          advice: "Minor dressing done",
+          followUp: "7 May 2026",
         },
       ],
     },
     {
-      source: { specialty: "ENT", author: "Dr Lav Selarka", date: "14 Feb 2026" },
-      reason: "Recurrent URI episodes managed by Dr Lav Selarka.",
-      dateRangeLabel: "5 Jun '25 - 14 Feb '26",
-      consultationCount: 6,
-      doctorsLabel: "Dr Lav Selarka",
-      // Verbatim from the most recent ENT visit (14 Feb 2026, Dr Lav Selarka).
+      source: { specialty: "Orthopaedics", author: "Dr TEJAS THAKKER", date: "6 Mar 2026" },
+      reason: "Verbatim from OMOP · 10 visits across the consultation window.",
+      dateRangeLabel: "14 Apr 2025 - 6 Mar 2026",
+      consultationCount: 10,
+      doctorsLabel: "Dr TEJAS THAKKER",
       lines: [
-        "**Findings**: **Acute viral pharyngitis** (3rd episode this calendar year)",
-        "**Medications**: **Betadine gargles BD × 5 days** | Paracetamol PRN | Levocetirizine 5 mg HS × 5 days | Lozenges PRN",
-        "**Plan**: PRN if symptoms > 7 days or any worsening",
+        "**Medications**: **Ccm Tablet** | **Osteofos 35MG Tablet** | **Macvestin 500MG Tablet**",
       ],
       consultations: [
         {
-          date: "14 Feb 2026",
+          date: "14 Apr 2025",
           visitType: "OPD",
-          doctor: "Dr Lav Selarka",
-          headline: "Most recent ENT visit · **acute viral pharyngitis** (6th URI of the year)",
-          symptoms: "Sore throat × 3 days | Mild fever | Painful swallowing | Hoarse voice | No SOB | No drooling",
-          examination: "Throat: pharyngeal congestion, no tonsillar exudate | No cervical lymphadenopathy | Ears clear | Anterior rhinoscopy: mild congestion",
-          diagnosis: "**Acute viral pharyngitis** (3rd episode this calendar year)",
-          investigations: "Throat swab not routinely needed | If episodes ≥ 5/year → immunological workup recommended",
-          medications: "**Betadine gargles BD × 5 days** | Paracetamol PRN | Levocetirizine 5 mg HS × 5 days | Lozenges PRN",
-          advice: "Voice rest | Adequate hydration | Avoid cold drinks | Steam inhalation BD",
-          followUp: "PRN if symptoms > 7 days or any worsening",
-          additionalNotes: "Pattern across the window: 6 visits, all viral pattern, no bacterial trigger documented. No allergy work-up done despite Levocetirizine and antibiotic exposure across the year.",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+          followUp: "28 Apr 2025",
+        },
+        {
+          date: "21 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+          followUp: "28 Apr 2025",
+        },
+        {
+          date: "24 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Linid 600MG Tablet regimen prescribed",
+          medications: "**Linid 600MG Tablet** | **Ccm Tablet**",
+          followUp: "28 Apr 2025",
+        },
+        {
+          date: "28 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+          followUp: "2 May 2025",
+        },
+        {
+          date: "19 May 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+        },
+        {
+          date: "4 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+        },
+        {
+          date: "9 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+        },
+        {
+          date: "17 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+        },
+        {
+          date: "26 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Consultation by Dr TEJAS THAKKER",
+        },
+        {
+          date: "6 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr TEJAS THAKKER",
+          headline: "Ccm Tablet regimen prescribed",
+          medications: "**Ccm Tablet** | **Osteofos 35MG Tablet** | **Macvestin 500MG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Diabetology", author: "Dr Kalpesh Talati / Dr Rushikesh Shah", date: "13 Oct 2025" },
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "3 Oct 2025 - 13 Oct 2025",
+      consultationCount: 3,
+      doctorsLabel: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+      lines: [
+        "**Findings**: NUMBNESS ON LEFT FLANK SIDE | URINATION - since , severity -, DARK COLOR;SWELLING IN HANDS",
+        "**Medications**: **Shelcal Xt Tablet** | **Supradyn Tablet** | **Sunbless 60K Capsule** | **Pantodac Dsr Capsule** | **Atarax Itch Lotion**",
+        "**Plan**: 13 Jan 2026",
+      ],
+      consultations: [
+        {
+          date: "3 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+          headline: "Fdson 12MG Tablet regimen prescribed",
+          symptoms: "Fever- since 1 Day, severity -,",
+          medications: "**Fdson 12MG Tablet** | **Supradyn Tablet** | **Pantodac Dsr Capsule** | **Dolo 650MG Tablet**",
+          advice: "Adequate oral fluids",
+          followUp: "6 Oct 2025",
+          additionalNotes: "DENGUE SEROLOGY",
+        },
+        {
+          date: "6 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+          headline: "Shelcal Xt Tablet regimen prescribed",
+          symptoms: "Itching- since 3 Day(s), severity -,",
+          medications: "**Shelcal Xt Tablet** | **Supradyn Tablet** | **Sunbless 60K Capsule** | **Pantodac Dsr Capsule** | **Atarax Itch Lotion**",
+          advice: "Adequate oral fluids",
+          followUp: "6 Jan 2026",
+        },
+        {
+          date: "13 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+          headline: "Shelcal Xt Tablet regimen prescribed",
+          symptoms: "NUMBNESS ON LEFT FLANK SIDE | URINATION - since , severity -, DARK COLOR;SWELLING IN HANDS",
+          medications: "**Shelcal Xt Tablet** | **Supradyn Tablet** | **Sunbless 60K Capsule** | **Pantodac Dsr Capsule** | **Atarax Itch Lotion**",
+          advice: "Adequate oral fluids",
+          followUp: "13 Jan 2026",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Onco-surgery", author: "Dr Raghuvir Solanki / Dr. Jatinkumar Bhojani", date: "11 Jul 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "11 Jul 2025",
+      consultationCount: 1,
+      doctorsLabel: "Dr Raghuvir Solanki / Dr. Jatinkumar Bhojani",
+      lines: [
+        "**Plan**: FOLLOW UP WITH DR GIRISH AMLANI SIR",
+      ],
+      consultations: [
+        {
+          date: "11 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Raghuvir Solanki / Dr. Jatinkumar Bhojani",
+          headline: "Consultation by Dr Raghuvir Solanki / Dr. Jatinkumar Bhojani",
+          advice: "CLEANING AND DRESSING | CONTINUE DRESSING",
+          additionalNotes: "FOLLOW UP WITH DR GIRISH AMLANI SIR",
         },
       ],
     },
   ],
-  collisions: [
-    {
-      kind: "coordination-gap",
-      title: "**Allergy status missing across all Rx**, entire record lacks allergy verification",
-      points: [
-        "182 prescription records; zero allergy verification rows in condition_occurrence.",
-        "Each new Rx assumes no allergy. Risk compounds with every prescription.",
-      ],
-      rule: {
-        body: "WHO HEARTS",
-        year: "2023",
-        section: "Primary-care Rx safety",
-        readableBody: "World Health Organization HEARTS — the WHO primary-care implementation package for cardiovascular and prescribing safety in low-and-middle-income-country settings.",
-        description: "Sets the baseline that every primary-care prescription must be preceded by a documented allergy review (drug + food + contrast as applicable).",
-        whyPicked: "Ms Krishnan has 182 prescription records across the consultation window and zero matching allergy-verification rows. Every new Rx is therefore being written on an unverified safety premise, and the risk compounds with each addition.",
-        fetches: "Whether any of the 182 prescriptions has a paired allergy-review entry.",
-        confidence: "established",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "Document allergy status at next visit (drug + food + contrast).",
-    "Workup recurrent viral fevers if frequency ≥ 3/year continues.",
-  ],
-  syntheses: [
-    {
-      panelTitle: "Primary-care HTN bundle",
-      guideline: {
-        body: "WHO HEARTS",
-        year: "2023",
-        readableBody: "World Health Organization HEARTS hypertension bundle — the WHO's primary-care BP-control package designed for outpatient settings.",
-        description: "Defines the standard BP target, risk-factor screen, and lifestyle counselling that should be on file for every hypertensive primary-care patient.",
-        whyPicked: "Ms Krishnan carries Essential Hypertension across consultations, on a multi-agent anti-HTN regimen. WHO HEARTS provides the target most-followed in primary-care clinics for non-diabetic adults.",
-        fetches: "Her current BP target and whether a structured BP trend is captured in measurements.",
-        confidence: "supportive",
-      },
-      rows: [
-        { label: "BP target", value: "<140/90", ref: "Standard adult target without diabetes.", tone: "ok" },
-        { label: "BP trend captured", value: "No", ref: "No lab rows of type 8480-6/8462-4.", tone: "alert" },
-      ],
-      note: "Sparse data limits panel firing, most metrics aren't ingested.",
-    },
-  ],
-  freshness: "Synced just now",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation · last refresh just now",
 }
-
 // ═════════════════════════════════════════════════════════════════════════
-// MEERA_JOSHI_BRIEF_MOCK  ·  P4 · person_id 241381057447 · F · 58
+// MEERA_JOSHI_BRIEF_MOCK  ·  person_id 241381057447 · F · 58y
 // ─────────────────────────────────────────────────────────────────────────
-// Scenario: dense cardio-cerebro-metabolic stack — CAD + prior CVA + DM +
-// Hypothyroid + NAFLD + obesity + LSCS/TL/renal-stone surgical history.
-// Demonstrates the "extensive data" case with prominent secondary-prevention
-// signals.
+// Rebuilt VERBATIM from the OMOP CDM export. Every drug name comes from
+// drug_exposure.drug_source_value (deduped per visit by brand + composition).
+// Every diagnosis / symptom / exam / advice / follow-up sentence comes from
+// observation.value_as_string. Co-morbidities pulled from condition_occurrence
+// (Active / Confirmed rows only).
 // ═════════════════════════════════════════════════════════════════════════
 export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientName: "Meera Joshi",
@@ -1454,424 +1598,457 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientId: "241381057447",
   medicalHistory: [
     {
-      title: "Primary problem",
-      tone: "primary",
-      items: [
-        { text: "**Coronary artery disease** (CAD, on dual antiplatelet for secondary prevention)" },
-        { text: "**Prior CVA** (cerebrovascular event, recovered)" },
-      ],
-      sources: [
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "16 Apr 2025" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "8 May 2025" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "20 Jan 2026" },
-        { doctor: "Dr Tejas Modi (Gastroenterology)", date: "10 Jul 2025" },
-      ],
-      reasoning:
-        "CAD with prior CVA in a 58-year-old female on dual antiplatelet (Aspirin plus Clopidogrel) and chronic statin. Classic secondary-prevention pattern; DAPT duration likely exceeded the optimal window for de-escalation review.",
-    },
-    {
       title: "Co-morbidities",
       tone: "neutral",
       items: [
+        { text: "**Dyslipidemia** (Active)" },
+        { text: "**CAD** (Active)" },
+        { text: "**Renal stone** (Active)" },
         { text: "**Hypothyroidism** (Active)" },
-        { text: "**Type-2 Diabetes Mellitus** (Active)" },
-        { text: "**Dyslipidaemia** (Active)" },
-        { text: "**Essential Hypertension** (Active)" },
-        { text: "**Obesity** (Active)" },
         { text: "**NAFLD** (Active)" },
-        { text: "**MDR-resistant UTI** (Recent)" },
+        { text: "**Obesity** (Active)" },
+        { text: "**DM** (Active)" },
+        { text: "**CVA** (Active)" },
+        { text: "**Hypertension** (Active)" },
+        { text: "**Diabetes** (Active)" },
+        { text: "**HTN** (Active)" },
+        { text: "**IHD -post Ptca** (Active)" },
+        { text: "**DM Type 2** (Active)" },
+        { text: "**Old CVA** (Active)" },
+        { text: "**Primary hyperparathyroidism** (Active)" },
+        { text: "**-** (Active)" },
+        { text: "**Type 2 Diabetes** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "16 Apr 2025" },
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "9 May 2026" },
-        { doctor: "Dr Payal Shah (Endocrinology)", date: "16 Feb 2026" },
-        { doctor: "Dr Payal Shah (Endocrinology)", date: "27 Mar 2026" },
-        { doctor: "Dr Shivang Sharma (Infectious Diseases)", date: "1-month UTI course" },
-      ],
-      reasoning:
-        "Classic metabolic syndrome layered onto cardiovascular disease. The recent MDR UTI in a diabetic with renal-stone history is a clinically significant addition; high event-recurrence risk and aggressive multi-target prevention needed.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE status IN (Active, Confirmed).",
     },
     {
       title: "Surgical history",
       tone: "neutral",
       items: [
-        { text: "**Lower-Segment Caesarean Section** (LSCS, historical)" },
-        { text: "**Tubal ligation** (historical)" },
-        { text: "**Renal-stone surgery** (historical)" },
+        { text: "**TL** (Active)" },
+        { text: "**LSCS** (Active)" },
+        { text: "**Renal stone surgery** (Active)" },
+        { text: "**Anroectal surgery** (Active)" },
       ],
-      sources: [
-        { doctor: "Historical context (multiple visits)", date: "prior to current consultations" },
-      ],
-      reasoning: "Surgical history reconstructed from consultation narrative; events happened before the current consultation period.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
       items: [
-        { text: "**No known drug allergy** (verified across 39 visits)" },
-        { text: "**No known food allergy** (verified across 36 visits)" },
+        { text: "**No known drug allergy** (Active)" },
+        { text: "**No known food allergy** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Nimit Shah (Diabetology)", date: "9 May 2026" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "20 Jan 2026" },
-        { doctor: "Dr Tejas Modi (Gastroenterology)", date: "9 May 2026" },
-        { doctor: "Dr Nikhil Dave (Neurology)", date: "26 Mar 2026" },
-        { doctor: "Dr Payal Shah (Endocrinology)", date: "27 Mar 2026" },
-      ],
-      reasoning: "Strong absence-of-allergy signal across many independent verifications from 5 specialty teams. Safe to prescribe contrast, antibiotics, and NSAIDs without further screening.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
     },
   ],
-  windowDays: 388,
+  windowDays: 389,
   specialties: [
     {
-      source: { specialty: "Diabetology", author: "Dr Nimit Shah", date: "9 May 2026" },
-      reason: "Anchor chronic-care team.",
-      dateRangeLabel: "16 Apr '25 - 9 May '26",
+      source: { specialty: "Diabetology", author: "Dr NIMIT SHAH", date: "9 May 2026" },
+      reason: "Verbatim from OMOP · 11 visits across the consultation window.",
+      dateRangeLabel: "16 Apr 2025 - 9 May 2026",
       consultationCount: 11,
-      doctorsLabel: "Dr Nimit Shah",
-      // Verbatim from the most recent diabetology visit
-      // (9 May 2026, Dr Nimit Shah).
+      doctorsLabel: "Dr NIMIT SHAH",
       lines: [
-        "**Findings**: T2DM, **sub-optimal control (HbA1c 8.2%)** | Early **diabetic nephropathy** (ACR 78) | Suspected early peripheral neuropathy",
-        "**Medications**: **Continue Amaryl M 1 BID** | **Plan SGLT2-i add-on next visit** (renal-protective in light of ACR) | Continue Feburic 40 | Continue Thyronorm 75 | **Discuss reconciliation of Glimepiride duplicate** with Cardiology team",
-        "**Plan**: After 1 month · earlier if any hypoglycaemia symptoms",
+        "**Medications**: **Nexpro Rd 40Mg/30Mg Capsule** | **Thyronorm 75MCG Tablet** | **Telma Am Tablet** | **Deplatt Cv 20MG Capsule** | **Amaryl M 1 Tablet** | **Aldonil Tablet** | **Feburic 40MG Tablet** | **Bistide 3 MG** | **Libotryp 12.5Mg Tablet** | **Livogen Z Tablet** | **Dytor Plus 10MG Tablet** | **Prevenar 20 Vaccine** | **Vaxiflu S 0.5Ml Vaccine** | **Liq Cital-SF 10 ML IN 1 GLASS WATER** | **Cremaffin Plus 225ML Syrup**",
       ],
-      labResults: [
-        { name: "HbA1c", value: "8.2", unit: "%", flag: "high", refRange: "<7.0 (target)", date: "9 May 2026", note: "Above ADA target. Consider regimen step-up." },
-        { name: "FPG", value: "168", unit: "mg/dL", flag: "high", refRange: "70–110", date: "9 May 2026" },
-        { name: "PPG (2-h)", value: "242", unit: "mg/dL", flag: "high", refRange: "<180", date: "9 May 2026" },
-        { name: "Urine ACR", value: "78", unit: "mg/g", flag: "high", refRange: "<30", date: "9 May 2026", note: "Microalbuminuria — early diabetic nephropathy." },
-        { name: "Serum Uric Acid", value: "7.8", unit: "mg/dL", flag: "high", refRange: "2.4–5.7 (F)", date: "9 May 2026", note: "On Febuxostat." },
-      ],
-      hiddenNormalLabCount: 8,
       consultations: [
         {
           date: "16 Apr 2025",
           visitType: "OPD",
-          doctor: "Dr Nimit Shah",
-          headline: "Baseline T2DM review — annual cadence visit",
-          symptoms: "No active complaints | Polyuria settled | Sleep good | No tingling LL",
-          examination: "BMI 28.6 | BP 134/82 | Fundus: no DR seen | Foot exam: normal sensation, palpable pulses",
-          diagnosis: "**Type-2 Diabetes Mellitus** on dual oral therapy | Hypothyroidism, stable | Hyperuricaemia controlled on Febuxostat",
-          investigations: "HbA1c · FPG · PPG · Lipid panel · TSH · Urine ACR · Serum creatinine",
-          medications: "Continue **Amaryl M 1 BID** | Continue **Feburic 40 OD** | Continue **Thyronorm 75 OD** | **FDson Total OD** (multivitamin)",
-          advice: "Continue DASH-style diet | Walk 10K steps/day | SMBG twice weekly",
-          followUp: "After 3 months · or sooner if symptoms",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Feburic 40MG Tablet regimen prescribed",
+          medications: "**Feburic 40MG Tablet** | **Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Lox 2% 30Gm Jelly** | **Dytor 10MG Tablet**",
+        },
+        {
+          date: "23 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Liq CITAL-SF** | **Betonin Ast 400ML Syrup** | **Ranraft 150ML Syrup**",
+        },
+        {
+          date: "10 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Dom Dt 10MG Tablet regimen prescribed",
+          medications: "**Dom Dt 10MG Tablet** | **Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Ranraft 150ML Syrup** | **Neogadine 300ML Elixir** | **Pruvict 2MG Tablet**",
+        },
+        {
+          date: "19 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Dom Dt 10MG Tablet regimen prescribed",
+          medications: "**Dom Dt 10MG Tablet** | **Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet**",
+        },
+        {
+          date: "6 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Dom Dt 10MG Tablet regimen prescribed",
+          medications: "**Dom Dt 10MG Tablet** | **Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Dytor Plus 10MG Tablet**",
+        },
+        {
+          date: "3 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Dytor Plus 10MG Tablet** | **Dom Dt 10MG Tablet**",
+        },
+        {
+          date: "20 Jan 2026",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Dytor Plus 10MG Tablet** | **Dom Dt 10MG Tablet**",
+        },
+        {
+          date: "24 Jan 2026",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Atorva 10MG Tablet** | **Feburic 40MG Tablet** | **Dytor Plus 10MG Tablet**",
+        },
+        {
+          date: "9 Feb 2026",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Rbson D Capsule** | **Telma Am Tablet** | **Deplatt Cv 20MG Capsule** | **Atorva 10MG Tablet** | **Amaryl M 1 Tablet** | **Aldonil Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Pregaba Nt 75MG Tablet** | **Bistide 3 MG** | **Cremaffin Plus 225ML Syrup** | **Dytor Plus 10MG Tablet** | **Prevenar 20 Vaccine**",
+        },
+        {
+          date: "9 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Rbson D Capsule** | **Telma Am Tablet** | **Deplatt Cv 20MG Capsule** | **Atorva 10MG Tablet** | **Amaryl M 1 Tablet** | **Aldonil Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Pregaba Nt 75MG Tablet** | **Bistide 3 MG** | **Cremaffin Plus 225ML Syrup** | **Dytor Plus 10MG Tablet** | **Prevenar 20 Vaccine**",
         },
         {
           date: "9 May 2026",
           visitType: "OPD",
-          doctor: "Dr Nimit Shah",
-          headline: "**Most recent review** — HbA1c trending up, microalbuminuria detected",
-          symptoms: "Mild fatigue | No osmotic symptoms | Diet less disciplined last 3 months | Tingling in toes occasionally",
-          examination: "BMI 28.9 (+0.3 since last) | BP 138/86 | Fundus: scheduled with eye-clinic next week | Monofilament: mildly reduced sensation big-toes bilaterally",
-          diagnosis: "T2DM, **sub-optimal control (HbA1c 8.2%)** | Early **diabetic nephropathy** (ACR 78) | Suspected early peripheral neuropathy",
-          investigations: "Repeat HbA1c · FPG · PPG · Urine ACR (today) | eGFR · LFT · Lipid · TSH",
-          medications:
-            "**Continue Amaryl M 1 BID** | **Plan SGLT2-i add-on next visit** (renal-protective in light of ACR) | Continue Feburic 40 | Continue Thyronorm 75 | **Discuss reconciliation of Glimepiride duplicate** with Cardiology team",
-          advice:
-            "Resume strict diet | SMBG diary needed at next visit | Eye-clinic dilated fundus mandatory | Refer to Diabetic-Foot clinic for neuropathy assessment",
-          followUp: "After 1 month · earlier if any hypoglycaemia symptoms",
-          labResults: [
-            { name: "HbA1c", value: "8.2", unit: "%", flag: "high", refRange: "<7.0", date: "9 May 2026" },
-            { name: "FPG", value: "168", unit: "mg/dL", flag: "high", refRange: "70–110", date: "9 May 2026" },
-            { name: "Urine ACR", value: "78", unit: "mg/g", flag: "high", refRange: "<30", date: "9 May 2026", note: "Microalbuminuria — start ARB if not already." },
-          ],
-          hiddenNormalCount: 10,
-          additionalNotes:
-            "Glimepiride duplicate (Amaryl M from us + Amaryl 1 from Cardiology) recognised today — formal cross-team note sent for reconciliation.",
+          doctor: "Dr NIMIT SHAH",
+          headline: "Nexpro Rd 40Mg/30Mg Capsule regimen prescribed",
+          medications: "**Nexpro Rd 40Mg/30Mg Capsule** | **Thyronorm 75MCG Tablet** | **Telma Am Tablet** | **Deplatt Cv 20MG Capsule** | **Amaryl M 1 Tablet** | **Aldonil Tablet** | **Feburic 40MG Tablet** | **Bistide 3 MG** | **Libotryp 12.5Mg Tablet** | **Livogen Z Tablet** | **Dytor Plus 10MG Tablet** | **Prevenar 20 Vaccine** | **Vaxiflu S 0.5Ml Vaccine** | **Liq Cital-SF 10 ML IN 1 GLASS WATER** | **Cremaffin Plus 225ML Syrup**",
         },
       ],
     },
     {
       source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "20 Jan 2026" },
-      reason: "Secondary prevention post-CVA + CAD on DAPT.",
-      dateRangeLabel: "16 Apr '25 - 20 Jan '26",
+      reason: "Verbatim from OMOP · 8 visits across the consultation window.",
+      dateRangeLabel: "16 Apr 2025 - 20 Jan 2026",
       consultationCount: 8,
       doctorsLabel: "Dr Bhavesh Roy",
-      // Verbatim from the most recent cardiology visit
-      // (20 Jan 2026, Dr Bhavesh Roy).
       lines: [
-        "**Findings**: CAD + post-CVA — **DAPT-duration review overdue per ESC 2024** | Sub-optimal BP on multi-drug regimen",
-        "**Medications**: Continue **Aspirin 75 mg OD** | **Hold formal Clopidogrel review** — discuss de-escalation at the very next visit | Switch **Telma 40** to **Telma H** (Telmisartan + HCT) for BP control",
-        "**Plan**: **Within 4 weeks — DAPT de-escalation visit (not yet booked, flagged)**",
-      ],
-      labResults: [
-        { name: "LDL-C", value: "98", unit: "mg/dL", flag: "high", refRange: "<70 (post-CVA target)", date: "20 Jan 2026", note: "Above the secondary-prevention LDL target." },
-        { name: "Office BP", value: "148/92", unit: "mmHg", flag: "high", refRange: "<130/80 (DM + CVA)", date: "20 Jan 2026", note: "Above target on Telma + Telma H." },
-      ],
-      hiddenNormalLabCount: 4,
-      openLoops: [
-        "Cardiology has not booked a **DAPT de-escalation review** despite > 12 months on dual antiplatelet, review still pending",
-        "Cardiology advised periodic **lipid panel** review, no result on file in the current window",
+        "**Medications**: **Deplatt Cv 10MG Capsule** | **Telma Am Tablet**",
       ],
       consultations: [
         {
-          date: "8 May 2025",
+          date: "16 Apr 2025",
           visitType: "OPD",
           doctor: "Dr Bhavesh Roy",
-          headline: "Routine secondary-prevention review · 1-year post-CVA",
-          symptoms: "No fresh chest pain | No SOB | No fresh focal deficit | Sleep good",
-          examination: "BP 142/88 | HR 70 (β-blocker effect) | No murmur | No carotid bruit | Neuro screening unchanged from baseline",
-          diagnosis: "**CAD + post-CVA secondary prevention**, regimen continued | Sub-optimal BP control",
-          investigations: "Lipid panel · HbA1c · KFT · ECG · 2D Echo (annual)",
-          medications: "Continue **Rozavel A 10/75** (Aspirin + Rosuvastatin) | Continue **Clopilet 75** | Add **Telma 40** for BP",
-          advice: "Salt restriction | Continue DAPT (12-month protocol underway) | Home BP recording",
-          followUp: "After 6 months",
+          headline: "Rozavel A 10/75Mg Capsules regimen prescribed",
+          medications: "**Rozavel A 10/75Mg Capsules** | **Clopilet 75MG Tablet** | **Tab. Telma H** | **Amaryl 1MG Tablet**",
+        },
+        {
+          date: "16 Apr 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Rozavel A 10/75Mg Capsules regimen prescribed",
+          medications: "**Rozavel A 10/75Mg Capsules** | **Clopilet 75MG Tablet** | **Telma 40MG Tablet** | **Pantodac 40MG 10**",
+        },
+        {
+          date: "23 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Rozavel A 10/75Mg Capsules regimen prescribed",
+          medications: "**Rozavel A 10/75Mg Capsules** | **Clopilet 75MG Tablet** | **Telma 40MG Tablet** | **Amlodac 5MG Tablet** | **Pantodac Dsr Capsule**",
+        },
+        {
+          date: "23 Jun 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Amaryl M 1 Tablet** | **Fdson Total Tablet** | **Feburic 40MG Tablet** | **Liq CITAL-SF** | **Betonin Ast 400ML Syrup** | **Ranraft 150ML Syrup**",
+        },
+        {
+          date: "8 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Consultation by Dr Bhavesh Roy",
+        },
+        {
+          date: "10 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Deplatt Cv 10MG Capsule regimen prescribed",
+          medications: "**Deplatt Cv 10MG Capsule** | **Telma Am Tablet** | **Pantocid 40 MG Tablet**",
+        },
+        {
+          date: "1 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Deplatt Cv 10MG Capsule regimen prescribed",
+          medications: "**Deplatt Cv 10MG Capsule** | **Telma Am Tablet** | **Pantocid 40 MG Tablet**",
         },
         {
           date: "20 Jan 2026",
           visitType: "OPD",
           doctor: "Dr Bhavesh Roy",
-          headline: "**Most recent review** — **DAPT now > 12 months**, BP still above target",
-          symptoms: "Occasional left-shoulder vague ache, not exertional | No SOB | No new focal deficit",
-          examination: "BP 148/92 (above DM + CVA target) | HR 72 | S1S2 normal, no murmur | No oedema",
-          diagnosis: "CAD + post-CVA — **DAPT-duration review overdue per ESC 2024** | Sub-optimal BP on multi-drug regimen",
-          investigations: "ECG done in clinic, NSR | 2D Echo scheduled | Repeat Lipid + KFT",
-          medications:
-            "Continue **Aspirin 75 mg OD** | **Hold formal Clopidogrel review** — discuss de-escalation at the very next visit | Switch **Telma 40** to **Telma H** (Telmisartan + HCT) for BP control",
-          advice:
-            "**Important**: bring patient back specifically for DAPT de-escalation discussion within 4 weeks · Strict salt | Adherence reinforced",
-          followUp: "**Within 4 weeks — DAPT de-escalation visit (not yet booked, flagged)**",
-          labResults: [
-            { name: "LDL-C", value: "98", unit: "mg/dL", flag: "high", refRange: "<70 (post-CVA target)", date: "20 Jan 2026" },
-            { name: "Office BP", value: "148/92", unit: "mmHg", flag: "high", refRange: "<130/80", date: "20 Jan 2026" },
-          ],
-          hiddenNormalCount: 6,
-          additionalNotes: "**Open loop**: the DAPT-review visit hasn't been booked in the system as of today. Aspirin + Clopidogrel running ~10+ months.",
+          headline: "Deplatt Cv 10MG Capsule regimen prescribed",
+          medications: "**Deplatt Cv 10MG Capsule** | **Telma Am Tablet**",
         },
       ],
     },
     {
       source: { specialty: "Gastroenterology", author: "Dr Tejas Modi", date: "9 May 2026" },
-      reason: "Chronic constipation + NAFLD management.",
-      dateRangeLabel: "10 Jul '25 - 9 May '26",
+      reason: "Verbatim from OMOP · 5 visits across the consultation window.",
+      dateRangeLabel: "10 Jul 2025 - 9 May 2026",
       consultationCount: 5,
       doctorsLabel: "Dr Tejas Modi",
-      // Verbatim from the most recent GI visit (9 May 2026, Dr Tejas Modi).
       lines: [
-        "**Findings**: **Chronic functional constipation** (~3 years) | **NAFLD** on routine LFT surveillance",
-        "**Medications**: Continue **Softovac (Ispaghula)** PRN | **Pruvict 1 mg OD** | **Cremaffin Plus 15 mL HS** PRN | **Bistide 3 mg OD** (Plecanatide) | Lifestyle measures",
-        "**Plan**: After 6 months · sooner if any alarm features",
+        "**Medications**: **Cremaffin Plus 200ML Syrup** | **Movicol 13.81Gm Sachet** | **Lintide 145MG Capsule** | **Rbson D Capsule** | **Lox 2% 30Gm Jelly**",
       ],
       consultations: [
+        {
+          date: "10 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Tejas Modi",
+          headline: "Softovac Powder 100 Gm regimen prescribed",
+          medications: "**Softovac Powder 100 Gm** | **Pruvict 1MG Tablet** | **Cremaffin Plus 200ML Syrup**",
+        },
+        {
+          date: "12 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Tejas Modi",
+          headline: "Softovac Powder 100 Gm regimen prescribed",
+          medications: "**Softovac Powder 100 Gm** | **Pruvict 1MG Tablet** | **Cremaffin Plus 200ML Syrup**",
+        },
+        {
+          date: "3 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Tejas Modi",
+          headline: "Softovac Powder 100 Gm regimen prescribed",
+          medications: "**Softovac Powder 100 Gm** | **Pruvict 1MG Tablet** | **Cremaffin Plus 200ML Syrup** | **Rbson D Capsule**",
+        },
+        {
+          date: "20 Jan 2026",
+          visitType: "OPD",
+          doctor: "Dr Tejas Modi",
+          headline: "Cremaffin Plus 200ML Syrup regimen prescribed",
+          medications: "**Cremaffin Plus 200ML Syrup** | **Bistide 3MG Tablet** | **Rbson D Capsule** | **Lox 2% 30Gm Jelly** | **Daflon 500MG Tablet**",
+        },
         {
           date: "9 May 2026",
           visitType: "OPD",
           doctor: "Dr Tejas Modi",
-          headline: "Most recent review · **chronic constipation + NAFLD surveillance**",
-          symptoms: "Bowel movements 2-3 per week | Hard stools | Mild bloating | No PR bleeding | No weight loss | No fresh epigastric pain",
-          examination: "BMI 28.9 | Soft abdomen, no organomegaly clinically | No flank tenderness | DRE: empty rectal vault, no mass",
-          diagnosis: "**Chronic functional constipation** (~3 years) | **NAFLD** on routine LFT surveillance",
-          investigations: "LFT every 6 months · Lipid panel · USG abdomen annually · Colonoscopy if any alarm symptom",
-          medications:
-            "Continue **Softovac (Ispaghula)** PRN | **Pruvict 1 mg OD** | **Cremaffin Plus 15 mL HS** PRN | **Bistide 3 mg OD** (Plecanatide) | Lifestyle measures",
-          advice: "**25-30 g fibre/day** | Adequate hydration (≥ 2 L/day) | Daily walking | Reduce processed foods | Alarm symptoms education (PR bleed, weight loss, anorexia) | Vaccination against Hep A + B given NAFLD background",
-          followUp: "After 6 months · sooner if any alarm features",
+          headline: "Cremaffin Plus 200ML Syrup regimen prescribed",
+          medications: "**Cremaffin Plus 200ML Syrup** | **Movicol 13.81Gm Sachet** | **Lintide 145MG Capsule** | **Rbson D Capsule** | **Lox 2% 30Gm Jelly**",
         },
       ],
     },
     {
-      source: { specialty: "Neurology", author: "Dr Nikhil Dave", date: "26 Mar 2026" },
-      reason: "Headache evaluation post-CVA.",
-      dateRangeLabel: "10 Sep '25 - 26 Mar '26",
+      source: { specialty: "Neurology", author: "Dr Ajit Sowani / Dr Nikhil Dave", date: "26 Mar 2026" },
+      reason: "Verbatim from OMOP · 5 visits across the consultation window.",
+      dateRangeLabel: "10 Sep 2025 - 26 Mar 2026",
       consultationCount: 5,
-      doctorsLabel: "Dr Sowani / Dr Nikhil Dave",
-      // Verbatim from the most recent neurology visit
-      // (26 Mar 2026, Dr Nikhil Dave).
+      doctorsLabel: "Dr Ajit Sowani / Dr Nikhil Dave",
       lines: [
-        "**Findings**: Chronic tension-type headache, **clinically stable** | Post-CVA, no fresh signs",
-        "**Medications**: Continue Paracetamol PRN | No fresh additions",
-        "**Plan**: After 3 months · with MRI report",
+        "**Findings**: (no observation_text recorded)",
       ],
-      openLoops: ["Neurology likely advised **follow-up MRI brain** post-CVA, no report on file"],
       consultations: [
         {
           date: "10 Sep 2025",
           visitType: "OPD",
-          doctor: "Dr Sowani",
-          headline: "Initial post-CVA headache assessment — first neurology visit this window",
-          symptoms: "**Chronic dull headache × 3 months** | Worse at end of day | No nausea, no vomiting | No visual disturbance | No fresh focal deficit | Sleep adequate",
-          examination: "Vitals stable | Higher mental functions intact | Cranial nerves intact | Power 5/5 all limbs | Sensory intact | Coordination intact | Cerebellar signs absent",
-          diagnosis: "**Chronic tension-type headache** on a post-CVA substrate — no fresh focal sign",
-          investigations: "**MRI brain advised** (rule out recurrent ischaemia / fresh lesion) · Renal function · ECG",
-          medications: "**Paracetamol 500 mg PRN** for headache | Continue background CVA + CAD regimen (Cardiology)",
-          advice: "Headache diary | Trigger identification | Avoid OTC NSAIDs given DAPT background | Return immediately if any motor / sensory / speech change",
-          followUp: "After 6 months · sooner if symptom escalation",
+          doctor: "Dr Ajit Sowani",
+          headline: "Consultation by Dr Ajit Sowani",
+        },
+        {
+          date: "29 Jan 2026",
+          visitType: "OPD",
+          doctor: "Dr Ajit Sowani",
+          headline: "Consultation by Dr Ajit Sowani",
+        },
+        {
+          date: "11 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Nikhil Dave",
+          headline: "Consultation by Dr Nikhil Dave",
+        },
+        {
+          date: "12 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Nikhil Dave",
+          headline: "Consultation by Dr Nikhil Dave",
         },
         {
           date: "26 Mar 2026",
           visitType: "OPD",
-          doctor: "Dr Nikhil Dave",
-          headline: "Most recent visit · headache pattern stable, MRI **still not on file**",
-          symptoms: "Headache frequency reduced ~30 % | No fresh complaints | No tingling | Mood stable",
-          examination: "Unchanged from September baseline | Neuro exam normal",
-          diagnosis: "Chronic tension-type headache, **clinically stable** | Post-CVA, no fresh signs",
-          investigations: "**MRI brain — still advised, not yet done** (open loop)",
-          medications: "Continue Paracetamol PRN | No fresh additions",
-          advice: "**Strongly re-advised to complete MRI brain** within 4 weeks · Continue headache diary",
-          followUp: "After 3 months · with MRI report",
-          additionalNotes: "Open loop persists — MRI brain advised 10 Sep 2025, re-advised 26 Mar 2026; report still not on file.",
+          doctor: "Dr Ajit Sowani",
+          headline: "Consultation by Dr Ajit Sowani",
         },
       ],
     },
     {
       source: { specialty: "Endocrinology", author: "Dr Payal Shah", date: "27 Mar 2026" },
-      reason: "High PTH workup + thyroid optimisation.",
-      dateRangeLabel: "16 Feb - 27 Mar '26",
+      reason: "Verbatim from OMOP · 4 visits across the consultation window.",
+      dateRangeLabel: "16 Feb 2026 - 27 Mar 2026",
       consultationCount: 4,
       doctorsLabel: "Dr Payal Shah",
-      // Verbatim from the most recent endocrinology visit
-      // (27 Mar 2026, Dr Payal Shah).
       lines: [
-        "**Findings**: **Primary hyperparathyroidism (PHPT) confirmed biochemically** — PTH 118 with Ca 10.8 and Vit D deficiency | Over-replaced hypothyroidism on T3 + T4 (TSH 0.18)",
-        "**Medications**: **Stop Linorma T3** (over-replacement) | **Continue Thyronorm 75 OD** alone | **Vit D 60K weekly × 8 weeks** loading | **Calcitriol 0.25 mcg OD** continued | Hydration | Avoid thiazide diuretics in HTN regimen",
-        "**Plan**: After 8 weeks · with all imaging + repeat PTH + Vit D + Ca",
-      ],
-      labResults: [
-        { name: "PTH (intact)", value: "118", unit: "pg/mL", flag: "high", refRange: "15–65", date: "27 Mar 2026", note: "Primary hyperparathyroidism workup trigger." },
-        { name: "Serum Calcium (corrected)", value: "10.8", unit: "mg/dL", flag: "high", refRange: "8.5–10.2", date: "27 Mar 2026" },
-        { name: "Vitamin D (25-OH)", value: "18", unit: "ng/mL", flag: "low", refRange: "30–100", date: "27 Mar 2026", note: "Deficient; replete before PTH re-check." },
-        { name: "TSH", value: "0.18", unit: "µIU/mL", flag: "low", refRange: "0.4–4.0", date: "27 Mar 2026", note: "On combined T3 + T4; over-replaced." },
-      ],
-      hiddenNormalLabCount: 5,
-      openLoops: [
-        "Endocrinology advised **primary hyperparathyroidism workup**, completion status (DEXA, neck USG, sestamibi) not yet on file",
-        "Endocrinology advised periodic **PTH + Vit D + calcium**, no structured result row on file",
+        "**Medications**: **Thyronorm 75MCG Tablet** | **Linorma T3 5MCG Tablet**",
       ],
       consultations: [
         {
           date: "16 Feb 2026",
           visitType: "OPD",
           doctor: "Dr Payal Shah",
-          headline: "First endocrinology visit · **elevated PTH** picked up on screening",
-          symptoms: "No fresh bone pain | History of renal calculi ~15 years back, no recurrence | No polyuria | No abdominal pain | Mood normal",
-          examination: "BMI 28.6 | BP 132/82 | No goitre | No proximal muscle weakness | No bony tenderness",
-          diagnosis: "**Asymptomatic primary hyperparathyroidism, suspected** | Pre-existing hypothyroidism on T3 + T4 combination — TSH potentially over-suppressed",
-          investigations: "**Repeat PTH (intact)** · Serum Ca corrected for albumin · Phosphate · 25-OH Vit D · 24-h urinary calcium · Renal USG · TSH · Free T4 · DEXA scan",
-          medications: "Continue **Thyronorm 75 OD** | Continue **Linorma T3 5 mcg** | Start **Calcitriol 0.25 mcg OD** while awaiting Vit D | High-calcium dietary advice",
-          advice: "Hydration to reduce renal-calculi recurrence | Low-oxalate diet | Sun exposure | Return immediately if any flank pain or bone pain",
-          followUp: "27 Mar 2026 · with full lab panel",
+          headline: "Consultation by Dr Payal Shah",
+        },
+        {
+          date: "26 Feb 2026",
+          visitType: "OPD",
+          doctor: "Dr Payal Shah",
+          headline: "Consultation by Dr Payal Shah",
+        },
+        {
+          date: "26 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Payal Shah",
+          headline: "Consultation by Dr Payal Shah",
         },
         {
           date: "27 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Payal Shah",
-          headline: "**Most recent visit** — diagnosis crystallising, full workup still pending",
-          symptoms: "No fresh complaints | Tolerating thyroid + Vit D supplementation",
-          examination: "Unchanged | BP 130/82",
-          diagnosis: "**Primary hyperparathyroidism (PHPT) confirmed biochemically** — PTH 118 with Ca 10.8 and Vit D deficiency | Over-replaced hypothyroidism on T3 + T4 (TSH 0.18)",
-          investigations: "**Sestamibi parathyroid scan ordered (not yet done)** | **Neck USG for parathyroid lesion (not yet done)** | DEXA scan (not yet done) | Annual 24-h urinary calcium",
-          medications:
-            "**Stop Linorma T3** (over-replacement) | **Continue Thyronorm 75 OD** alone | **Vit D 60K weekly × 8 weeks** loading | **Calcitriol 0.25 mcg OD** continued | Hydration | Avoid thiazide diuretics in HTN regimen",
-          advice: "Once Vit D replete, repeat PTH and Ca | Surgical referral for parathyroidectomy decision once imaging complete",
-          followUp: "After 8 weeks · with all imaging + repeat PTH + Vit D + Ca",
-          labResults: [
-            { name: "PTH (intact)", value: "118", unit: "pg/mL", flag: "high", refRange: "15–65", date: "27 Mar 2026" },
-            { name: "Serum Calcium (corrected)", value: "10.8", unit: "mg/dL", flag: "high", refRange: "8.5–10.2", date: "27 Mar 2026" },
-            { name: "Vitamin D (25-OH)", value: "18", unit: "ng/mL", flag: "low", refRange: "30–100", date: "27 Mar 2026" },
-            { name: "TSH", value: "0.18", unit: "µIU/mL", flag: "low", refRange: "0.4–4.0", date: "27 Mar 2026" },
-          ],
-          hiddenNormalCount: 6,
-          additionalNotes:
-            "**Open loops**: Sestamibi scan, neck USG, and DEXA all advised — none on file. PTH workup completion is the bottleneck for the parathyroidectomy decision.",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Linorma T3 5MCG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Nephrology", author: "Dr Devang Patwari", date: "27 Mar 2026" },
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "26 Mar 2026 - 27 Mar 2026",
+      consultationCount: 3,
+      doctorsLabel: "Dr Devang Patwari",
+      lines: [
+        "**Medications**: **Thyronorm 75MCG Tablet** | **Linorma T3 5MCG Tablet**",
+      ],
+      consultations: [
+        {
+          date: "26 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Devang Patwari",
+          headline: "Consultation by Dr Devang Patwari",
+        },
+        {
+          date: "26 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Devang Patwari",
+          headline: "Consultation by Dr Devang Patwari",
+        },
+        {
+          date: "27 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Devang Patwari",
+          headline: "Thyronorm 75MCG Tablet regimen prescribed",
+          medications: "**Thyronorm 75MCG Tablet** | **Linorma T3 5MCG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Dermatology", author: "Dr Dhwani R Shah", date: "19 Jul 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "19 Jul 2025",
+      consultationCount: 1,
+      doctorsLabel: "Dr Dhwani R Shah",
+      lines: [
+        "**Medications**: **Allegra 120MG Tablet** | **Xyzal 10MG Tablet** | **Emolene 100Gm Cream** | **Episoft Oc Cleansing Gel 125ML**",
+      ],
+      consultations: [
+        {
+          date: "19 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Dhwani R Shah",
+          headline: "Allegra 120MG Tablet regimen prescribed",
+          medications: "**Allegra 120MG Tablet** | **Xyzal 10MG Tablet** | **Emolene 100Gm Cream** | **Episoft Oc Cleansing Gel 125ML**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Orthopaedics", author: "Dr Satish Patel", date: "10 Sep 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "10 Sep 2025",
+      consultationCount: 1,
+      doctorsLabel: "Dr Satish Patel",
+      lines: [
+        "**Medications**: **Ultracet Tablet** | **Xymoheal Spray**",
+      ],
+      consultations: [
+        {
+          date: "10 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Satish Patel",
+          headline: "Ultracet Tablet regimen prescribed",
+          medications: "**Ultracet Tablet** | **Xymoheal Spray**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Ophthalmology", author: "Dr SEJAL SHAH", date: "11 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "11 Mar 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr SEJAL SHAH",
+      lines: [
+        "**Findings**: (no observation_text recorded)",
+      ],
+      consultations: [
+        {
+          date: "11 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr SEJAL SHAH",
+          headline: "Consultation by Dr SEJAL SHAH",
+        },
+      ],
+    },
+    {
+      source: { specialty: "E.N.T.", author: "Dr Lav Selarka", date: "11 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "11 Mar 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr Lav Selarka",
+      lines: [
+        "**Medications**: **Zifi Cv 200MG Tablet** | **Pantodac Dsr Capsule** | **Mondeslor Tablet** | **Betadine Gargle 50ML** | **Enzoflam Tablet**",
+      ],
+      consultations: [
+        {
+          date: "11 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Lav Selarka",
+          headline: "Zifi Cv 200MG Tablet regimen prescribed",
+          medications: "**Zifi Cv 200MG Tablet** | **Pantodac Dsr Capsule** | **Mondeslor Tablet** | **Betadine Gargle 50ML** | **Enzoflam Tablet**",
         },
       ],
     },
   ],
-  collisions: [
-    {
-      kind: "ddi",
-      title: "**Glimepiride double-dose** across Diabetology + Cardiology",
-      points: [
-        "Diabetology Rx: **Amaryl M 1** (Glimepiride 1 mg + Metformin 500 mg).",
-        "Cardiology Rx: **Amaryl 1** (Glimepiride 1 mg) separately.",
-        "Hypoglycaemia risk in a 58-yo on β-blocker (masks symptoms).",
-      ],
-      rule: {
-        body: "NICE",
-        year: "2024",
-        section: "NG28 §Glycaemic",
-        readableBody: "National Institute for Health and Care Excellence — UK national clinical-practice guideline body. NG28 is its Type-2 Diabetes guideline.",
-        description: "Specifies that only one sulfonylurea should be active at any time, and flags the hypoglycaemia risk that compounds when β-blockers run alongside (β-blockers mask the warning symptoms of low sugar).",
-        whyPicked: "Ms Joshi is taking **Amaryl M 1 from Diabetology** (Glimepiride 1 mg + Metformin) AND **Amaryl 1 from Cardiology** (Glimepiride 1 mg) — the same sulfonylurea prescribed twice by two different teams. She is 58, also on a β-blocker, so the hypoglycaemia would be silent.",
-        fetches: "Which teams are independently prescribing the same sulfonylurea.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "coordination-gap",
-      title: "**DAPT duration likely exceeded**, secondary prevention review overdue",
-      points: [
-        "Aspirin + Clopidogrel running ~10 months with no de-escalation review.",
-        "Post-CVA + chronic CCS: bleeding risk increases beyond 12 months.",
-      ],
-      rule: {
-        body: "ESC",
-        year: "2024",
-        section: "Stroke + Atherothrombosis",
-        readableBody: "European Society of Cardiology — Europe's principal cardiology body whose secondary-prevention guidance is widely adopted internationally.",
-        description: "Sets the optimal duration of dual antiplatelet therapy (DAPT) for chronic coronary syndrome patients post-CVA, after which bleeding risk starts to outweigh the additional ischaemic protection.",
-        whyPicked: "Ms Joshi has been on Aspirin + Clopidogrel for ~10 months post-CVA. ESC expects a formal de-escalation review around month 12; no such review visit appears in her record. Continuing dual antiplatelet past the de-escalation window in a 58-year-old female compounds bleeding risk without proportional benefit.",
-        fetches: "How long she has been on dual antiplatelet, and whether a de-escalation review visit is on file.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "ddi",
-      title: "**T3 + T4 combination therapy** prescribed cross-specialty",
-      points: [
-        "Diabetology runs **Thyronorm** (T4); Endocrinology added **Linorma T3** (Liothyronine).",
-        "Combination T3+T4 is non-guideline in stable hypothyroidism.",
-      ],
-      rule: {
-        body: "AACE",
-        year: "2022",
-        section: "Hypothyroidism",
-        readableBody: "American Association of Clinical Endocrinologists — US specialty body whose hypothyroidism guidance is the most-cited reference.",
-        description: "Specifies that hypothyroid patients should be on Levothyroxine monotherapy unless very specific criteria are met (incomplete symptom resolution despite stable TSH, documented deiodinase polymorphism, or persistently low T3).",
-        whyPicked: "Diabetology has Ms Joshi on **Thyronorm (T4 only)**, then Endocrinology added **Linorma T3** (Liothyronine) — a combined T3 + T4 regimen. The combination is non-guideline for stable hypothyroidism, and her TSH on this regimen is 0.18 (over-replaced).",
-        fetches: "Which team prescribed which agent, and whether the combination-therapy criteria are documented.",
-        confidence: "established",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "DAPT de-escalation review with Cardiology.",
-    "Reconcile glimepiride prescribing across Diabetology + Cardiology.",
-    "Endocrinology + Diabetology to align on T4 monotherapy vs combination.",
-    "PTH workup conclusion → parathyroidectomy decision pending.",
-  ],
-  syntheses: [
-    {
-      panelTitle: "Secondary prevention · post-CVA + CAD",
-      guideline: {
-        body: "ESC",
-        year: "2024",
-        readableBody: "European Society of Cardiology — Europe's principal cardiology body whose secondary-prevention guideline is widely adopted in Indian practice.",
-        description: "Defines the antiplatelet regimen, statin intensity and BP target a diabetic CCS patient with prior CVA should be running on.",
-        whyPicked: "Ms Joshi has CAD and a prior CVA, and is in the post-event chronic phase — the exact patient type this ESC guideline covers. Velora used it to check her current regimen against the secondary-prevention bundle.",
-        fetches: "Whether her antiplatelet regimen, statin intensity, and BP control align with the bundle.",
-        confidence: "established",
-      },
-      rows: [
-        { label: "Antiplatelet regimen", value: "Aspirin + Clopidogrel", ref: "Both active per drug_exposure.", tone: "warn" },
-        { label: "DAPT review since start", value: "Overdue", ref: "No de-escalation visit in record.", tone: "alert" },
-        { label: "Statin on board", value: "Rosuvastatin (combined)", ref: "Rozavel A 10/75 active.", tone: "ok" },
-      ],
-      note: "Secondary-prevention regimen looks correct; the open question is DAPT duration not the agents.",
-    },
-  ],
-  freshness: "Synced just now",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation · last refresh just now",
 }
-
 // ═════════════════════════════════════════════════════════════════════════
-// ANITA_DESAI_BRIEF_MOCK  ·  P5 · person_id 714696991886 · F · 64
+// ANITA_DESAI_BRIEF_MOCK  ·  person_id 714696991886 · F · 64y
 // ─────────────────────────────────────────────────────────────────────────
-// Scenario: classic metabolic syndrome + severe hypertriglyceridaemia
-// (TG 2898 documented) driving recurrent acute pancreatitis. Heaviest
-// polypharmacy of all 5 patients. Demonstrates the "rich, high-risk" case
-// where the headline number lives in narrative not measurement.
+// Rebuilt VERBATIM from the OMOP CDM export. Every drug name comes from
+// drug_exposure.drug_source_value (deduped per visit by brand + composition).
+// Every diagnosis / symptom / exam / advice / follow-up sentence comes from
+// observation.value_as_string. Co-morbidities pulled from condition_occurrence
+// (Active / Confirmed rows only).
 // ═════════════════════════════════════════════════════════════════════════
 export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientName: "Anita Desai",
@@ -1882,410 +2059,425 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientId: "714696991886",
   medicalHistory: [
     {
-      title: "Primary problem",
-      tone: "primary",
-      items: [
-        { text: "**Severe hypertriglyceridaemia** (TG 2898 mg/dL documented)" },
-        { text: "**Recurrent acute pancreatitis** (13 episodes on record)" },
-      ],
-      sources: [
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "11 Apr 2025" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "7 May 2025" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "8 Sep 2025" },
-        { doctor: "Dr Talati (Diabetology)", date: "13 Apr 2026" },
-      ],
-      reasoning:
-        "TG 2898 mg/dL is in the pancreatitis-risk territory. 13 acute episodes documented. Current statin-only regimen is inadequate; fibrate or omega-3 indicated.",
-    },
-    {
       title: "Co-morbidities",
       tone: "neutral",
       items: [
-        { text: "**Type-2 Diabetes Mellitus** (Active)" },
+        { text: "**Diabetes Mellitus Type 2** (Active)" },
         { text: "**Hypertension** (Active)" },
         { text: "**Hypothyroidism** (Active)" },
+        { text: "**Dyslipidemia With Pre-dominentaly Hypertryglyceridemia** (Active)" },
+        { text: "**Diabetes** (Active)" },
+        { text: "**Dyslipidemia** (Active)" },
         { text: "**Bronchial Asthma** (Active)" },
-        { text: "**Postural hypotension** (Active)" },
-        { text: "**Peripheral vertigo** (Active)" },
+        { text: "**Acute Exacerbaton Of Bronchial Asthma** (Active)" },
+        { text: "**Hypothyroidsim** (Active)" },
+        { text: "**Peripheral Vertigo** (Active)" },
+        { text: "**DM / HTN** (Active)" },
+        { text: "**H/o Acute Pancreatitis** (Active)" },
+        { text: "**DM/ HTN/ Postural hypotension** (Active)" },
+        { text: "**DM/ HTN/ Postural hypotension / Dyslipidemia / Hypothyroid** (Active)" },
+        { text: "**Generalised Pruritus, Xerosis** (Active)" },
       ],
-      sources: [
-        { doctor: "Dr Navneet Shah (Internal Medicine)", date: "25 Aug 2025" },
-        { doctor: "Dr Navneet Shah (Internal Medicine)", date: "11 Mar 2026" },
-        { doctor: "Dr Navneet Shah (Internal Medicine)", date: "25 Mar 2026" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "8 Sep 2025" },
-        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "27 Oct 2025" },
-      ],
-      reasoning:
-        "Classic metabolic syndrome. The asthma adds steroid-burden complexity if a flare requires bursts.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE status IN (Active, Confirmed).",
     },
     {
       title: "Surgical history",
       tone: "neutral",
-      items: [{ text: "**Past cholecystectomy** (gallbladder removed)" }],
+      items: [
+        { text: "No surgical history found" },
+      ],
       sources: [],
-      reasoning: "Gallbladder out. Recurrent pancreatitis is therefore not gallstone-driven; metabolic origin confirmed.",
+      reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
-      items: [{ text: "Allergy review not explicitly documented" }],
+      items: [
+        { text: "**Drug Allergies** (Active)" },
+        { text: "**Allergic Bronchitis** (Active)" },
+      ],
       sources: [],
-      reasoning: "Narrative notes are now well-captured (284 entries) but allergy status was never spelled out as 'no known drug allergy' across those notes. Treat as unknown until reviewed at next visit.",
+      reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
     },
   ],
   windowDays: 517,
   specialties: [
     {
-      source: { specialty: "Internal Medicine", author: "Dr Navneet Shah", date: "25 Mar 2026" },
-      reason: "Anchor team coordinating CV + metabolic + endocrine.",
-      dateRangeLabel: "25 Aug '25 - 25 Mar '26",
+      source: { specialty: "Internal Medicine", author: "Dr Navneet Shah / Dr. Pranav Nanavaty /Dr.Tapan Kotadia", date: "25 Mar 2026" },
+      reason: "Verbatim from OMOP · 8 visits across the consultation window.",
+      dateRangeLabel: "25 Aug 2025 - 25 Mar 2026",
       consultationCount: 8,
-      doctorsLabel: "Dr Navneet Shah / Dr Nanavaty",
-      // Verbatim across the three IM visits — Dr Navneet Shah ran the
-      // acute TG-2898 intervention + 6-day follow-up; Dr Nanavaty ran
-      // the consolidation review.
+      doctorsLabel: "Dr Navneet Shah / Dr. Pranav Nanavaty /Dr.Tapan Kotadia",
       lines: [
-        "**Findings**: **Dr Navneet Shah (11 Mar)**: **Severe hypertriglyceridaemia (TG 2898)** — pancreatitis-risk territory | Uncontrolled DM (HbA1c 8.5%) | Pre-existing HTN, sub-optimal control.",
-        "**Findings**: **Dr Navneet Shah (17 Mar)**: Hypertriglyceridaemia — **dramatic biochemical response**, still well above target | Pancreatitis risk still elevated, less acute.",
-        "**Findings**: **Dr Nanavaty (25 Mar)**: Severe hypertriglyceridaemia, **acute phase resolved**; chronic surveillance phase | DM-II, HTN, dyslipidaemia all sub-optimal.",
-        "**Medications**: **Dr Navneet Shah (11 Mar)**: Continue Rozavel EZ 20 | **Plan Fenofibrate add-on next visit** if no contraindication | Continue Valzaar 80 + Amlodac 5 + Inderal LA 20 | Aspirin 75 continued | **Strict diet · zero alcohol · no high-fat foods**.",
-        "**Medications**: **Dr Navneet Shah (17 Mar)**: Continue Rozavel EZ 20 | **Add Fenofibrate 145 mg OD** — formal initiation today.",
-        "**Medications**: **Dr Nanavaty (25 Mar)**: Continue full regimen | Reinforce dietary discipline.",
-        "**Plan**: **Dr Navneet Shah (11 Mar)**: 17 Mar 2026 · repeat TG.",
-        "**Plan**: **Dr Navneet Shah (17 Mar)**: 25 Mar 2026 · standard cadence review.",
-        "**Plan**: **Dr Nanavaty (25 Mar)**: After 2-3 weeks.",
-      ],
-      labResults: [
-        { name: "Triglycerides", value: "2898", unit: "mg/dL", flag: "critical", refRange: "<150", date: "11 Mar 2026", note: "Pancreatitis-risk territory. Fibrate indicated above 500." },
-        { name: "Triglycerides (repeat)", value: "798", unit: "mg/dL", flag: "high", refRange: "<150", date: "17 Mar 2026", note: "Down 73% on therapy in 6 days." },
-        { name: "HbA1c", value: "8.5", unit: "%", flag: "high", refRange: "<7.0", date: "11 Mar 2026" },
-        { name: "FPG", value: "191", unit: "mg/dL", flag: "high", refRange: "70–110", date: "11 Mar 2026" },
-        { name: "LDL-C", value: "112", unit: "mg/dL", flag: "high", refRange: "<70 (DM target)", date: "11 Mar 2026" },
-      ],
-      hiddenNormalLabCount: 7,
-      openLoops: [
-        "Internal Medicine advised **repeat TG, HbA1c, fasting sugar, creatinine** on 11 Mar 2026, structured result rows not yet on file",
-        "Internal Medicine flagged **fibrate add-on** as a pending decision, no Rx issued yet",
+        "**Medications**: **Ryzodeg 100 Iu/Ml Penfill** | **Sitason 100MG Tablet** | **Diamicron Xr Mex 60/500Mg Tablet** | **Ltk 50MG Tablet** | **Ctd M 12.5/50Mg Tablet** | **Rozavel Ez 20MG Tablet** | **Ecosprin -75 MG Tablet** | **Icos 1Gm Capsule** | **Thyronorm 50MCG Tablet** | **Serta 25MG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Bilastine 20 MG Tablet** | **Lacto Calamine 115ML Lotion**",
       ],
       consultations: [
+        {
+          date: "25 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr. Pranav Nanavaty /Dr.Tapan Kotadia",
+          headline: "Arg 9 Sachet regimen prescribed",
+          medications: "**Arg 9 Sachet**",
+        },
+        {
+          date: "12 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr. Pranav Nanavaty /Dr.Tapan Kotadia",
+          headline: "Valzaar 80MG Tablet regimen prescribed",
+          medications: "**Valzaar 80MG Tablet** | **Inderal La 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet** | **Lipaglyn 4MG Tablet** | **Thyronorm 25MCG Tablet** | **Sitaglyn 100MG Tablet** | **Dianorm M Tablet** | **Novomix 50 Flexpen** | **Nexpro Rd 40Mg/30Mg Capsule** | **Dexid 25MG Tablet** | **Folimax D3 Forte Tablet** | **Limcee Tablet** | **Colospa Retard Capsule**",
+        },
+        {
+          date: "30 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr. Pranav Nanavaty /Dr.Tapan Kotadia",
+          headline: "Valzaar 80MG Tablet regimen prescribed",
+          medications: "**Valzaar 80MG Tablet** | **Inderal La 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet** | **Lipaglyn 4MG Tablet** | **Thyronorm 25MCG Tablet** | **Novomix 50 Flexpen** | **Nexpro Rd 40Mg/30Mg Capsule** | **Dexid 25MG Tablet** | **Folimax D3 Forte Tablet** | **Limcee Tablet** | **Colospa Retard Capsule** | **Glimigem M2 Tablet** | **Sitaglyn M 50+500** | **Volix 0.3Mg Tablet** | **Happibiotic Capsule**",
+        },
+        {
+          date: "6 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Navneet Shah",
+          headline: "Ryzodeg 100 Iu/Ml Penfill regimen prescribed",
+          medications: "**Ryzodeg 100 Iu/Ml Penfill** | **Glimigem M2 Tablet** | **Sitaglyn M 50+500** | **Volix 0.3Mg Tablet** | **Thyronorm 50MCG Tablet** | **Valzaar 80MG Tablet** | **Inderal La 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet** | **Icos 1Gm Capsule** | **Lipaglyn 4MG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Dexid 25MG Tablet** | **Folimax D3 Forte Tablet** | **Limcee Tablet** | **Colospa Retard Capsule** | **Happibiotic Capsule**",
+        },
+        {
+          date: "17 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Navneet Shah",
+          headline: "Ryzodeg 100 Iu/Ml Penfill regimen prescribed",
+          medications: "**Ryzodeg 100 Iu/Ml Penfill** | **Glimigem M2 Tablet** | **Sitaglyn M 50+500** | **Volix 0.3Mg Tablet** | **Thyronorm 50MCG Tablet** | **Valzaar 80MG Tablet** | **Inderal La 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet** | **Icos 1Gm Capsule** | **Lipaglyn 4MG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Dexid 25MG Tablet** | **Folimax D3 Forte Tablet** | **Limcee Tablet** | **Colospa Retard Capsule** | **Happibiotic Capsule**",
+        },
+        {
+          date: "17 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Navneet Shah",
+          headline: "Ryzodeg 100 Iu/Ml Penfill regimen prescribed",
+          medications: "**Ryzodeg 100 Iu/Ml Penfill** | **Sitabite 100MG Tablet** | **Zoryl Mv 2MG Tablet** | **Thyronorm 50MCG Tablet** | **Valzaar 80MG Tablet** | **Inderal La 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet** | **Icos 1Gm Capsule** | **Lipaglyn 4MG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Dexid 25MG Tablet** | **Folimax D3 Forte Tablet** | **Limcee Tablet** | **Colospa Retard Capsule** | **Happibiotic Capsule**",
+        },
         {
           date: "11 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Navneet Shah",
-          headline: "**Severe hypertriglyceridaemia TG 2898 mg/dL** — emergency outpatient intervention",
-          symptoms: "Vague upper-abdominal discomfort × 4 days | No frank pancreatitis pain at present | Diet very poor recent weeks | No fresh chest pain | Increasing fatigue",
-          examination: "BMI 31 | BP 142/92 | HR 86 | Soft abdomen, mild epigastric tenderness | No xanthomas seen | No lipaemia retinalis on screening fundus",
-          diagnosis: "**Severe hypertriglyceridaemia (TG 2898)** — pancreatitis-risk territory | Uncontrolled DM (HbA1c 8.5%) | Pre-existing HTN, sub-optimal control",
-          investigations: "Lipid panel | HbA1c | FPG | Renal function | LFT | Repeat TG in 1 week | USG abdomen if any escalation",
-          medications:
-            "**Continue Rozavel EZ 20** (Rosuvastatin 20 + Ezetimibe) | **Plan Fenofibrate add-on next visit** if no contraindication | Continue Valzaar 80 + Amlodac 5 + Inderal LA 20 | Aspirin 75 continued | **Strict diet · zero alcohol · no high-fat foods**",
-          advice: "**Patient instructed: any abdominal pain → emergency room same day** | Hydration | Daily walking | Weight reduction goal 2-3 kg over 8 weeks",
-          followUp: "17 Mar 2026 · repeat TG",
-          labResults: [
-            { name: "Triglycerides", value: "2898", unit: "mg/dL", flag: "critical", refRange: "<150", date: "11 Mar 2026", note: "**Critical** — pancreatitis-risk territory." },
-            { name: "HbA1c", value: "8.5", unit: "%", flag: "high", refRange: "<7.0", date: "11 Mar 2026" },
-            { name: "FPG", value: "191", unit: "mg/dL", flag: "high", refRange: "70–110", date: "11 Mar 2026" },
-            { name: "LDL-C", value: "112", unit: "mg/dL", flag: "high", refRange: "<70 (DM target)", date: "11 Mar 2026" },
-          ],
-          hiddenNormalCount: 6,
-        },
-        {
-          date: "17 Mar 2026",
-          visitType: "OPD",
-          doctor: "Dr Navneet Shah",
-          headline: "**6-day follow-up** — TG down 73% (2898 → 798) on dietary discipline + intensified statin",
-          symptoms: "No abdominal pain | No vomiting | Diet adherent | Energy improving",
-          examination: "BMI 30.8 (-0.2) | BP 138/86 | Soft abdomen, non-tender",
-          diagnosis: "Hypertriglyceridaemia — **dramatic biochemical response**, still well above target | Pancreatitis risk still elevated, less acute",
-          investigations: "Repeat TG in 2 weeks",
-          medications: "Continue Rozavel EZ 20 | **Add Fenofibrate 145 mg OD** — formal initiation today | Counselled on statin-fibrate combination safety (rare myalgia, monitor CK)",
-          advice: "Continue strict diet · zero alcohol · no high-fat | Report any muscle pain immediately (rhabdomyolysis warning)",
-          followUp: "25 Mar 2026 · standard cadence review",
-          labResults: [
-            { name: "Triglycerides", value: "798", unit: "mg/dL", flag: "high", refRange: "<150", date: "17 Mar 2026", note: "Down 73% in 6 days — strong response." },
-          ],
-          hiddenNormalCount: 4,
+          headline: "Ryzodeg 100 Iu/Ml Penfill regimen prescribed",
+          medications: "**Ryzodeg 100 Iu/Ml Penfill** | **Sitason 100MG Tablet** | **Diamicron Xr Mex 60/500Mg Tablet** | **Ltk 50MG Tablet** | **Ctd M 12.5/50Mg Tablet** | **Serta 25MG Tablet** | **Rozavel Ez 20MG Tablet** | **Ecosprin -75 MG Tablet** | **Icos 1Gm Capsule** | **Thyronorm 50MCG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Bilastine 20 MG Tablet** | **Lacto Calamine 115ML Lotion**",
         },
         {
           date: "25 Mar 2026",
           visitType: "OPD",
-          doctor: "Dr Nanavaty",
-          headline: "Most recent IM visit · regimen consolidation",
-          symptoms: "Stable | Tolerating fibrate well | No muscle pain | Sleep good",
-          examination: "BP 134/84 | No fresh findings",
-          diagnosis: "Severe hypertriglyceridaemia, **acute phase resolved**; chronic surveillance phase | DM-II, HTN, dyslipidaemia all sub-optimal",
-          investigations: "Repeat TG in 2 weeks | Liver function on fibrate + statin combination | CK if any myalgia",
-          medications: "Continue full regimen | Reinforce dietary discipline",
-          advice: "Cardiology + Diabetology cross-referrals reinforced",
-          followUp: "After 2-3 weeks",
+          doctor: "Dr Navneet Shah",
+          headline: "Ryzodeg 100 Iu/Ml Penfill regimen prescribed",
+          medications: "**Ryzodeg 100 Iu/Ml Penfill** | **Sitason 100MG Tablet** | **Diamicron Xr Mex 60/500Mg Tablet** | **Ltk 50MG Tablet** | **Ctd M 12.5/50Mg Tablet** | **Rozavel Ez 20MG Tablet** | **Ecosprin -75 MG Tablet** | **Icos 1Gm Capsule** | **Thyronorm 50MCG Tablet** | **Serta 25MG Tablet** | **Nexpro Rd 40Mg/30Mg Capsule** | **Bilastine 20 MG Tablet** | **Lacto Calamine 115ML Lotion**",
         },
       ],
     },
     {
       source: { specialty: "Gastroenterology", author: "Dr Ajay Choksey", date: "12 Mar 2026" },
-      reason: "Recurrent pancreatitis surveillance.",
-      dateRangeLabel: "11 Apr '25 - 12 Mar '26",
+      reason: "Verbatim from OMOP · 5 visits across the consultation window.",
+      dateRangeLabel: "11 Apr 2025 - 12 Mar 2026",
       consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
-      // Verbatim from the most recent GI visit (12 Mar 2026, Dr Ajay Choksey).
       lines: [
-        "**Findings**: **Acute pancreatitis (mild, Balthazar A clinically)** — 13th episode | Background severe hypertriglyceridaemia",
-        "**Medications**: **NPO × 24 h, then clear liquids** | IV NS 100 mL/h × 24 h (outpatient short bridge) | **Buscopan 10 mg q8h IV** | Tramadol 50 mg IV slow for pain | **Oson O** (Ofloxacin + Ornidazole) for stool symptoms × 5 days | Continue Nexpro 40 | Continue Ganaton 50 | **Bistide 3 mg HS** (Plecanatide for bowel routine, started today)",
-        "**Plan**: Within 1 week · USG abdomen if symptoms persist",
+        "**Medications**: **Nexpro 40MG Tablet** | **Ganaton 50MG Tablet** | **Folimax D3 Forte Tablet** | **Rifagut 400MG Tablet** | **Econorm Capsule** | **Colospa Retard Capsule** | **Movicol 200ML Syrup**",
       ],
-      labResults: [
-        { name: "Serum Lipase", value: "412", unit: "U/L", flag: "high", refRange: "0–160", date: "12 Mar 2026", note: "Elevated during the 13th acute pancreatitis episode." },
-        { name: "Serum Amylase", value: "286", unit: "U/L", flag: "high", refRange: "30–110", date: "12 Mar 2026" },
-        { name: "CRP", value: "62", unit: "mg/L", flag: "high", refRange: "<10", date: "12 Mar 2026" },
-      ],
-      hiddenNormalLabCount: 8,
       consultations: [
         {
           date: "11 Apr 2025",
           visitType: "OPD",
           doctor: "Dr Ajay Choksey",
-          headline: "Baseline post-pancreatitis review (episode 11) · chronic surveillance handover",
-          symptoms: "Stable | Mild bloating, intermittent | No active pain | Tolerating low-fat diet",
-          examination: "BMI 30.4 | Soft abdomen | No organomegaly | No flank tenderness",
-          diagnosis: "**Recurrent acute pancreatitis (metabolic origin, gallbladder out)** | s/p cholecystectomy",
-          investigations: "MRCP if any escalation | Annual TG, lipase | LFT",
-          medications: "**Nexpro 40 OD** (Esomeprazole) | **Ganaton 50 BID** (Itopride for dyspepsia) | Reinforce zero alcohol, low-fat diet",
-          advice: "Pancreatitis precautions | Aggressive TG control with Internal Medicine | Annual GI surveillance",
-          followUp: "After 3 months · earlier if any abdominal pain",
+          headline: "Nexpro 40MG Tablet regimen prescribed",
+          medications: "**Nexpro 40MG Tablet** | **Ganaton 50MG Tablet** | **Oson O Tablet** | **Mucaine Gel**",
+        },
+        {
+          date: "24 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Ajay Choksey",
+          headline: "Nexpro 40MG Tablet regimen prescribed",
+          medications: "**Nexpro 40MG Tablet** | **Ganaton 50MG Tablet**",
+        },
+        {
+          date: "25 Aug 2025",
+          visitType: "OPD",
+          doctor: "Dr Ajay Choksey",
+          headline: "Nexpro Rd 40Mg/30Mg Capsule regimen prescribed",
+          medications: "**Nexpro Rd 40Mg/30Mg Capsule** | **Ganaton 50MG Tablet** | **Folimax D3 Forte Tablet** | **Colospa Retard Capsule** | **Econorm Capsule**",
+        },
+        {
+          date: "6 Jan 2026",
+          visitType: "OPD",
+          doctor: "Dr Ajay Choksey",
+          headline: "Nexpro Rd 40Mg/30Mg Capsule regimen prescribed",
+          medications: "**Nexpro Rd 40Mg/30Mg Capsule** | **Folimax D3 Forte Tablet** | **Rifagut 400MG Tablet** | **Econorm Capsule** | **Colospa Retard Capsule**",
         },
         {
           date: "12 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Ajay Choksey",
-          headline: "**13th acute pancreatitis episode** — managed outpatient given mild severity",
-          symptoms: "Epigastric pain × 18 h, radiating to back | Nausea, no vomiting | Atypical chest pain (radiation, not cardiac) | Watery stool 3 episodes today | Decreased appetite",
-          examination: "T 99.2 | HR 92 | BP 134/86 | Tenderness epigastrium, mild guarding | No rebound | Bowel sounds present | No icterus",
-          diagnosis: "**Acute pancreatitis (mild, Balthazar A clinically)** — 13th episode | Background severe hypertriglyceridaemia",
-          investigations: "**Serum Lipase 412** | **Amylase 286** | **CRP 62** | USG abdomen — no fresh collection | LFT WNL",
-          medications:
-            "**NPO × 24 h, then clear liquids** | IV NS 100 mL/h × 24 h (outpatient short bridge) | **Buscopan 10 mg q8h IV** | Tramadol 50 mg IV slow for pain | **Oson O** (Ofloxacin + Ornidazole) for stool symptoms × 5 days | Continue Nexpro 40 | Continue Ganaton 50 | **Bistide 3 mg HS** (Plecanatide for bowel routine, started today)",
-          advice: "**Strict zero alcohol** | No high-fat foods × 6 weeks | Slow re-introduction of diet | **Any worsening pain, fever, or vomiting → emergency hospital admission**",
-          followUp: "Within 1 week · USG abdomen if symptoms persist",
-          labResults: [
-            { name: "Serum Lipase", value: "412", unit: "U/L", flag: "high", refRange: "0–160", date: "12 Mar 2026" },
-            { name: "Serum Amylase", value: "286", unit: "U/L", flag: "high", refRange: "30–110", date: "12 Mar 2026" },
-            { name: "CRP", value: "62", unit: "mg/L", flag: "high", refRange: "<10", date: "12 Mar 2026" },
-          ],
-          hiddenNormalCount: 8,
+          headline: "Nexpro 40MG Tablet regimen prescribed",
+          medications: "**Nexpro 40MG Tablet** | **Ganaton 50MG Tablet** | **Folimax D3 Forte Tablet** | **Rifagut 400MG Tablet** | **Econorm Capsule** | **Colospa Retard Capsule** | **Movicol 200ML Syrup**",
         },
       ],
     },
     {
-      source: { specialty: "Urology", author: "Dr Kamlesh Patel", date: "13 Nov 2025" },
-      reason: "Recurrent UTI in diabetic post-menopausal female.",
-      dateRangeLabel: "18 Aug - 13 Nov '25",
+      source: { specialty: "Urology", author: "Dr Kaustubh Patel / Dr Kamlesh Patel", date: "13 Nov 2025" },
+      reason: "Verbatim from OMOP · 5 visits across the consultation window.",
+      dateRangeLabel: "18 Aug 2025 - 13 Nov 2025",
       consultationCount: 5,
-      doctorsLabel: "Dr Kamlesh Patel / Dr Kaustubh Patel",
-      // Verbatim from the most recent urology visit
-      // (13 Nov 2025, Dr Kaustubh Patel).
+      doctorsLabel: "Dr Kaustubh Patel / Dr Kamlesh Patel",
       lines: [
-        "**Findings**: Voiding dysfunction in DM-II post-menopausal female — **mixed under-active bladder + bladder-neck dysfunction**",
-        "**Medications**: Continue **Veltam 0.4 mg HS** (Tamsulosin — bladder-neck relaxation) | **Add Urotone SR 75 mg OD** (Bethanechol — for under-active bladder contraction) | Continue Premarin vaginal | Periodic urine culture",
-        "**Plan**: **Urodynamics-anchored review (not yet booked)**",
-      ],
-      openLoops: [
-        "Urology has not booked a **bladder-function review** despite contradictory Tamsulosin + Bethanechol regimen, reconciliation visit still pending",
+        "**Medications**: **Uribid Tablet** | **Progynova 2MG Tablet** | **Pyridium 200 MG Tablet**",
       ],
       consultations: [
         {
           date: "18 Aug 2025",
           visitType: "OPD",
+          doctor: "Dr Kaustubh Patel",
+          headline: "Chymoral Forte Tablet regimen prescribed",
+          medications: "**Chymoral Forte Tablet** | **Citralka 100ML Syrup**",
+        },
+        {
+          date: "30 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Kaustubh Patel",
+          headline: "Veltam 0.4Mg Tablet regimen prescribed",
+          medications: "**Veltam 0.4Mg Tablet** | **Urotone Sr 75MG Tablet** | **Premarin Vaginal Cream 14 Gm**",
+        },
+        {
+          date: "27 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Kaustubh Patel",
+          headline: "Premarin Vaginal Cream 14Gm regimen prescribed",
+          medications: "**Premarin Vaginal Cream 14Gm** | **Urotone Sr 75MG Tablet** | **Veltam 0.4Mg Tablet**",
+        },
+        {
+          date: "10 Nov 2025",
+          visitType: "OPD",
           doctor: "Dr Kamlesh Patel",
-          headline: "Initial urology consult — **recurrent UTI + voiding dysfunction**",
-          symptoms: "Frequency, urgency × 3 weeks | Burning micturition intermittent | Poor flow + hesitancy × 6 months | Nocturia 2-3 episodes | Mild urge incontinence",
-          examination: "Suprapubic non-tender | DRE: no fresh findings | External genitalia: post-menopausal atrophic changes mild",
-          diagnosis: "**Recurrent UTI in a diabetic post-menopausal female** with mixed voiding-dysfunction pattern",
-          investigations: "Urine R/M + culture | Renal USG | Post-void residual scan | HbA1c",
-          medications: "Empirical **Nitrofurantoin 100 mg BD × 5 days** (pending culture) | **Veltam 0.4 mg HS** (Tamsulosin) | **Premarin** vaginal cream BD",
-          advice: "Adequate hydration | Voiding hygiene | Cranberry supplement | Recheck culture before any escalation",
-          followUp: "13 Nov 2025 · culture-targeted plan",
+          headline: "Consultation by Dr Kamlesh Patel",
         },
         {
           date: "13 Nov 2025",
           visitType: "OPD",
-          doctor: "Dr Kaustubh Patel",
-          headline: "Most recent visit · **bladder pharmacology contradiction** introduced",
-          symptoms: "UTI symptoms resolved on culture-targeted course | Voiding still slow | Urgency persists | Mild stress incontinence on cough",
-          examination: "Unchanged | Bladder USG: PVR 80 mL",
-          diagnosis: "Voiding dysfunction in DM-II post-menopausal female — **mixed under-active bladder + bladder-neck dysfunction**",
-          investigations: "Urodynamics advised (not yet booked) | Repeat urine R/M",
-          medications:
-            "Continue **Veltam 0.4 mg HS** (Tamsulosin — bladder-neck relaxation) | **Add Urotone SR 75 mg OD** (Bethanechol — for under-active bladder contraction) | Continue Premarin vaginal | Periodic urine culture",
-          advice: "Pelvic-floor exercises | Voiding diary | Urodynamics within 4 weeks",
-          followUp: "**Urodynamics-anchored review (not yet booked)**",
-          additionalNotes:
-            "**Open loop**: Tamsulosin (relaxes outflow) and Bethanechol (contracts bladder) are pharmacologically contradictory. The team intended one to address each component but the combination is unusual without urodynamic confirmation.",
+          doctor: "Dr Kamlesh Patel",
+          headline: "Uribid Tablet regimen prescribed",
+          medications: "**Uribid Tablet** | **Progynova 2MG Tablet** | **Pyridium 200 MG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "E.N.T.", author: "Dr Lav Selarka", date: "1 Apr 2026" },
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "13 Nov 2024 - 1 Apr 2026",
+      consultationCount: 3,
+      doctorsLabel: "Dr Lav Selarka",
+      lines: [
+        "**Findings**: (no observation_text recorded)",
+      ],
+      consultations: [
+        {
+          date: "13 Nov 2024",
+          visitType: "OPD",
+          doctor: "Dr Lav Selarka",
+          headline: "Pantodac Dsr Capsule regimen prescribed",
+          medications: "**Pantodac Dsr Capsule** | **Rebagen 100MG Tablet** | **Betadine Gargle 50ML** | **Supradyn Tablet** | **Metrogyl Dg Forte 20Gm Gel**",
+        },
+        {
+          date: "25 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Lav Selarka",
+          headline: "Fluticone Ft Nasal Spray regimen prescribed",
+          medications: "**Fluticone Ft Nasal Spray** | **Soliwax 10ML Ear Drop**",
+        },
+        {
+          date: "1 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Lav Selarka",
+          headline: "Consultation by Dr Lav Selarka",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Pulmonology", author: "Dr Jitendra Kotadiya / Dr Avadh Vithlani", date: "25 Mar 2026" },
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "24 Jul 2025 - 25 Mar 2026",
+      consultationCount: 3,
+      doctorsLabel: "Dr Jitendra Kotadiya / Dr Avadh Vithlani",
+      lines: [
+        "**Medications**: **Omnacortil 20MG Tablet** | **Azithral 500MG Tablet** | **Pulmoclear Tablet** | **Montair Lc Tablet** | **Zerostat Mini Spacer** | **Budamate-G MDI** | **Benz Pearls Capsule** | **L Dio - 1 Tablet** | **Grilinctus 100ML Syrup**",
+      ],
+      consultations: [
+        {
+          date: "24 Jul 2025",
+          visitType: "OPD",
+          doctor: "Dr Jitendra Kotadiya",
+          headline: "Foracort 200MCG Rotacap regimen prescribed",
+          medications: "**Foracort 200MCG Rotacap** | **Montek Bl Tablet** | **Ultracet Tablet** | **Wikoryl 10MG Tablet**",
+        },
+        {
+          date: "6 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Jitendra Kotadiya",
+          headline: "Foracort 200MCG Rotacap regimen prescribed",
+          medications: "**Foracort 200MCG Rotacap** | **Montek Bl Tablet** | **Wikoryl 10MG Tablet**",
+        },
+        {
+          date: "25 Mar 2026",
+          visitType: "OPD",
+          doctor: "Dr Avadh Vithlani",
+          headline: "Omnacortil 20MG Tablet regimen prescribed",
+          medications: "**Omnacortil 20MG Tablet** | **Azithral 500MG Tablet** | **Pulmoclear Tablet** | **Montair Lc Tablet** | **Zerostat Mini Spacer** | **Budamate-G MDI** | **Benz Pearls Capsule** | **L Dio - 1 Tablet** | **Grilinctus 100ML Syrup**",
         },
       ],
     },
     {
       source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "27 Oct 2025" },
-      reason: "HTN regimen + statin management.",
-      dateRangeLabel: "8 Sep - 27 Oct '25",
+      reason: "Verbatim from OMOP · 3 visits across the consultation window.",
+      dateRangeLabel: "8 Sep 2025 - 27 Oct 2025",
       consultationCount: 3,
       doctorsLabel: "Dr Bhavesh Roy",
-      // Verbatim from the most recent cardiology visit
-      // (27 Oct 2025, Dr Bhavesh Roy).
       lines: [
-        "**Findings**: **β-blocker over-suppression risk** on full anti-HTN regimen | CV risk well controlled overall",
-        "**Medications**: **Reduce Inderal LA 20 → Inderal 10 OD** (down-titration) | Continue Valzaar 80, Amlodac 5, Ecospin 75 | Continue Rozavel EZ 20 (statin maximised)",
-        "**Plan**: After 4 weeks · with BP diary + ECG",
+        "**Medications**: **Valzaar 80MG Tablet** | **Inderal 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet**",
+      ],
+      consultations: [
+        {
+          date: "8 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Valzaar 80MG Tablet regimen prescribed",
+          medications: "**Valzaar 80MG Tablet** | **Inderal 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet**",
+        },
+        {
+          date: "15 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Valzaar 80MG Tablet regimen prescribed",
+          medications: "**Valzaar 80MG Tablet** | **Inderal 10 MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet**",
+        },
+        {
+          date: "27 Oct 2025",
+          visitType: "OPD",
+          doctor: "Dr Bhavesh Roy",
+          headline: "Valzaar 80MG Tablet regimen prescribed",
+          medications: "**Valzaar 80MG Tablet** | **Inderal 20MG Tablet** | **Amlodac 5MG Tablet** | **Ecosprin -75 MG Tablet** | **Rozavel Ez 20MG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Dermatology", author: "Dr Dhwani R Shah / Dr Niyati Parikh", date: "17 Dec 2025" },
+      reason: "Verbatim from OMOP · 2 visits across the consultation window.",
+      dateRangeLabel: "27 Oct 2025 - 17 Dec 2025",
+      consultationCount: 2,
+      doctorsLabel: "Dr Dhwani R Shah / Dr Niyati Parikh",
+      lines: [
+        "**Medications**: **Dazit 10MG Tablet** | **Xyzal 10MG Tablet** | **Enmoist 200Gm Cream** | **Momate Xl 40Gm Cream**",
       ],
       consultations: [
         {
           date: "27 Oct 2025",
           visitType: "OPD",
-          doctor: "Dr Bhavesh Roy",
-          headline: "Most recent cardiology review · **β-blocker over-suppression** flagged",
-          symptoms: "Easy fatigue × 4 weeks | One episode of light-headedness on standing | Sleep good | No chest pain | No SOB",
-          examination: "**BP 110/70** (lower than usual; patient admits 2 doses skipped due to fatigue) | HR 58 (bradycardic on Inderal) | S1S2 normal | No murmur | No oedema",
-          diagnosis: "**β-blocker over-suppression risk** on full anti-HTN regimen | CV risk well controlled overall",
-          investigations: "ECG today (NSR, HR 58) | 2D Echo annual | Repeat lipid panel · TG · LDL",
-          medications:
-            "**Reduce Inderal LA 20 → Inderal 10 OD** (down-titration) | Continue Valzaar 80, Amlodac 5, Ecospin 75 | Continue Rozavel EZ 20 (statin maximised)",
-          advice: "Postural-symptom education | Take meds with food | Record BP twice daily for 2 weeks | Fibrate-decision deferred to Internal Medicine",
-          followUp: "After 4 weeks · with BP diary + ECG",
+          doctor: "Dr Dhwani R Shah",
+          headline: "Vitipause 15ML Gel regimen prescribed",
+          medications: "**Vitipause 15ML Gel** | **Melgain 10ML Lotion** | **Oryza 50Gm Cream** | **Ega 30Gm Cream** | **L Dio - 1 Tablet**",
+        },
+        {
+          date: "17 Dec 2025",
+          visitType: "OPD",
+          doctor: "Dr Niyati Parikh",
+          headline: "Dazit 10MG Tablet regimen prescribed",
+          medications: "**Dazit 10MG Tablet** | **Xyzal 10MG Tablet** | **Enmoist 200Gm Cream** | **Momate Xl 40Gm Cream**",
         },
       ],
     },
     {
-      source: { specialty: "Diabetology", author: "Dr Talati", date: "13 Apr 2026" },
-      reason: "Uncontrolled DM-II with allergic symptoms.",
-      dateRangeLabel: "13 Apr '26",
+      source: { specialty: "Orthopaedics", author: "Dr Maulik Patwa", date: "30 Sep 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "30 Sep 2025",
       consultationCount: 1,
-      doctorsLabel: "Dr Talati / Dr Rushikesh Shah",
-      // Verbatim from the diabetology visit (13 Apr 2026, Dr Talati).
+      doctorsLabel: "Dr Maulik Patwa",
       lines: [
-        "**Findings**: **Uncontrolled Type-2 Diabetes Mellitus** — likely insulin requirement | Pruritus probably hyperglycaemic + dry skin (allergic component to be ruled out)",
-        "**Medications**: **Start Ryzodeg 100 SC** — pre-breakfast titration | **Eurepa V** (Repaglinide + Voglibose) with meals | **LTK 50** (Losartan) for HTN | **CTD M** (Chlorthalidone + Metoprolol combination) for HTN | Continue **Thyronorm 50 OD** | **Cetirizine 10 mg HS** for pruritus × 7 days | **Emollient** twice daily for dry skin",
-        "**Plan**: Within 2-3 weeks · with SMBG diary + repeat labs",
+        "**Medications**: **Dan 30Gm Gel** | **Maxgalin 75MG Capsule** | **Ultracet Semi Tablet**",
       ],
-      openLoops: [
-        "Diabetology advised **insulin titration + repeat workup at next visit**, follow-up not yet booked",
+      consultations: [
+        {
+          date: "30 Sep 2025",
+          visitType: "OPD",
+          doctor: "Dr Maulik Patwa",
+          headline: "Dan 30Gm Gel regimen prescribed",
+          medications: "**Dan 30Gm Gel** | **Maxgalin 75MG Capsule** | **Ultracet Semi Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Spine Surgeon", author: "Dr NIRAJ VASAVADA", date: "10 Nov 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "10 Nov 2025",
+      consultationCount: 1,
+      doctorsLabel: "Dr NIRAJ VASAVADA",
+      lines: [
+        "**Medications**: **Muvera 15MG Tablet** | **Myoril 4MG Capsule** | **Gabantin 100MG Tablet** | **Tryptomer 10MG Tablet**",
+      ],
+      consultations: [
+        {
+          date: "10 Nov 2025",
+          visitType: "OPD",
+          doctor: "Dr NIRAJ VASAVADA",
+          headline: "Muvera 15MG Tablet regimen prescribed",
+          medications: "**Muvera 15MG Tablet** | **Myoril 4MG Capsule** | **Gabantin 100MG Tablet** | **Tryptomer 10MG Tablet**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Neurology", author: "Dr ARVIND SHARMA", date: "20 Nov 2025" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "20 Nov 2025",
+      consultationCount: 1,
+      doctorsLabel: "Dr ARVIND SHARMA",
+      lines: [
+        "**Medications**: **Ecosprin -75 MG Tablet** | **Flupirza 100MG Capsule**",
+      ],
+      consultations: [
+        {
+          date: "20 Nov 2025",
+          visitType: "OPD",
+          doctor: "Dr ARVIND SHARMA",
+          headline: "Ecosprin -75 MG Tablet regimen prescribed",
+          medications: "**Ecosprin -75 MG Tablet** | **Flupirza 100MG Capsule**",
+        },
+      ],
+    },
+    {
+      source: { specialty: "Diabetology", author: "Dr Kalpesh Talati / Dr Rushikesh Shah", date: "13 Apr 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "13 Apr 2026",
+      consultationCount: 1,
+      doctorsLabel: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+      lines: [
+        "**Medications**: **Ltk 50MG Tablet** | **Ctd M 12.5/50Mg Tablet** | **Thyronorm 50MCG Tablet** | **Ryzodeg 100 Iu/Ml Penfill** | **Eurepa V 1/0.3Mg Tablet** | **Glycomet Gp-2 Tablet** | **Sitaxa E 25/100Mg Tablet** | **Adilip 135MG Tablet** | **Arvast 10MG Tablet** | **Serta 25MG Tablet** | **Maxepa Capsules**",
       ],
       consultations: [
         {
           date: "13 Apr 2026",
           visitType: "OPD",
-          doctor: "Dr Talati",
-          headline: "**First diabetology visit** — uncontrolled DM-II + generalised pruritus",
-          symptoms: "Polyuria, polydipsia × 6 weeks | **Itching all over body × 3 weeks** | Weight loss 2 kg | Fatigue | No fresh visual symptoms | No tingling LL fresh",
-          examination: "BMI 30.6 | BP 138/88 | Fundus: scheduled within 4 weeks | Foot exam: no fresh sensory loss | Skin: no rash, dry skin++",
-          diagnosis: "**Uncontrolled Type-2 Diabetes Mellitus** — likely insulin requirement | Pruritus probably hyperglycaemic + dry skin (allergic component to be ruled out)",
-          investigations: "HbA1c · FPG · PPG · Urine ACR · eGFR · TSH · Skin allergy panel (if pruritus persists post-control)",
-          medications:
-            "**Start Ryzodeg 100 SC** — pre-breakfast titration | **Eurepa V** (Repaglinide + Voglibose) with meals | **LTK 50** (Losartan) for HTN | **CTD M** (Chlorthalidone + Metoprolol combination) for HTN | Continue **Thyronorm 50 OD** | **Cetirizine 10 mg HS** for pruritus × 7 days | **Emollient** twice daily for dry skin",
-          advice:
-            "Insulin injection technique training | SMBG 4 times daily × 1 week then bring chart | Diet diary | **Notify if any hypoglycaemia signs** | Repeat workup at next visit",
-          followUp: "Within 2-3 weeks · with SMBG diary + repeat labs",
-          additionalNotes:
-            "**Cross-team concern**: this regimen adds Losartan (an ARB) to a patient already on Valzaar (another ARB) from Cardiology, AND adds Metoprolol to a patient already on Propranolol from Cardiology. Cross-team reconciliation request placed.",
+          doctor: "Dr Kalpesh Talati / Dr Rushikesh Shah",
+          headline: "Ltk 50MG Tablet regimen prescribed",
+          medications: "**Ltk 50MG Tablet** | **Ctd M 12.5/50Mg Tablet** | **Thyronorm 50MCG Tablet** | **Ryzodeg 100 Iu/Ml Penfill** | **Eurepa V 1/0.3Mg Tablet** | **Glycomet Gp-2 Tablet** | **Sitaxa E 25/100Mg Tablet** | **Adilip 135MG Tablet** | **Arvast 10MG Tablet** | **Serta 25MG Tablet** | **Maxepa Capsules**",
         },
       ],
     },
   ],
-  collisions: [
-    {
-      kind: "coordination-gap",
-      title: "**Severe hypertriglyceridaemia untreated with fibrate**, pancreatitis risk untreated",
-      points: [
-        "TG 2898 mg/dL documented (in narrative, not lab table).",
-        "Only Rosuvastatin + Ezetimibe on board.",
-        "Fenofibrate or omega-3 indicated above TG > 500 to reduce pancreatitis recurrence.",
-      ],
-      rule: {
-        body: "NICE",
-        year: "2024",
-        section: "NG28 §5.4 / AHA 2021",
-        readableBody: "Joint NICE (UK) + AHA (American Heart Association) — the standard combined reference for severe hypertriglyceridaemia management in adults.",
-        description: "Defines the TG cut-off (typically > 500 mg/dL) above which a fibrate or omega-3 must be added to statin therapy to reduce acute-pancreatitis recurrence, and the safety rules for statin + fibrate combinations.",
-        whyPicked: "Ms Desai had a documented TG of **2898 mg/dL** in March 2026 — six times the fibrate-indication threshold — and **13 prior acute-pancreatitis episodes**. Her current regimen has only Rosuvastatin + Ezetimibe; no fibrate or omega-3. NICE/AHA both indicate fibrate add-on at this TG level.",
-        fetches: "Her current TG value, whether a fibrate is on board, and her pancreatitis-episode count.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "ddi",
-      title: "**Triple anti-HTN across specialties**, no reconciliation",
-      points: [
-        "Cardiology: Valsartan + Amlodipine + Propranolol.",
-        "Diabetology added Losartan + Chlorthalidone + Metoprolol (April 2026).",
-        "Two ARBs and two β-blockers across specialties → hypotension risk.",
-      ],
-      rule: {
-        body: "ESC/ESH",
-        year: "2023",
-        readableBody: "European Society of Cardiology + European Society of Hypertension — the joint European hypertension guideline, widely followed in Indian practice.",
-        description: "Specifies that anti-hypertensive regimens should use one agent per class (one ARB, one β-blocker), not two ARBs or two β-blockers stacked across specialties.",
-        whyPicked: "Cardiology has Ms Desai on Valsartan + Amlodipine + Propranolol. Diabetology then added Losartan + Chlorthalidone + Metoprolol in April 2026 — so she now has TWO ARBs (Valsartan + Losartan) and TWO β-blockers (Propranolol + Metoprolol) live concurrently across two teams. ESC/ESH explicitly warns about this exact stacking.",
-        fetches: "Which two teams prescribed which agents, and the duplicated classes.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "ddi",
-      title: "**Bladder pharmacology contradiction**, Tamsulosin + Bethanechol",
-      points: [
-        "Both prescribed by the same Urology team.",
-        "Tamsulosin relaxes bladder-neck; Bethanechol stimulates bladder contraction.",
-        "Opposing actions, verify or de-prescribe.",
-      ],
-      rule: {
-        body: "AUA",
-        year: "2020",
-        section: "BPH / Voiding dysfunction",
-        readableBody: "American Urological Association — US urology body whose voiding-dysfunction guideline is the standard reference.",
-        description: "Sets the principle that voiding-dysfunction drugs should be matched to the mechanism (over-active vs under-active bladder), not stacked with opposing actions.",
-        whyPicked: "The same Urology team has Ms Desai on **Tamsulosin** (relaxes bladder-neck for under-active outflow) AND **Bethanechol** (stimulates bladder contraction for under-active detrusor). These are opposing mechanisms — usually one or the other, not both — and no reconciliation visit appears in the record.",
-        fetches: "Whether both drugs are simultaneously active, and which clinician owns the reconciliation.",
-        confidence: "established",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "Initiate fibrate (or omega-3) for TG-driven pancreatitis risk.",
-    "Reconcile anti-HTN: Cardiology vs Diabetology regimens.",
-    "Review bladder Rx contradiction (Tamsulosin + Bethanechol).",
-    "Move TG value from narrative into structured measurement.",
-  ],
-  syntheses: [
-    {
-      panelTitle: "Hypertriglyceridaemia · pancreatitis-risk panel",
-      guideline: {
-        body: "AHA",
-        year: "2021",
-        readableBody: "American Heart Association — US cardiology body whose Hypertriglyceridaemia Scientific Statement is the most-cited reference.",
-        description: "Defines the TG values at which pancreatitis risk dominates, the fibrate-add-on threshold, and the statin-fibrate combination safety rules.",
-        whyPicked: "Ms Desai's TG history (peak 2898, repeat 798, 13 acute pancreatitis episodes) makes this the single most-relevant published reference for her risk profile.",
-        fetches: "Her TG trajectory, fibrate-on-board status, and pancreatitis recurrence count.",
-        confidence: "established",
-      },
-      rows: [
-        { label: "Triglyceride", value: "2898 mg/dL", ref: "From Internal Medicine narrative, not in lab table.", tone: "alert" },
-        { label: "Fibrate on board", value: "No", ref: "No fenofibrate / gemfibrozil in drug_exposure.", tone: "alert" },
-        { label: "Pancreatitis episodes", value: "13", ref: "From consultation records tagged 'H/O ACUTE PANCREATITIS'.", tone: "alert" },
-      ],
-      note: "Three independent alerts converge on the same gap. Highest-priority intervention for this patient.",
-    },
-  ],
-  freshness: "Synced just now",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation · last refresh just now",
 }
-
 // ═════════════════════════════════════════════════════════════════════════
-// ARJUN_VERMA_BRIEF_MOCK  ·  P6 · person_id 319033560465 · M · 14
+// ARJUN_VERMA_BRIEF_MOCK  ·  person_id 319033560465 · M · 14y
 // ─────────────────────────────────────────────────────────────────────────
-// Scenario: 3-day inpatient admission (24-26 Feb 2026) for decompensated
-// Wilson's disease + acute Hepatitis A in a pediatric patient, followed by
-// 5 OPD reviews over the next month. FIRST patient in the catalogue with:
-//   · a real inpatient visit_occurrence row (visit_concept_id = 9201)
-//   · structured OMOP `note` rows (Presenting Complaints + Discharge Condition)
-//   · 315 lab measurements (type 44818702) — serial LFT monitoring
-// Demonstrates the "IPD + OPD continuum" rendering for the brief.
+// Rebuilt VERBATIM from the OMOP CDM export. Every drug name comes from
+// drug_exposure.drug_source_value (deduped per visit by brand + composition).
+// Every diagnosis / symptom / exam / advice / follow-up sentence comes from
+// observation.value_as_string. Co-morbidities pulled from condition_occurrence
+// (Active / Confirmed rows only).
 // ═════════════════════════════════════════════════════════════════════════
 export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientName: "Arjun Verma",
@@ -2296,416 +2488,104 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientId: "319033560465",
   medicalHistory: [
     {
-      title: "Primary problem",
-      tone: "primary",
-      items: [
-        { text: "**Wilson's disease** (on chelation therapy, Penicillamine + Zinc)" },
-        { text: "**Acute Hepatitis A** (HAV IgM positive, admitted 24 Feb 2026 with jaundice and hepatic decompensation)" },
-        { text: "**Decompensated chronic liver disease** (ascites and cholestasis on the IPD admission)" },
-      ],
-      sources: [
-        { doctor: "Dr Ajay Choksey (Gastroenterology, IPD admission)", date: "24 Feb 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology, Discharge)", date: "26 Feb 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "3 Mar 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "10 Mar 2026" },
-        { doctor: "Dr Sejal Shah (Ophthalmology, KF-ring assessment)", date: "10 Mar 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "25 Mar 2026" },
-      ],
-      reasoning:
-        "13 consultation records tagged HAV IgM POSITIVE across the IPD admission and 5 OPD follow-ups. Wilson's disease is inferred from the Cilamin (Penicillamine) plus Zinfate (Zinc) regimen, the classic chelation-plus-anti-absorption combination. The combination of Wilson's and acute HAV in a 14-year-old is what tipped the patient into hepatic decompensation requiring admission.",
-    },
-    {
       title: "Co-morbidities",
       tone: "neutral",
-      items: [{ text: "**Hypothyroidism** (Active)" }],
-      sources: [
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "24 Feb 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "3 Mar 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "10 Mar 2026" },
-        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "25 Mar 2026" },
+      items: [
+        { text: "**Hypothyroidism** (Active)" },
+        { text: "**HAV Igm Positive** (Active)" },
       ],
-      reasoning:
-        "13 consultation records tagged HYPOTHYROIDISM as Active. On stable Thyroxine 125 mcg replacement; not the driver of the admission but relevant for chronic-care continuity.",
+      sources: [],
+      reasoning: "Pulled from condition_occurrence WHERE status IN (Active, Confirmed).",
     },
     {
       title: "Surgical history",
       tone: "neutral",
-      items: [{ text: "No surgical history found" }],
+      items: [
+        { text: "No surgical history found" },
+      ],
       sources: [],
-      reasoning: "No surgical procedures recorded for this patient. The Wilson's diagnosis predates current consultations but no past surgery is documented.",
+      reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
-      items: [{ text: "Allergy review not explicitly verified (pre-Penicillamine challenge documentation absent)" }],
+      items: [
+        { text: "Allergy review not explicitly verified" },
+      ],
       sources: [],
-      reasoning:
-        "Penicillamine carries a non-trivial hypersensitivity and nephrotic-syndrome risk. The absence of a documented allergy review on initiation is a meaningful gap. Flag for the next OPD visit.",
+      reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
     },
   ],
-  windowDays: 29,
+  windowDays: 30,
   specialties: [
     {
-      source: { specialty: "Gastroenterology · IPD admission", author: "Dr Ajay Choksey", date: "24-26 Feb 2026" },
-      reason: "The index admission. 3-day stay managed by the hepatology arm of Gastroenterology.",
-      dateRangeLabel: "24 - 26 Feb '26 (IPD)",
-      consultationCount: 1,
+      source: { specialty: "Gastroenterology", author: "Dr Ajay Choksey", date: "25 Mar 2026" },
+      reason: "Verbatim from OMOP · 5 visits across the consultation window.",
+      dateRangeLabel: "24 Feb 2026 - 25 Mar 2026",
+      consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
-      // Verbatim from the IPD admission Rx (24 Feb 2026, Dr Ajay Choksey).
       lines: [
-        "**Findings**: **Acute Hepatitis A** (HAV IgM positive) on a background of **Wilson's disease** with **hepatic decompensation** | Mild ascites | Suspected UTI (burning micturition)",
-        "**Medications**: **Wysolone 10 mg OD** | **Cilamin 250 mg BID** (Penicillamine) | **Zinfate OD** (Zinc) | **Ursocol 300 BID** (UDCA) | **Hepamerz** sachet TID | **Aldactone 25 OD** (Spironolactone) | **Looz** 15 mL HS (Lactulose) | **Thyrox 125 mcg OD** continued | Cefixime 200 mg BID (empirical for UTI) | IV fluids — DNS @ 75 mL/h",
-        "**Plan**: Discharge planned by 26 Feb if LFTs trend down; OPD review on 3 Mar 2026",
+        "**Medications**: **Nexpro 40MG Tablet** | **Lesuride 25MG Tablet** | **Folimax D3 Forte Tablet** | **Ursocol 300MG Tablet** | **Nusam 400MG Tablet** | **Thyrox 125 MCG** | **Hepamerz Sachet** | **Prohance Liv Powder** | **Aldactone 25MG Tablet** | **Ostocalcium Total Centrum Chewable Tablet** | **Gabawin 25MG Tablet** | **Choltran 5Gm Sachet** | **Looz 240ML Syrup** | **Zinfate Tablet** | **Cilamin 250MG Capsule** | **Wysolone 10MG Tablet**",
       ],
-      // Specialty-level abnormal labs from the admission. Latest in-stay reading
-      // shown for each parameter. Normal CBC parameters from the same panels
-      // are rolled up via hiddenNormalLabCount.
-      labResults: [
-        { name: "Bilirubin (Total)", value: "8.4", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "24 Feb 2026", note: "Peak admission value — falling on D2." },
-        { name: "Bilirubin (Direct)", value: "5.9", unit: "mg/dL", flag: "high", refRange: "0.0–0.3", date: "24 Feb 2026", note: "Cholestatic component on admission." },
-        { name: "SGPT (ALT)", value: "612", unit: "U/L", flag: "high", refRange: "5–40", date: "24 Feb 2026", note: "Consistent with acute HAV hepatocyte injury." },
-        { name: "SGOT (AST)", value: "498", unit: "U/L", flag: "high", refRange: "5–40", date: "24 Feb 2026" },
-        { name: "Alk Phosphatase", value: "286", unit: "U/L", flag: "high", refRange: "40–129", date: "24 Feb 2026", note: "Cholestasis." },
-        { name: "GGT", value: "194", unit: "U/L", flag: "high", refRange: "9–48", date: "24 Feb 2026" },
-        { name: "Serum Albumin", value: "2.9", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "24 Feb 2026", note: "Mild hypoalbuminemia, expected in decompensated CLD." },
-        { name: "INR", value: "1.6", unit: "", flag: "high", refRange: "0.8–1.2", date: "24 Feb 2026", note: "Synthetic dysfunction marker." },
-      ],
-      hiddenNormalLabCount: 18,
-      // No open loops from this admission alone — the discharge plan (OPD
-      // review 3 Mar 2026 + continued chelation) has been followed through.
-      // Active monitoring loops are surfaced on the OPD follow-up card below.
       consultations: [
         {
           date: "24 Feb 2026",
           visitType: "IPD",
           doctor: "Dr Ajay Choksey",
-          headline: "**Admitted** with **jaundice**, fever, abdominal pain, decreased oral intake. **HAV IgM positive**, ascites on exam.",
-          symptoms:
-            "Jaundice × 4 days | Fever (low-grade, intermittent) × 3 days | Right hypochondrial pain | Decreased appetite | Itching over body × 1-1.5 months | Burning micturition × 2 days",
-          examination:
-            "Icterus +++ | Mild ascites on flank percussion | Hepatomegaly 3 cm below costal margin, tender | No flapping tremor | No KF ring grossly visible (slit-lamp deferred) | Afebrile at admission, HR 96, BP 102/64",
-          diagnosis:
-            "**Acute Hepatitis A** (HAV IgM positive) on a background of **Wilson's disease** with **hepatic decompensation** | Mild ascites | Suspected UTI (burning micturition)",
-          investigations:
-            "LFT — daily | CBC, KFT, electrolytes — daily | INR, PT — daily | HAV IgM, IgG | HBsAg, Anti-HCV (rule-out) | USG abdomen | Urine routine + culture | Serum ceruloplasmin (sent, pending) | 24-h urinary copper (planned for post-discharge)",
-          medications:
-            "**Wysolone 10 mg OD** | **Cilamin 250 mg BID** (Penicillamine) | **Zinfate OD** (Zinc) | **Ursocol 300 BID** (UDCA) | **Hepamerz** sachet TID | **Aldactone 25 OD** (Spironolactone) | **Looz** 15 mL HS (Lactulose) | **Thyrox 125 mcg OD** continued | Cefixime 200 mg BID (empirical for UTI) | IV fluids — DNS @ 75 mL/h",
-          advice:
-            "Bed rest | Liver-friendly diet, salt restriction | Strict I/O charting | No NSAIDs, no paracetamol > 1.5 g/day | Family briefed re: HAV transmission precautions",
-          followUp: "Discharge planned by 26 Feb if LFTs trend down; OPD review on 3 Mar 2026",
-          labResults: [
-            { name: "Bilirubin (Total)", value: "8.4", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "24 Feb 2026" },
-            { name: "SGPT (ALT)", value: "612", unit: "U/L", flag: "high", refRange: "5–40", date: "24 Feb 2026" },
-            { name: "SGOT (AST)", value: "498", unit: "U/L", flag: "high", refRange: "5–40", date: "24 Feb 2026" },
-            { name: "INR", value: "1.6", unit: "", flag: "high", refRange: "0.8–1.2", date: "24 Feb 2026" },
-            { name: "Serum Albumin", value: "2.9", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "24 Feb 2026" },
-          ],
-          hiddenNormalCount: 14,
-          additionalNotes:
-            "Wilson's disease confirmed on prior records (parent's report) — chelation continued through admission. Family screening status to be addressed at OPD.",
-          dischargeSummary: {
-            admissionLine:
-              "Admitted 24 Feb 2026 · Discharged 26 Feb 2026 · 3 days · Pediatric Ward, Bed 4-B",
-            finalDiagnosis:
-              "**Acute Hepatitis A** with hepatic decompensation, on a background of **Wilson's disease** (on Penicillamine + Zinc). Mild ascites resolving.",
-            presentingComplaints:
-              "Jaundice × 4 days, fever × 3 days, abdominal pain, decreased oral intake, itching over body × 1-1.5 months, burning micturition.",
-            hospitalCourse:
-              "Admitted with cholestatic jaundice and mild ascites. Started on hepatoprotective regimen, Spironolactone for ascites, Lactulose for HE prophylaxis. Wilson's chelation (Cilamin + Zinfate) continued uninterrupted. Empirical Cefixime for UTI symptoms. **LFTs trended down each day** (Bilirubin 8.4 → 6.1 → 4.2 mg/dL; SGPT 612 → 410 → 268 U/L). Ascites clinically resolved by D3. Tolerated full oral diet on D3.",
-            dischargeCondition: "**Stable, ambulating, tolerating oral feeds.** No fresh complaints at discharge.",
-            dischargeExam:
-              "Afebrile · HR 84 · BP 110/72 · No icterus on D3 (clinically faint scleral tinge persists) · No flapping · No ascites on percussion · Soft, non-tender abdomen",
-            dischargeAdvice: [
-              "Continue **Cilamin 250 mg BID** and **Zinfate OD** indefinitely — do not skip doses",
-              "**Wysolone 10 mg** taper as charted, follow exact schedule",
-              "Liver-friendly diet, **no paracetamol > 1 g/day**, absolutely no NSAIDs",
-              "HAV transmission precautions for household × 2 weeks",
-              "Bring all parents + siblings for **family screening** at the next OPD",
-            ],
-            warningSigns: [
-              "**Recurrence of jaundice** or fresh yellow tinge of eyes",
-              "**Persistent vomiting** or refusing oral intake",
-              "Fever > 100.4°F (38°C) | abdominal swelling | drowsiness or confusion (**possible HE**)",
-              "Reduced urine output | bleeding gums | red urine",
-            ],
-            functionalAssessment:
-              "Pediatric functional status restored to baseline by D3. Tolerating school-equivalent activity at discharge. Nutritional intake adequate.",
-          },
+          headline: "Inpatient admission — Dr Ajay Choksey",
+          medications: "**Lactihep 200ML Syrup** | **Ursocol 300MG Tablet** | **Nusam 400MG Tablet** | **Folimax D3 Forte Tablet** | **INJ Vit -K ( 30 MG ) In 100 ML Ns IV Over 1 Hour** | **Nexpro 40MG Tablet** | **Lesuride 25MG Tablet**",
         },
-      ],
-    },
-    {
-      source: { specialty: "Gastroenterology · OPD follow-up series", author: "Dr Ajay Choksey", date: "25 Mar 2026" },
-      reason: "Post-discharge surveillance, five reviews over the month after admission.",
-      dateRangeLabel: "24 Feb - 25 Mar '26",
-      consultationCount: 5,
-      doctorsLabel: "Dr Ajay Choksey",
-      // Verbatim from the most recent OPD follow-up
-      // (25 Mar 2026, Dr Ajay Choksey — the 1-month milestone visit).
-      lines: [
-        "**Findings**: Acute HAV, **resolved** | Wilson's disease, **stable on chelation** | Hypothyroidism, stable",
-        "**Medications**: Cilamin 250 mg BID — **continue indefinitely** | Zinfate OD — continue | Ursocol 300 BID × 4 more weeks | Folimax D3 Forte weekly | Nusam 400 BID | Hepamerz BD | Ostocalcium OD | ProHance LIV | Pregaba 50 PRN | Thyrox 125 mcg OD",
-        "**Plan**: 24 Jun 2026 · 3-month interval | sooner if any neuropsychiatric symptoms",
-      ],
-      // Latest abnormal labs across the 5-visit follow-up window. SGPT and
-      // Bilirubin have improved from admission values but are not yet normal.
-      labResults: [
-        { name: "Bilirubin (Total)", value: "1.8", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "25 Mar 2026", note: "Down from 8.4 on admission. Approaching normal." },
-        { name: "SGPT (ALT)", value: "62", unit: "U/L", flag: "high", refRange: "5–40", date: "25 Mar 2026", note: "Down from 612 on admission. Continued resolution expected." },
-        { name: "SGOT (AST)", value: "48", unit: "U/L", flag: "high", refRange: "5–40", date: "25 Mar 2026" },
-        { name: "Alk Phosphatase", value: "168", unit: "U/L", flag: "high", refRange: "40–129", date: "25 Mar 2026", note: "Cholestasis resolving." },
-        { name: "Serum Albumin", value: "3.4", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "25 Mar 2026", note: "Borderline. Nutritional support advised." },
-      ],
-      hiddenNormalLabCount: 11,
-      openLoops: [
-        "Gastroenterology advised **re-test HAV IgG seroconversion** post-acute, no result on file",
-        "Gastroenterology advised periodic **24-h urinary copper** for Penicillamine monitoring, no result on file",
-        "Gastroenterology advised **first-degree-relative ATP7B screening**, no family-screening entries on file",
-      ],
-      consultations: [
+        {
+          date: "24 Feb 2026",
+          visitType: "OPD",
+          doctor: "Dr Ajay Choksey",
+          headline: "Consultation by Dr Ajay Choksey",
+        },
         {
           date: "3 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Ajay Choksey",
-          headline: "**First post-discharge review** (1-week). Jaundice clinically resolving, LFTs trending down.",
-          symptoms: "No fresh complaints | Mild residual itching, less than pre-admission | Appetite returning | No vomiting | Sleep undisturbed",
-          examination: "Afebrile · HR 82 · BP 108/68 · Faint icterus only · No ascites · Mild hepatomegaly persists, non-tender · No flapping",
-          diagnosis: "Acute HAV, **recovering** | Wilson's disease, continuing on chelation | Hypothyroidism, stable",
-          investigations: "Repeat LFT (Bilirubin Total/Direct/Indirect, SGPT, SGOT, ALP, GGT, Albumin) | INR | CBC",
-          medications:
-            "Cilamin 250 mg BID continued | Zinfate OD continued | **Wysolone 7.5 mg OD** (taper step) | Ursocol 300 BID | Hepamerz BD | Aldactone 25 stopped (ascites resolved) | Lactulose continued PRN | Thyrox 125 mcg continued",
-          advice: "Liver-friendly diet, slow reintroduction of normal protein | Continue HAV precautions × 1 more week",
-          followUp: "10 Mar 2026 · with repeat LFTs · also slit-lamp KF ring assessment by Ophthalmology",
-          labResults: [
-            { name: "Bilirubin (Total)", value: "3.6", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "3 Mar 2026" },
-            { name: "SGPT (ALT)", value: "228", unit: "U/L", flag: "high", refRange: "5–40", date: "3 Mar 2026" },
-            { name: "SGOT (AST)", value: "186", unit: "U/L", flag: "high", refRange: "5–40", date: "3 Mar 2026" },
-            { name: "INR", value: "1.3", unit: "", flag: "high", refRange: "0.8–1.2", date: "3 Mar 2026" },
-          ],
-          hiddenNormalCount: 9,
+          headline: "Consultation by Dr Ajay Choksey",
         },
         {
           date: "10 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Ajay Choksey",
-          headline: "**2-week review**. LFTs continuing to improve. Slit-lamp Ophthalmology done same day.",
-          symptoms: "Itching resolved | Energy returning | Eating well | Mild fatigue post-exertion",
-          examination: "Afebrile · No icterus on close inspection · No hepatomegaly today · Normal abdominal exam",
-          diagnosis: "Acute HAV, **near resolution clinically** | Wilson's, on chelation, no extrapyramidal signs",
-          investigations: "Repeat LFT | KFT | Urinalysis (Penicillamine monitoring) | Slit-lamp for KF ring (Ophthalmology, same day)",
-          medications: "Same regimen | **Wysolone 5 mg OD** (taper step) | Added **Folimax D3 Forte** weekly (nutritional support) | Added **Nusam 400** BID (SAMe)",
-          advice: "Re-introduce school in graded manner from next week | Continue chelation strictly",
-          followUp: "18 Mar 2026 · with KFT + urine PCR",
-          labResults: [
-            { name: "Bilirubin (Total)", value: "2.4", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "10 Mar 2026" },
-            { name: "SGPT (ALT)", value: "124", unit: "U/L", flag: "high", refRange: "5–40", date: "10 Mar 2026" },
-            { name: "SGOT (AST)", value: "98", unit: "U/L", flag: "high", refRange: "5–40", date: "10 Mar 2026" },
-          ],
-          hiddenNormalCount: 10,
-        },
-        {
-          date: "18 Mar 2026",
-          visitType: "OPD",
-          doctor: "Dr Ajay Choksey",
-          headline: "**3-week review**. Asymptomatic. KFT normal, urine PCR borderline, **24-h copper not done**.",
-          symptoms: "No active complaints | School re-started, tolerating",
-          examination: "Vitals normal | No icterus | No new neurological signs | Abdomen soft",
-          diagnosis: "Acute HAV, resolved clinically | Wilson's, on chelation",
-          investigations: "Repeat LFT | KFT | Urinalysis | **24-h urinary copper advised, not done yet**",
-          medications: "Continue Cilamin + Zinfate | **Wysolone 2.5 mg OD** (final taper step) | Stop Lactulose | Continue Ursocol",
-          advice: "Reminder: 24-h urinary copper collection on weekend | School OK, no contact sports for 4 more weeks | **Family screening: bring parents and 8-year-old sister next visit**",
-          followUp: "25 Mar 2026",
-          labResults: [
-            { name: "Bilirubin (Total)", value: "1.9", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "18 Mar 2026" },
-            { name: "SGPT (ALT)", value: "82", unit: "U/L", flag: "high", refRange: "5–40", date: "18 Mar 2026" },
-            { name: "Urine PCR", value: "180", unit: "mg/g", flag: "high", refRange: "<150", date: "18 Mar 2026", note: "Penicillamine-related; monitor monthly." },
-          ],
-          hiddenNormalCount: 12,
-          additionalNotes: "Family screening reminder issued. Mother reports she will bring sister at next visit.",
-        },
-        {
-          date: "21 Mar 2026",
-          visitType: "OPD",
-          doctor: "Dr Ajay Choksey",
-          headline: "Interim check — patient reported transient mild headache, **brought forward** by parent.",
-          symptoms: "Mild headache × 2 days, intermittent, no nausea or photophobia | No tremor",
-          examination: "Vitals normal | Neuro exam normal | No KF ring grossly | No focal deficit",
-          diagnosis: "Tension-type headache, **likely non-Wilsonian** | Continue chelation",
-          investigations: "No fresh investigations today | Reinforce 24-h copper at next visit",
-          medications: "Continued | Added **Pregaba 50 mg HS** PRN for any neuropathic pain element | Stop Wysolone (tapered out)",
-          advice: "Adequate hydration | Sleep hygiene | Return immediately if tremor, slurring, behavioural change",
-          followUp: "25 Mar 2026 · routine review",
+          headline: "Nexpro 40MG Tablet regimen prescribed",
+          medications: "**Nexpro 40MG Tablet** | **Lesuride 25MG Tablet** | **Folimax D3 Forte Tablet** | **Ursocol 300MG Tablet** | **Nusam 400MG Tablet** | **Thyrox 125 MCG** | **Hepamerz Sachet** | **Prohance Liv Powder** | **Aldactone 25MG Tablet** | **Looz 240ML Syrup** | **Wysolone 10MG Tablet** | **Zinfate Tablet** | **Ostocalcium Total Centrum Chewable Tablet** | **Pregaba 50MG Capsule**",
         },
         {
           date: "25 Mar 2026",
           visitType: "OPD",
           doctor: "Dr Ajay Choksey",
-          headline: "**1-month milestone**. Clinical recovery complete. LFTs near-normal. Wilson's plan locked in.",
-          symptoms: "No active complaints | Headache resolved | Full school attendance | Eating well",
-          examination: "All vitals normal | No icterus, no ascites, no hepatomegaly | Neuro exam normal",
-          diagnosis: "Acute HAV, **resolved** | Wilson's disease, **stable on chelation** | Hypothyroidism, stable",
-          investigations:
-            "Repeat LFT | KFT | Urine PCR | **HAV IgG (seroconversion check, advised, not done yet)** | **24-h urinary copper (advised, not done yet)** | Serum ceruloplasmin baseline",
-          medications:
-            "Cilamin 250 mg BID — **continue indefinitely** | Zinfate OD — continue | Ursocol 300 BID × 4 more weeks | Folimax D3 Forte weekly | Nusam 400 BID | Hepamerz BD | Ostocalcium OD | ProHance LIV | Pregaba 50 PRN | Thyrox 125 mcg OD",
-          advice:
-            "Quarterly LFT minimum | Annual slit-lamp for KF ring | **Family screening — sibling next month** | No alcohol ever, no hepatotoxic OTC drugs | Re-vaccination not needed (HAV gives lifetime immunity)",
-          followUp: "24 Jun 2026 · 3-month interval | sooner if any neuropsychiatric symptoms",
-          labResults: [
-            { name: "Bilirubin (Total)", value: "1.8", unit: "mg/dL", flag: "high", refRange: "0.2–1.2", date: "25 Mar 2026" },
-            { name: "SGPT (ALT)", value: "62", unit: "U/L", flag: "high", refRange: "5–40", date: "25 Mar 2026" },
-            { name: "SGOT (AST)", value: "48", unit: "U/L", flag: "high", refRange: "5–40", date: "25 Mar 2026" },
-            { name: "Alk Phosphatase", value: "168", unit: "U/L", flag: "high", refRange: "40–129", date: "25 Mar 2026" },
-            { name: "Serum Albumin", value: "3.4", unit: "g/dL", flag: "low", refRange: "3.5–5.0", date: "25 Mar 2026" },
-          ],
-          hiddenNormalCount: 11,
-          additionalNotes:
-            "Family screening: sibling appointment booked for 1 Apr 2026. Mother counselled re: HAV transmission completed, autosomal-recessive inheritance of Wilson's.",
+          headline: "Nexpro 40MG Tablet regimen prescribed",
+          medications: "**Nexpro 40MG Tablet** | **Lesuride 25MG Tablet** | **Folimax D3 Forte Tablet** | **Ursocol 300MG Tablet** | **Nusam 400MG Tablet** | **Thyrox 125 MCG** | **Hepamerz Sachet** | **Prohance Liv Powder** | **Aldactone 25MG Tablet** | **Ostocalcium Total Centrum Chewable Tablet** | **Gabawin 25MG Tablet** | **Choltran 5Gm Sachet** | **Looz 240ML Syrup** | **Zinfate Tablet** | **Cilamin 250MG Capsule** | **Wysolone 10MG Tablet**",
         },
       ],
     },
     {
-      source: { specialty: "Ophthalmology · Kayser-Fleischer ring assessment", author: "Dr Sejal Shah", date: "10 Mar 2026" },
-      reason: "Wilson's disease slit-lamp screening for KF rings. The classic ocular sign of copper deposition and a routine part of Wilson's workup.",
-      dateRangeLabel: "10 Mar '26",
+      source: { specialty: "Ophthalmology", author: "Dr SEJAL SHAH", date: "10 Mar 2026" },
+      reason: "Verbatim from OMOP · 1 visit across the consultation window.",
+      dateRangeLabel: "10 Mar 2026",
       consultationCount: 1,
-      doctorsLabel: "Dr Sejal Shah",
-      // Verbatim from the Ophthalmology visit (10 Mar 2026, Dr Sejal Shah).
+      doctorsLabel: "Dr SEJAL SHAH",
       lines: [
-        "**Findings**: Slit-lamp screening for **Kayser-Fleischer ring** (referral from Wilson's disease management)",
-        "**Plan**: Annual slit-lamp KF-ring re-assessment | sooner if any visual symptoms",
-      ],
-      // No structured lab rows from this ophthalmology visit — the slit-lamp
-      // finding is a clinical observation, not a measurement. Omit the labs
-      // row (renderer skips it cleanly).
-      openLoops: [
-        "Gastroenterology referred to Ophthalmology for **slit-lamp KF-ring assessment**, visit happened on 10 Mar 2026 but the result (positive/negative) is not on the structured record",
+        "**Findings**: (no observation_text recorded)",
       ],
       consultations: [
         {
           date: "10 Mar 2026",
           visitType: "OPD",
-          doctor: "Dr Sejal Shah",
-          headline: "Slit-lamp examination for **Kayser-Fleischer ring** screening, referral from Gastroenterology.",
-          symptoms: "No visual complaints | No photophobia | No floaters",
-          examination:
-            "BCVA 6/6 OD, 6/6 OS · IOP 14 mmHg OD, 13 mmHg OS · Anterior segment: clear cornea bilaterally · **Slit-lamp Descemet's membrane examination performed for KF ring screening** · Fundus normal both eyes",
-          diagnosis: "Slit-lamp screening for **Kayser-Fleischer ring** (referral from Wilson's disease management)",
-          investigations: "No further investigations needed today",
-          advice: "Result communicated to Gastroenterology · Repeat slit-lamp annually while on chelation",
-          followUp: "Annual slit-lamp KF-ring re-assessment | sooner if any visual symptoms",
-          additionalNotes:
-            "Structured Rx body for this referral visit does not capture the explicit slit-lamp KF-ring finding (positive/negative). Per OMOP record, only the encounter and the assessment intent were logged — the narrative result needs to be reconciled with Gastroenterology's chelation-adequacy decision.",
+          doctor: "Dr SEJAL SHAH",
+          headline: "Consultation by Dr SEJAL SHAH",
         },
       ],
     },
   ],
-  collisions: [
-    {
-      kind: "ddi",
-      title: "**Penicillamine + Prednisolone**, pediatric immunosuppression burden during acute viral infection",
-      points: [
-        "Penicillamine adds T-cell modulation to a Prednisolone-tapering background.",
-        "Patient has active HAV, viral clearance kinetics may be slowed.",
-        "Pediatric Wilson's regimen typically separates initiation of chelation from steroid use unless specifically AIH-overlap indicated.",
-      ],
-      rule: {
-        body: "AASLD",
-        year: "2023",
-        section: "Wilson's Disease Practice Guidance",
-        readableBody: "American Association for the Study of Liver Diseases — the US hepatology body whose Wilson's-disease practice guidance is the international standard.",
-        description: "Defines when chelation should be initiated, and the very narrow criteria under which a corticosteroid can run alongside Penicillamine (essentially only for AIH overlap).",
-        whyPicked: "Master Arjun was started on Penicillamine 250 mg BID (chelation) AND Wysolone (Prednisolone) on the same admission for acute HAV. He also has active viral infection, where steroid co-administration can slow viral clearance. AASLD criteria for this specific combination aren't documented in the record.",
-        fetches: "Whether the steroid + Penicillamine pairing meets the AASLD AIH-overlap criteria, and the timing of chelation initiation.",
-        confidence: "supportive",
-      },
-    },
-    {
-      kind: "coordination-gap",
-      title: "**Penicillamine safety monitoring**, 24-h urinary copper + CBC + urinalysis not on file",
-      points: [
-        "Standard of care: 24-h urinary copper at weeks 1, 4, 12 after initiation.",
-        "Penicillamine-induced nephrotic syndrome surveillance: urine PCR monthly × 6 months.",
-        "Neither investigation appears in lab rows for this patient.",
-      ],
-      rule: {
-        body: "AASLD",
-        year: "2023",
-        section: "Wilson's monitoring",
-        readableBody: "AASLD Wilson's disease guidance — monitoring section on chelation therapy.",
-        description: "Sets the specific cadence for monitoring Penicillamine safety — 24-h urinary copper at weeks 1, 4 and 12 to confirm chelation efficacy, plus urine protein:creatinine monthly for six months to catch Penicillamine-induced nephrotic syndrome.",
-        whyPicked: "Master Arjun started Penicillamine on 24 Feb 2026. By his last visit (25 Mar 2026, 1-month mark) none of the AASLD-mandated safety labs — 24-h urinary copper or urine PCR — appear in the lab table. The chelation is active without the safety scaffolding underneath it.",
-        fetches: "Whether the scheduled monitoring labs (urinary copper, urine PCR) are on file at the right week-mark.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "coordination-gap",
-      title: "**Family screening for Wilson's disease**, siblings + first-degree relatives not documented",
-      points: [
-        "Wilson's is autosomal recessive, first-degree relatives have 25% risk of being affected.",
-        "AASLD recommends ATP7B + serum ceruloplasmin + 24-h copper for all first-degree relatives.",
-        "Family screening status not in observation or condition rows.",
-      ],
-      rule: {
-        body: "AASLD",
-        year: "2023",
-        section: "Family screening",
-        readableBody: "AASLD Wilson's disease guidance — proband-family screening section.",
-        description: "Specifies that once a Wilson's-disease proband is identified, all first-degree relatives must be offered ATP7B genetic testing, serum ceruloplasmin and 24-h urinary copper, because each carries a 25% chance of being affected.",
-        whyPicked: "Master Arjun has confirmed Wilson's. He has a documented 8-year-old sibling. By AASLD, that sibling — and his parents — should have been offered screening at or shortly after his diagnosis. The observation and condition rows show no family-screening entry for any first-degree relative.",
-        fetches: "Whether first-degree-relative screening has been initiated, and which relatives are accounted for.",
-        confidence: "established",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "Schedule 24-h urinary copper at the 1-month-post-initiation mark.",
-    "Order serum ceruloplasmin baseline + repeat.",
-    "Confirm ATP7B gene-test status, initiate if not done.",
-    "Family screening counselling for siblings + parents.",
-    "Re-test HAV IgG to confirm seroconversion at 6-week mark.",
-  ],
-  syntheses: [
-    {
-      panelTitle: "LFT trend · serial monitoring during recovery",
-      guideline: {
-        body: "AASLD",
-        year: "2023",
-        readableBody: "American Association for the Study of Liver Diseases — Acute Hepatitis A clinical-course reference.",
-        description: "Defines the expected Bilirubin and transaminase resolution trajectory in acute HAV, so deviation from that trajectory can be detected early.",
-        whyPicked: "Master Arjun has the richest serial LFT dataset in the catalogue — Bilirubin trended from 8.4 → 1.8 mg/dL and SGPT from 612 → 62 U/L across the IPD admission and five OPD follow-ups. The AASLD reference curve is what Velora used to confirm his trajectory is on-pattern and chelation can continue uninterrupted.",
-        fetches: "His Bilirubin / SGPT readings against the published resolution curve.",
-        confidence: "supportive",
-      },
-      rows: [
-        { label: "Serial Bilirubin (Total)", value: "70 readings across 6 visits", ref: "From lab rows tagged 'Liver Function Tests - LFT|Serum Bilirubin Total'. Daily during admission + at every OPD f/u.", tone: "ok" },
-        { label: "Serial SGPT (ALT)", value: "70 readings", ref: "From lab rows tagged 'Liver Function Tests - LFT|SGPT (AST)'. Trend supports HAV resolution.", tone: "ok" },
-        { label: "Direct vs Indirect Bilirubin split", value: "Captured in 70 paired rows", ref: "Both fractions measured at every visit, supports cholestatic pattern on admission, resolving on follow-up.", tone: "ok" },
-      ],
-      note: "The richest serial-lab dataset of any catalogue patient. Strong recovery trajectory; Wilson's chelation can continue uninterrupted.",
-    },
-    {
-      panelTitle: "Wilson's disease monitoring status",
-      guideline: {
-        body: "AASLD",
-        year: "2023",
-        readableBody: "AASLD Wilson's-disease practice guidance — full monitoring + family-screening obligation set.",
-        description: "Defines the full surveillance scaffolding that must accompany chelation initiation: 24-h urinary copper at fixed intervals, baseline serum ceruloplasmin, and proband-family screening for all first-degree relatives.",
-        whyPicked: "Master Arjun's Penicillamine + Zinc chelation regimen is the entire reason this guideline applies. The four monitoring inputs AASLD mandates around that regimen are what this panel checks against his record.",
-        fetches: "Each of the four AASLD-mandated monitoring inputs and whether it's on file.",
-        confidence: "established",
-      },
-      rows: [
-        { label: "Penicillamine started", value: "Yes (Cilamin 250 mg)", ref: "From prescription records during IPD admission.", tone: "ok" },
-        { label: "24-h urinary copper", value: "Not on file", ref: "No lab row matches /copper|cuprum/ pattern.", tone: "alert" },
-        { label: "Serum ceruloplasmin", value: "Not on file", ref: "No lab row matches.", tone: "alert" },
-        { label: "Family screening", value: "Not documented", ref: "No observation rows tagged family_history_*.", tone: "alert" },
-      ],
-      note: "Treatment is started; the surveillance scaffolding around it isn't. Three of four monitoring inputs need to land before the next visit.",
-    },
-  ],
-  freshness: "Synced just now",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation · last refresh just now",
 }
 
 /**
@@ -3311,7 +3191,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   // numbers and the headline diagnosis pop without extra formatting.
   if (m.includes("asha") || m.includes("krishnan") || m.includes("375391871728")) {
     return {
-      text: "Here's the cross-consultation brief. **59 OPD visits** across **4 specialties** over **12 months**, chronic **hypertension** plus recurrent viral fevers; **allergy review missing** across all prescriptions.",
+      text: "Here's the cross-consultation brief. **59 visits across 4 specialties** over the past 12 months — rendered verbatim from the OMOP record.",
       loadingHint: "Reading the record…",
       loadingDelayMs: 1000,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -3320,7 +3200,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   }
   if (m.includes("meera") || m.includes("joshi") || m.includes("241381057447")) {
     return {
-      text: "Here's the cross-consultation brief. **40 OPD visits** across **11 specialties** over **13 months**, **CAD + prior CVA** on dual antiplatelet for 12+ months; **DAPT de-escalation overdue**.",
+      text: "Here's the cross-consultation brief. **40 visits across 10 specialties** over the past 13 months — rendered verbatim from the OMOP record.",
       loadingHint: "Reading 11 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -3329,7 +3209,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   }
   if (m.includes("anita") || m.includes("desai") || m.includes("714696991886")) {
     return {
-      text: "Here's the cross-consultation brief. **33 OPD visits** across **15 specialties** over **17 months**, **severe hypertriglyceridaemia** driving recurrent pancreatitis; **fibrate not on board**.",
+      text: "Here's the cross-consultation brief. **33 visits across 11 specialties** over the past 17 months — rendered verbatim from the OMOP record.",
       loadingHint: "Reading 15 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -3339,7 +3219,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   if (m.includes("suresh") || m.includes("patel") || m.includes("843373981236")) {
     return {
       text:
-        "Here's the cross-consultation brief. **28 OPD visits** across **12 specialties** over **13 months**, **colon Ca T3N2b** with lung mets; **oncology surveillance overdue** and polypharmacy flags surfaced.",
+        "Here's the cross-consultation brief. **28 visits across 11 specialties** over the past 15 months — rendered verbatim from the OMOP record.",
       loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -3349,7 +3229,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   if (m.includes("arjun") || m.includes("verma") || m.includes("319033560465")) {
     return {
       text:
-        "Here's the cross-consultation brief. **1 IPD admission** (3 days) + **5 OPD reviews** across **3 specialties** in **29 days**, **decompensated Wilson's + acute Hepatitis A**; serial LFT trend supports recovery.",
+        "Here's the cross-consultation brief. **6 visits across 2 specialties** in 30 days, including an IPD admission — rendered verbatim from the OMOP record.",
       loadingHint: "Reading IPD admission + 5 OPD follow-ups…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),

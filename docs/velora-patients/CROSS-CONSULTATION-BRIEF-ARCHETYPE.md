@@ -273,46 +273,56 @@ One card per active specialty team. Cards render in priority order
 
 ### 4.5 · Open loops 🚩
 
-Amber-tinted block under each specialty body. **Always rendered when at
-least one loop is detected** — never collapsed, never hidden. Three
-categories of finding, each with its own detector logic.
+Amber-tinted block under each specialty body. **Only renders when at
+least one loop is genuinely open.** The block is omitted entirely for
+specialties whose plans have all been followed through.
 
-> [!CAUTION]
-> Open loops are the no-data-loss disclosure layer. Anything captured
-> upstream that the brief chose not to surface, plus anything missing
-> from upstream, plus anything overdue per a cited guideline.
+> [!IMPORTANT]
+> **Strict definition.** An open loop is one specific clinical pattern:
+> *"This team **planned** an action — a follow-up, an investigation,
+> a referral, a procedure — but the result / follow-through / outcome
+> we'd expect is not yet on the record."* Each loop names the team, the
+> planned action, and what's missing.
 
-#### Category A · Captured upstream but not surfaced
+#### What qualifies as an open loop
 
-| Loop | Detector logic |
+Every entry is of the form **`{Team} planned X on {date} → {expected outcome} not on file`**. Five concrete patterns:
+
+| Pattern | Example |
 |---|---|
-| **Examination notes truncated** | We show one summary line of `observation.examination_text`; the deep-dive has the full delimited content. Surface the truncation so the doctor knows more is available. |
-| **Discharge summary partial** | For an IPD admission, when the OMOP `note` table has fewer than the expected discharge-summary titles (Hospital Course, Operative Note, Discharge Advice, Warning Signs, Discharge Condition), list the missing titles. |
-| **Provider notes restricted** | Private provider notes exist but are provider-scoped. List their presence so the doctor knows the deep-dive will have them. |
+| 🧪 **Investigation advised, no result** | *Cardiology advised an Echo on 27 Apr → no result on file.* |
+| 📅 **Follow-up scheduled, visit not kept** | *Diabetology scheduled follow-up on 26 Mar 2026 → no visit recorded for that date.* |
+| 🔪 **Procedure scheduled, not yet done** | *Onco-surgery scheduled resection → date still pending in the system.* |
+| 🤝 **Referral / clearance requested, response missing** | *Oncology requested cardiac fitness sign-off from Cardiology → no clearance on record.* |
+| 💊 **Course expected to be renewed, refill not on file** | *Neurology issued a 2-month gabapentinoid supply ending 16 Apr → no refill Rx after that date.* |
 
-#### Category B · Missing from upstream entirely
+#### What does NOT qualify (and where it lives instead)
 
-| Loop | Detector logic |
+These signals are real, but they're not open loops — they live in **Where they collide** (§ 5) or are absorbed into the source-tooltip's reasoning:
+
+| Signal | Where it actually lives |
 |---|---|
-| **Investigation advised, no result** | `observation.investigation_text` mentions a test (CBC, CEA, PET-CT…) but no `measurement` row with a matching `measurement_source_value` exists for the same patient within 90 days. |
-| **Required monitoring lab missing** | For a known active condition, if the standard monitoring panel (HbA1c → T2DM, TSH → hypothyroid, eGFR → CKD, CEA → colon-Ca surveillance) has no `measurement` row within the guideline interval, flag. |
-| **Allergy verification absent** | If the patient has any `drug_exposure` rows but no `condition_occurrence` row tagged with an Allergy section, the prescription stream is operating without documented allergy review. |
-| **IPD admission in narrative only** | `observation.symptoms_text` mentions phrases like *"Operated for X on DD/MM/YY"* or *"admitted at"* but no `visit_occurrence` row with `visit_concept_id = 9201` matches. |
-| **Vitals trend absent** | Condition needs longitudinal vitals (HTN → BP, T2DM → weight + BP) but `measurement` rows for the relevant LOINC are sparse or missing. |
-| **Family screening obligation unmet** | Active diagnosis is a genetic condition (Wilson's, BRCA, familial cardiomyopathy) but no first-degree-relative screening entries exist in `condition_occurrence` Family History rows. |
-| **Vaccine status not documented** | Active regimen is immunosuppressive (steroids, biologics, chemo) but `observation` rows don't include vaccination status (pneumococcal, varicella, hepatitis). |
+| DDI between two active prescriptions | § 5.1 DDI flag |
+| Cross-team duplication / contradiction (gabapentin double-dose, T3+T4 combination) | § 5.1 DDI flag |
+| Guideline-derived gaps that no team explicitly planned for | § 5.2 Coordination gap |
+| Cumulative steroid / sedative burden | § 5.3 Guideline-anchored synthesis panel |
+| Visit classification mismatch (IV-grade care coded OPD) | § 5.2 Coordination gap |
+| Pure data-quality / ingestion gaps | Excluded — relayed to data eng separately, not surfaced to the doctor |
 
-#### Category C · Guideline-anchored gaps
+The narrower scope means each open loop is **actionable by the named team**: the doctor reading the card knows *exactly* which team owes which piece of follow-through.
 
-| Loop | Detector logic |
-|---|---|
-| **Surveillance overdue** | For a primary problem with a guideline-defined cadence (NCCN for cancers, ESC for CCS, AAS for AAA), compute `today − MAX(visit_start_date WHERE specialty = guardian_specialty)`. If > cadence threshold, flag with cited section. |
-| **Follow-up advised, not kept** | When `observation.followup_date` set a date that has passed without a matching `visit_occurrence` within 14 days, flag the missed follow-up. |
-| **DAPT duration exceeded** | When Aspirin + a P2Y12 inhibitor have been continuously active for >12 months in chronic CCS, flag for de-escalation review per ESC. |
-| **Combination therapy without sign-off** | Non-guideline combinations (T3+T4 for hypothyroid, double SSRI/SNRI) detected across specialties — flag for reconciliation. |
-| **Cross-team prescription duplication** | Same drug class prescribed by two specialties without a documented coordination note — flag and name both prescribers. |
-| **Cardiac fitness sign-off pending** | Pre-op patient flagged for surgery but no Cardiology clearance documented in the window between last Cardiology contact and surgery date. |
-| **Visit overdue per anchor team's cadence** | When the anchor specialty recommended a return cadence on their last note but no return visit has happened, flag as a loop. |
+#### Format
+
+Each loop renders as one short sentence naming the team, the action, the
+date it was planned, and what's still missing.
+
+```
+   🚩 OPEN LOOPS ON THIS SPECIALTY
+     • Oncology advised CEA tumour marker on 4 Apr 2025, no result on file
+     • Oncology advised PET-CT on 4 Apr 2025, no result on file
+     • Oncology advised the next surveillance visit within 3-6 months
+       of 30 Sep 2025, no visit booked since
+```
 
 Each loop renders as one short sentence with the cited guideline section
 where applicable:

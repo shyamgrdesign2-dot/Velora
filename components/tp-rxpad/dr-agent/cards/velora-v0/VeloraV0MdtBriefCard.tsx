@@ -60,20 +60,32 @@ function formatPatientStrip(data: {
 }
 
 /**
- * Compact a possibly-multi-doctor label into one-doctor-plus-overflow.
+ * Normalise a multi-doctor label so every doctor's first + last name is
+ * shown explicitly (no "+N" overflow), middle names stripped.
  *
- *   "Dr Tahiliani"                          → "Dr Tahiliani"
- *   "Dr Tahiliani / Dr Sandeep Jain"        → "Dr Tahiliani  +1"
- *   "Dr Sowani / Dr Nikhil Dave / Dr X"     → "Dr Sowani  +2"
+ *   "Dr Dhara Girish Pandya"                → "Dr Dhara Pandya"
+ *   "Dr Pankaj Shah / Dr Mithun Shah"       → "Dr Pankaj Shah / Dr Mithun Shah"
+ *   "Dr Nahush Tahiliani / Dr Sandeep Jain" → "Dr Nahush Tahiliani / Dr Sandeep Jain"
  *
- * The trailing has to fit on one row alongside date + visit-count + chevron,
- * so the second / third doctor name is folded into an overflow count. The
- * sidebar (opened by the chevron) shows the full doctor list.
+ * Doctors are joined with " / " in the input; middle-name trimming keeps
+ * each name to two tokens (first + last) so multi-doctor specialties still
+ * fit on the header row without collapsing to a "+N" count.
  */
 function compactDoctorsLabel(raw: string): string {
-  const list = raw.split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean)
-  if (list.length <= 1) return raw
-  return `${list[0]}  +${list.length - 1}`
+  return raw
+    .split(/\s*\/\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((name) => {
+      // Tokens past "Dr " — keep first + last only.
+      const m = name.match(/^(Dr\.?|Mr|Ms|Mrs)\s+(.+)$/i)
+      if (!m) return name
+      const tokens = m[2].split(/\s+/).filter(Boolean)
+      if (tokens.length <= 2) return name
+      // First + last; drop middle tokens.
+      return `${m[1]} ${tokens[0]} ${tokens[tokens.length - 1]}`
+    })
+    .join(" / ")
 }
 
 function HeaderTrailing({
@@ -92,12 +104,15 @@ function HeaderTrailing({
   //
   // Multi-doctor specialty labels are compacted to "Dr First +N" — the full
   // doctor list lives in the sidebar that the chevron opens.
+  // Segments ordered DOCTOR → VISITS → DATE per design call (doctor first
+  // because that's the most-scanned identity; visit count anchors how much
+  // engagement; date last because it's the least time-sensitive read).
   const hasStructured = rec.dateRangeLabel || rec.doctorsLabel || typeof rec.consultationCount === "number"
   const segments: string[] = []
   if (hasStructured) {
-    if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
-    if (typeof rec.consultationCount === "number") segments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
     if (rec.doctorsLabel) segments.push(compactDoctorsLabel(rec.doctorsLabel))
+    if (typeof rec.consultationCount === "number") segments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
+    if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
   } else {
     segments.push(shortDate(rec.source.date))
   }
@@ -108,15 +123,17 @@ function HeaderTrailing({
       className="flex shrink-0 items-center gap-[5px] rounded-[4px] px-[6px] py-[2px] text-[12px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
       aria-label={`Open ${rec.source.specialty} consultation timeline`}
     >
+      {/* Parens + dividers all at slate-500 so the "structural punctuation"
+          matches the in-body PipeDivider and reads as one design layer. */}
       <span className="flex items-center">
-        <span className="text-tp-slate-300">(</span>
+        <span className="text-tp-slate-500">(</span>
         {segments.map((s, i) => (
           <React.Fragment key={i}>
-            {i > 0 && <span className="mx-[6px] text-tp-slate-300">|</span>}
+            {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
             <span>{s}</span>
           </React.Fragment>
         ))}
-        <span className="text-tp-slate-300">)</span>
+        <span className="text-tp-slate-500">)</span>
       </span>
       <ArrowRight2 size={14} variant="Linear" />
     </button>

@@ -183,7 +183,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       },
       reason:
         "Primary problem · 12 surveillance visits with the oncology team across May-Sep 2025. Selected as the lead specialty because the colon-cancer history drives every other team's decisions.",
-      dateRangeLabel: "8 May → 30 Sep '25",
+      dateRangeLabel: "8 May - 30 Sep '25",
       consultationCount: 12,
       doctorsLabel: "Dr Pankaj Shah / Dr Mithun Shah",
       lines: [
@@ -193,9 +193,9 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Monthly surveillance cadence held May-Sep 2025 | last contact 30 Sep 2025",
       ],
       openLoops: [
-        "**Oncology surveillance overdue** · last contact 30 Sep 2025, no visit since · 6+ months gap · NCCN Colon Ca v.2.2024 §SURV-2 expects q3-6 mo",
-        "**CEA tumour marker** last ordered 4 Apr 2025, no result row on file · NCCN §SURV-1 expects q3-6 mo × 5y post-resection",
-        "**PET-CT** ordered 4 Apr 2025, no result row, critical given lung metastasis flagged later",
+        "Oncology advised the next **surveillance visit** within 3-6 months of 30 Sep 2025, no visit booked since",
+        "Oncology advised **CEA tumour marker** on 4 Apr 2025, no result on file",
+        "Oncology advised **PET-CT** on 4 Apr 2025, no result on file",
       ],
     },
     {
@@ -206,7 +206,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       },
       reason:
         "Most recent acute event in the record, SOB + cough + chest heaviness × 4 days with IV-grade regimen administered OPD. Worth surfacing first to any new clinician.",
-      dateRangeLabel: "7 → 9 May '26",
+      dateRangeLabel: "7 - 9 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Avadh Vithlani",
       lines: [
@@ -215,8 +215,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Acute antibiotic-steroid bridge (Ceftriaxone IV + Doxy IV + Hydrocort IV + nebs) **completed 12 May 2026** | regimen closed",
       ],
       openLoops: [
-        "**IV-grade care coded as OPD** · Ceftriaxone IV + Hydrocort IV + nebs is normally inpatient-level, re-classify or verify",
-        "**No CXR or sputum culture** in lab rows, investigations likely ordered but not ingested",
+        "Pulmonology likely advised **CXR + sputum culture** before starting IV antibiotics, no result on file",
       ],
     },
     {
@@ -236,8 +235,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Post-surgical pain control | Morphine 10 mg PO short-course (5 May, ≤ 7 days) **closed** | no refill request on record",
       ],
       openLoops: [
-        "**Opioid on neuropathic stack** · already on Dulotin (SNRI) + Gabator NT + Tryptomer (TCA), respiratory depression + serotonin-syndrome risk · Beers Criteria 2023 §sedative",
-        "**No GB-perforation surgical record** in graph (mentioned only in this Pain Specialist symptom note), IPD slice missing",
+        "Pain Specialist did not schedule a **follow-up review**, refill status of the short-course Morphine is open",
       ],
     },
     {
@@ -257,8 +255,8 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: SMBG (FBS + before-dinner) diary × 1 week | Home BP 8 am + 8 pm with chart | review in 1 month (follow-up advised 26 Mar 2026)",
       ],
       openLoops: [
-        "**No HbA1c result row** in lab table, ADA expects q3-6 mo in T2DM",
-        "**Steroid burst in a diabetic** without explicit insulin titration plan, glycaemic monitoring intensified via advice but no insulin Rx adjustment recorded",
+        "Diabetology advised **HbA1c** as part of standard T2DM follow-up, no result on file in the current window",
+        "Diabetology scheduled **follow-up on 26 Mar 2026**, visit not yet recorded",
       ],
     },
     {
@@ -278,8 +276,8 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Follow-up **16 Mar 2026** | investigations advised, CBC · ESR · SGPT · SGOT · CRP · Creatinine",
       ],
       openLoops: [
-        "**All 6 investigations advised → 0 result rows** captured in lab table",
-        "**Steroid burden across teams** · Rheumatology (Omnacortil) + Diabetology (Medrol) + Pulmonology (Hydrocort IV) within a 2-month window, cumulative immunosuppression flag",
+        "Rheumatology advised **CBC, ESR, SGPT, SGOT, CRP, Creatinine** on 2 Mar 2026, no results on file",
+        "Rheumatology scheduled **follow-up on 16 Mar 2026**, visit not yet recorded",
       ],
     },
     {
@@ -290,7 +288,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       },
       reason:
         "Co-prescribes gabapentin family alongside the neurosurgery team, primary cross-team coordination signal.",
-      dateRangeLabel: "20 Dec '25 → 16 Feb '26",
+      dateRangeLabel: "20 Dec '25 - 16 Feb '26",
       consultationCount: 2,
       doctorsLabel: "Dr Nikhil Dave",
       lines: [
@@ -299,7 +297,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Continue dual-channel neuropathic control (oral + topical gabapentin)",
       ],
       openLoops: [
-        "**Gabapentin double-dose** with Neurosurgery's Gabator NT (gabapentin + nortriptyline), same active ingredient from two specialties",
+        "Neurology issued the gabapentinoid regimen with **2-month supply ending 16 Apr 2026**, no refill prescription on file",
       ],
     },
     {
@@ -310,7 +308,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       },
       reason:
         "Earliest specialty to address the neuropathic-pain arm; sets the gabapentin baseline that Neurology later layers on.",
-      dateRangeLabel: "10 Jun → 18 Jul '25",
+      dateRangeLabel: "10 Jun - 18 Jul '25",
       consultationCount: 3,
       doctorsLabel: "Dr Kalpesh Shah / Dr Y. Saija",
       lines: [
@@ -319,9 +317,9 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Findings**: TN (trigeminal-like) pain in extremities | exam no gross focal deficit",
         "**Plan**: Follow-up advised **10 Jul 2025** (kept on 11 Jun, then 18 Jul) | investigations, Serum ferritin + iron (WNL on f/u) | gabapentinoid management since taken over by Neurology",
       ],
-      openLoops: [
-        "**Last contact 18 Jul 2025**, no re-evaluation despite continued gabapentin family co-prescriptions by Neurology team",
-      ],
+      // No open loops — ferritin + iron came back WNL on the 11 Jun + 18 Jul
+      // follow-ups, gabapentinoid management was formally handed to
+      // Neurology. Every action this team planned has closed.
     },
   ],
   // Section 3 · Where they collide — DDIs + coordination gaps, anchored to
@@ -530,16 +528,16 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Oncology", author: "Dr Tahiliani", date: "12 May 2026" },
       reason: "Treatment plan being finalised this week.",
-      dateRangeLabel: "11 → 12 May '26",
+      dateRangeLabel: "11 - 12 May '26",
       consultationCount: 2,
-      doctorsLabel: "Dr Tahiliani / Dr Sandeep Jain",
+      doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep Jain",
       lines: [
         "**Findings**: **T1cN0 stage IA** ductal Ca · planning adjuvant pathway",
         "**Plan**: Surgical resection scheduled | adjuvant decisions post-pathology",
       ],
       openLoops: [
-        "**Cardiac fitness sign-off** not documented after Cardiology review (27 Apr)",
-        "**OSA airway plan** not in record, needed pre-anaesthesia",
+        "Oncology requested **cardiac fitness sign-off** from Cardiology on 11 May, sign-off not yet on record",
+        "Oncology requested **OSA airway plan** from Anaesthesia + Pulmonology, plan not yet documented",
       ],
       consultations: [
         {
@@ -563,7 +561,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Onco-surgery", author: "Dr Pandya", date: "11 May 2026" },
       reason: "Lead surgeon, booking pending.",
-      dateRangeLabel: "30 Apr → 11 May '26",
+      dateRangeLabel: "30 Apr - 11 May '26",
       consultationCount: 5,
       doctorsLabel: "Dr Dhara Girish Pandya",
       lines: [
@@ -571,8 +569,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Date booking awaiting anaesthesia + cardio + nephro clearances",
       ],
       openLoops: [
-        "**Surgery date** not yet entered into the system",
-        "**Pre-op renal-dose ceiling** for contrast imaging pending Nephrology",
+        "Onco-surgery scheduled **resection** but date not yet booked in the system (held pending clearances)",
+        "Onco-surgery requested **renal-dose ceiling for contrast imaging** from Nephrology on 4 May, response not yet on record",
       ],
       consultations: [
         {
@@ -612,8 +610,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Echo + functional capacity assessment | re-review pre-surgery",
       ],
       openLoops: [
-        "**Echo report** advised but no result row",
-        "**ECG / Trop trend** not in lab table",
+        "Cardiology advised a **resting Echo** on 27 Apr, no result on file",
+        "Cardiology advised a **functional capacity test** on 27 Apr, no result on file",
       ],
       consultations: [
         {
@@ -637,7 +635,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Pulmonology & Critical Care", author: "Dr Manoj Singh", date: "1 May 2026" },
       reason: "Severe OSA + airway risk for anaesthesia.",
-      dateRangeLabel: "29 Apr → 1 May '26",
+      dateRangeLabel: "29 Apr - 1 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Manoj Singh",
       lines: [
@@ -646,8 +644,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: CPAP titration data not in record | difficult-airway plan with anaesthesia pending",
       ],
       openLoops: [
-        "**CPAP / sleep study report** not in lab data",
-        "**ABG / SpO₂ trend** not captured",
+        "Pulmonology advised a **formal sleep study + CPAP titration** on 29 Apr, no report on file",
+        "Pulmonology requested a **difficult-airway plan** from Anaesthesia, response not yet documented",
       ],
       consultations: [
         {
@@ -680,8 +678,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Pre + post-contrast hydration protocol | renal-dose review on all current meds",
       ],
       openLoops: [
-        "**Serum creatinine / eGFR**, not in lab table",
-        "**Urine PCR / ACR** not in record",
+        "Nephrology advised **repeat Serum creatinine + eGFR before surgery** on 29 Apr, no result on file",
+        "Nephrology advised **Urine PCR + ACR** on 29 Apr, no result on file",
       ],
       consultations: [
         {
@@ -811,7 +809,7 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Internal Medicine", author: "Family Physician", date: "across window" },
       reason: "Anchor team, 40+ visits across the window.",
-      dateRangeLabel: "Apr '25 → Apr '26",
+      dateRangeLabel: "Apr '25 - Apr '26",
       consultationCount: 40,
       doctorsLabel: "Family Physician",
       lines: [
@@ -819,8 +817,7 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: HTN regimen continuation | per-episode acute management",
       ],
       openLoops: [
-        "**Allergy status** never recorded, every Rx issued without verification",
-        "**BP trend** not in lab table, vitals not consistently ingested",
+        "Internal Medicine prescribed multiple courses without first **documenting allergy status**, allergy review still pending",
       ],
     },
     {
@@ -967,7 +964,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Diabetology", author: "Dr Nimit Shah", date: "9 May 2026" },
       reason: "Anchor chronic-care team.",
-      dateRangeLabel: "16 Apr '25 → 9 May '26",
+      dateRangeLabel: "16 Apr '25 - 9 May '26",
       consultationCount: 11,
       doctorsLabel: "Dr Nimit Shah",
       lines: [
@@ -979,7 +976,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "20 Jan 2026" },
       reason: "Secondary prevention post-CVA + CAD on DAPT.",
-      dateRangeLabel: "16 Apr '25 → 20 Jan '26",
+      dateRangeLabel: "16 Apr '25 - 20 Jan '26",
       consultationCount: 8,
       doctorsLabel: "Dr Bhavesh Roy",
       lines: [
@@ -988,14 +985,14 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Annual review | DAPT de-escalation review **overdue**",
       ],
       openLoops: [
-        "**DAPT duration** >12 months without documented de-escalation review",
-        "**Lipid panel result** not in lab table, only Rx pattern",
+        "Cardiology has not booked a **DAPT de-escalation review** despite > 12 months on dual antiplatelet, review still pending",
+        "Cardiology advised periodic **lipid panel** review, no result on file in the current window",
       ],
     },
     {
       source: { specialty: "Gastroenterology", author: "Dr Tejas Modi", date: "9 May 2026" },
       reason: "Chronic constipation + NAFLD management.",
-      dateRangeLabel: "10 Jul '25 → 9 May '26",
+      dateRangeLabel: "10 Jul '25 - 9 May '26",
       consultationCount: 5,
       doctorsLabel: "Dr Tejas Modi",
       lines: [
@@ -1007,19 +1004,19 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Neurology", author: "Dr Nikhil Dave", date: "26 Mar 2026" },
       reason: "Headache evaluation post-CVA.",
-      dateRangeLabel: "10 Sep '25 → 26 Mar '26",
+      dateRangeLabel: "10 Sep '25 - 26 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Sowani / Dr Nikhil Dave",
       lines: [
         "**Findings**: Chronic headache pattern post-CVA · no fresh focal deficit",
         "**Plan**: Headache workup ongoing · no acute change",
       ],
-      openLoops: ["**MRI brain follow-up** not in record"],
+      openLoops: ["Neurology likely advised **follow-up MRI brain** post-CVA, no report on file"],
     },
     {
       source: { specialty: "Endocrinology", author: "Dr Payal Shah", date: "27 Mar 2026" },
       reason: "High PTH workup + thyroid optimisation.",
-      dateRangeLabel: "16 Feb → 27 Mar '26",
+      dateRangeLabel: "16 Feb - 27 Mar '26",
       consultationCount: 4,
       doctorsLabel: "Dr Payal Shah",
       lines: [
@@ -1028,8 +1025,8 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Primary hyperparathyroidism workup | T3+T4 combination under review",
       ],
       openLoops: [
-        "**T3+T4 combination** therapy is non-guideline, sign-off needed",
-        "**PTH result** in narrative only, not in lab table",
+        "Endocrinology advised **primary hyperparathyroidism workup**, completion status (DEXA, neck USG, sestamibi) not yet on file",
+        "Endocrinology advised periodic **PTH + Vit D + calcium**, no structured result row on file",
       ],
     },
   ],
@@ -1177,7 +1174,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Internal Medicine", author: "Dr Navneet Shah", date: "25 Mar 2026" },
       reason: "Anchor team coordinating CV + metabolic + endocrine.",
-      dateRangeLabel: "25 Aug '25 → 25 Mar '26",
+      dateRangeLabel: "25 Aug '25 - 25 Mar '26",
       consultationCount: 8,
       doctorsLabel: "Dr Navneet Shah / Dr Nanavaty",
       lines: [
@@ -1186,14 +1183,14 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: TG trajectory positive; consider fibrate add-on if rebound | aggressive HTN reconciliation needed",
       ],
       openLoops: [
-        "Critical lab values (TG, HbA1c, S. creatinine, RBS) live in narrative rather than structured lab rows",
-        "Structured lab pipeline still needs to land for these values",
+        "Internal Medicine advised **repeat TG, HbA1c, fasting sugar, creatinine** on 11 Mar 2026, structured result rows not yet on file",
+        "Internal Medicine flagged **fibrate add-on** as a pending decision, no Rx issued yet",
       ],
     },
     {
       source: { specialty: "Gastroenterology", author: "Dr Ajay Choksey", date: "12 Mar 2026" },
       reason: "Recurrent pancreatitis surveillance.",
-      dateRangeLabel: "11 Apr '25 → 12 Mar '26",
+      dateRangeLabel: "11 Apr '25 - 12 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
       lines: [
@@ -1205,7 +1202,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Urology", author: "Dr Kamlesh Patel", date: "13 Nov 2025" },
       reason: "Recurrent UTI in diabetic post-menopausal female.",
-      dateRangeLabel: "18 Aug → 13 Nov '25",
+      dateRangeLabel: "18 Aug - 13 Nov '25",
       consultationCount: 5,
       doctorsLabel: "Dr Kamlesh Patel / Dr Kaustubh Patel",
       lines: [
@@ -1214,13 +1211,13 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Recurrent UTI prophylaxis | bladder-neck dysfunction management",
       ],
       openLoops: [
-        "**Tamsulosin + Bethanechol**, bladder pharmacology contradiction within the same stream",
+        "Urology has not booked a **bladder-function review** despite contradictory Tamsulosin + Bethanechol regimen, reconciliation visit still pending",
       ],
     },
     {
       source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "27 Oct 2025" },
       reason: "HTN regimen + statin management.",
-      dateRangeLabel: "8 Sep → 27 Oct '25",
+      dateRangeLabel: "8 Sep - 27 Oct '25",
       consultationCount: 3,
       doctorsLabel: "Dr Bhavesh Roy",
       lines: [
@@ -1241,7 +1238,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Insulin titration | repeat workup at next visit",
       ],
       openLoops: [
-        "**Anti-HTN switch** to Losartan + Chlorthalidone + Metoprolol duplicates Cardiology's regimen",
+        "Diabetology advised **insulin titration + repeat workup at next visit**, follow-up not yet booked",
       ],
     },
   ],
@@ -1389,7 +1386,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       source: { specialty: "Gastroenterology · IPD admission", author: "Dr Ajay Choksey", date: "24-26 Feb 2026" },
       reason: "The index admission. 3-day stay managed by the hepatology arm of Gastroenterology.",
-      dateRangeLabel: "24 → 26 Feb '26 (IPD)",
+      dateRangeLabel: "24 - 26 Feb '26 (IPD)",
       consultationCount: 1,
       doctorsLabel: "Dr Ajay Choksey",
       lines: [
@@ -1397,16 +1394,14 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Medications**: **Wysolone 10 mg** (Prednisolone, taper started) | **Cilamin 250 mg** (Penicillamine) | **Zinfate** (Zinc) | **Ursocol 300** (UDCA) | **Hepamerz sachet** (L-ornithine L-aspartate) | **Aldactone 25** (Spironolactone for ascites) | **Looz syrup** (Lactulose for HE prophylaxis) | **Thyrox 125 mcg** continued",
         "**Plan**: Discharged on **26 Feb in BETTER condition** | review LFTs at every OPD | continue chelation + zinc | symptomatic + hepatoprotective regimen | OPD review **3 Mar 2026**",
       ],
-      openLoops: [
-        "**Hospital Course chronological summary** not in record (day-by-day progress notes from the admission)",
-        "**Operative Notes** section absent (consistent with no procedures during stay)",
-        "**Warning Signs narrative** not on file (discharge advice diet captured separately as a structured entry)",
-      ],
+      // No open loops from this admission alone — the discharge plan (OPD
+      // review 3 Mar 2026 + continued chelation) has been followed through.
+      // Active monitoring loops are surfaced on the OPD follow-up card below.
     },
     {
       source: { specialty: "Gastroenterology · OPD follow-up series", author: "Dr Ajay Choksey", date: "25 Mar 2026" },
       reason: "Post-discharge surveillance, five reviews over the month after admission.",
-      dateRangeLabel: "24 Feb → 25 Mar '26",
+      dateRangeLabel: "24 Feb - 25 Mar '26",
       consultationCount: 5,
       doctorsLabel: "Dr Ajay Choksey",
       lines: [
@@ -1415,10 +1410,9 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Continue chelation indefinitely | quarterly LFT review at minimum | watch for Wilson's-related neuropsychiatric features | HAV is acute, expect resolution; re-test IgG seroconversion",
       ],
       openLoops: [
-        "**Penicillamine 24-h urinary copper** monitoring, not on file",
-        "**Wilson's gene confirmation (ATP7B)** status not in record",
-        "**Family screening** for Wilson's, siblings not documented",
-        "**HAV IgG seroconversion** check not scheduled",
+        "Gastroenterology advised **re-test HAV IgG seroconversion** post-acute, no result on file",
+        "Gastroenterology advised periodic **24-h urinary copper** for Penicillamine monitoring, no result on file",
+        "Gastroenterology advised **first-degree-relative ATP7B screening**, no family-screening entries on file",
       ],
     },
     {
@@ -1432,8 +1426,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Result feeds back into Gastroenterology's chelation-monitoring loop. Repeat slit-lamp annually until KF ring resolves on adequate chelation.",
       ],
       openLoops: [
-        "KF-ring presence or absence not in structured data (only the visit fact is recorded)",
-        "Slit-lamp photo / report not on file",
+        "Gastroenterology referred to Ophthalmology for **slit-lamp KF-ring assessment**, visit happened on 10 Mar 2026 but the result (positive/negative) is not on the structured record",
       ],
     },
   ],

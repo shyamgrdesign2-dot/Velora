@@ -87,7 +87,7 @@ const VELORA_BRIEF_PREAMBLE: Record<VeloraPatientId, string> = {
   "velora-priya": "Quick brief on Priya: one gap, three silos.",
   "velora-rajesh": "Quick brief on Rajesh: one chain, three specialists.",
   "velora-suresh":
-    "Here's the cross-consultation brief — 12 specialties touched in the last 13 months. Oncology surveillance gap + polypharmacy flags surfaced.",
+    "Here's the cross-consultation brief. **28 OPD visits** across **12 specialties** over **13 months**, **colon Ca T3N2b** with lung mets; **oncology surveillance overdue** and polypharmacy flags surfaced.",
 }
 
 const VELORA_BRIEF_SUGGESTIONS: Record<VeloraPatientId, RxAgentChatMessage["suggestions"]> = {

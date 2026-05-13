@@ -401,11 +401,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
         ]}
       >
         <div className="flex flex-col gap-[10px]">
-          <p data-mdt-anchor="window-line" className="text-[14px] leading-[1.5] text-tp-slate-600">
-            <strong className="font-semibold text-tp-slate-800">{data.specialties.length} specialties</strong>
-            {" "}touched this patient in the last{" "}
-            <strong className="font-semibold text-tp-slate-800">{data.windowDays} days</strong>.
-          </p>
+          {/* Window-line ("N specialties touched the patient in N days")
+              removed — the same information now lives in the chat preamble
+              above the card. Duplicating it inside the body was noise; the
+              card now opens straight into Medical history. */}
 
           {/* ── Section 1 · Medical issues ──────────────────────────────
               Surfaced once at the top so per-specialty sections only describe

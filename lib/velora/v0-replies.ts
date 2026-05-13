@@ -1915,9 +1915,15 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   // distinct so order between them doesn't matter; what matters is that the
   // generic "Show cross-consultation brief" with no patient name lands on
   // Lakshmi (the catalogue's first / default patient) at the end.
+  // ─── Per-patient chat preambles ─────────────────────────────────────
+  // Two-line format: opens with "Here's the cross-consultation brief."
+  // Second sentence states the visit profile (**N OPD**, **N IPD**, **N
+  // specialties**, **window**) followed by the single most actionable
+  // clinical signal. The ChatBubble renders **bold** markdown so key
+  // numbers and the headline diagnosis pop without extra formatting.
   if (m.includes("asha") || m.includes("krishnan") || m.includes("375391871728")) {
     return {
-      text: "Here's the cross-consultation brief, narrow specialty footprint (4 teams, 59 visits). Allergy review missing across all prescriptions.",
+      text: "Here's the cross-consultation brief. **59 OPD visits** across **4 specialties** over **12 months**, chronic **hypertension** plus recurrent viral fevers; **allergy review missing** across all prescriptions.",
       loadingHint: "Reading the record…",
       loadingDelayMs: 1000,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -1926,7 +1932,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   }
   if (m.includes("meera") || m.includes("joshi") || m.includes("241381057447")) {
     return {
-      text: "Here's the cross-consultation brief, CAD + prior CVA on DAPT for 12+ months. De-escalation review overdue; glimepiride double-dose flagged.",
+      text: "Here's the cross-consultation brief. **40 OPD visits** across **11 specialties** over **13 months**, **CAD + prior CVA** on dual antiplatelet for 12+ months; **DAPT de-escalation overdue**.",
       loadingHint: "Reading 11 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -1935,7 +1941,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   }
   if (m.includes("anita") || m.includes("desai") || m.includes("714696991886")) {
     return {
-      text: "Here's the cross-consultation brief, severe hypertriglyceridaemia driving recurrent pancreatitis. Fibrate not on board; triple anti-HTN cross-specialty.",
+      text: "Here's the cross-consultation brief. **33 OPD visits** across **15 specialties** over **17 months**, **severe hypertriglyceridaemia** driving recurrent pancreatitis; **fibrate not on board**.",
       loadingHint: "Reading 15 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -1945,7 +1951,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   if (m.includes("suresh") || m.includes("patel") || m.includes("843373981236")) {
     return {
       text:
-        "Here's the cross-consultation brief, 12 specialties touched in the last 13 months. Oncology surveillance gap + polypharmacy flags surfaced.",
+        "Here's the cross-consultation brief. **28 OPD visits** across **12 specialties** over **13 months**, **colon Ca T3N2b** with lung mets; **oncology surveillance overdue** and polypharmacy flags surfaced.",
       loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -1955,7 +1961,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   if (m.includes("arjun") || m.includes("verma") || m.includes("319033560465")) {
     return {
       text:
-        "Here's the cross-consultation brief, 3-day IPD admission for decompensated Wilson's + acute Hepatitis A, followed by 5 OPD reviews. Serial LFT trend supports recovery; chelation monitoring gaps flagged.",
+        "Here's the cross-consultation brief. **1 IPD admission** (3 days) + **5 OPD reviews** across **3 specialties** in **29 days**, **decompensated Wilson's + acute Hepatitis A**; serial LFT trend supports recovery.",
       loadingHint: "Reading IPD admission + 5 OPD follow-ups…",
       loadingDelayMs: 1400,
       suggestions: subSuggestionsFor("mdt_brief"),
@@ -1967,7 +1973,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   // brief.
   if (isCrossConsult || m.includes("lakshmi") || m.includes("iyer") || m.includes("1093717054960")) {
     return {
-      text: "Here's the cross-consultation brief, 5 specialties active in a 17-day pre-op work-up. Cardiac + OSA + CKD clearances pending.",
+      text: "Here's the cross-consultation brief. **21 OPD visits** across **5 specialties** in a **17-day pre-op burst**, **right breast Ca stage IA**; cardiac, OSA, and CKD clearances pending.",
       loadingHint: "Reading 5 specialty streams…",
       loadingDelayMs: 1200,
       suggestions: subSuggestionsFor("mdt_brief"),

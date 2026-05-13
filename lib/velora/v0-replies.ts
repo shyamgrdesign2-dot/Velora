@@ -161,7 +161,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 12,
       doctorsLabel: "Dr PANKAJ SHAH /Dr MITHUN SHAH",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -303,7 +303,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Dr Mahesh D Patel/ Dr S. Das",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -327,7 +327,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 2,
       doctorsLabel: "Dr Nikhil Dave",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -397,7 +397,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr Monark Shah",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -434,7 +434,7 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "DR AMIT SHAH",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -527,14 +527,14 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       title: "Surgical history",
       tone: "neutral",
-      items: [{ text: "No surgical history found in condition_occurrence" }],
+      items: [],
       sources: [],
       reasoning: "No surgical procedure rows in condition_occurrence for this patient.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
-      items: [{ text: "Allergy review not explicitly verified" }],
+      items: [],
       sources: [],
       reasoning: "No allergy entry appears in condition_occurrence or observation rows.",
     },
@@ -991,7 +991,7 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
       title: "Allergies & safety",
       tone: "neutral",
       items: [
-        { text: "Allergy review not explicitly verified" },
+
       ],
       sources: [],
       reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
@@ -2011,7 +2011,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 5,
       doctorsLabel: "Dr Ajit Sowani / Dr Nikhil Dave",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -2159,7 +2159,7 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr SEJAL SHAH",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -2239,7 +2239,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       title: "Surgical history",
       tone: "neutral",
       items: [
-        { text: "No surgical history found" },
+
       ],
       sources: [],
       reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
@@ -2525,7 +2525,7 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 3,
       doctorsLabel: "Dr Lav Selarka",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {
@@ -2755,7 +2755,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       title: "Surgical history",
       tone: "neutral",
       items: [
-        { text: "No surgical history found" },
+
       ],
       sources: [],
       reasoning: "Pulled from condition_occurrence WHERE source value matches a surgical procedure.",
@@ -2764,7 +2764,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       title: "Allergies & safety",
       tone: "neutral",
       items: [
-        { text: "Allergy review not explicitly verified" },
+
       ],
       sources: [],
       reasoning: "Pulled from condition_occurrence WHERE source value mentions an allergy.",
@@ -2851,7 +2851,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 1,
       doctorsLabel: "Dr SEJAL SHAH",
       lines: [
-        "**Findings**: Visit recorded · no diagnostic note on file",
+
       ],
       consultations: [
         {

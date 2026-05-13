@@ -972,8 +972,12 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             // surgical history found", "Allergy review not on file") we
             // still render it so the doctor sees the explicit absence
             // rather than wondering if the section was checked.
+            // Universal rule: if OMOP didn't write it, the card doesn't
+            // show it. Drop Primary problem (duplicates each specialty's
+            // first-row Diagnosis) AND any group whose items array is
+            // empty — no synthesized "No surgical history found" filler.
             const filteredHistory = data.medicalHistory.filter(
-              (g) => g.title !== "Primary problem",
+              (g) => g.title !== "Primary problem" && g.items.length > 0,
             )
             if (filteredHistory.length === 0) return null
             return (

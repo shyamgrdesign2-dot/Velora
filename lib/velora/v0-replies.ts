@@ -193,12 +193,19 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "8 May - 30 Sep '25",
       consultationCount: 12,
       doctorsLabel: "Dr Pankaj Shah / Dr Mithun Shah",
-      // Verbatim Findings / Plan from the most recent oncology visit
-      // (30 Sep 2025, Dr Pankaj Shah — the now-overdue surveillance review).
+      // Verbatim across BOTH oncologists' representative visits — Dr Pankaj
+      // Shah ran the post-adjuvant and most-recent reviews, Dr Mithun Shah
+      // ran the mid-window review. Each opinion is attributed inline.
       lines: [
-        "**Findings**: Stage IIIB colon Ca · **CEA back-up trend** plus pulmonary symptoms — suspicion for lung metastasis raised",
-        "**Medications**: No medication change today | Symptomatic Pantoprazole 40 mg OD for epigastric discomfort",
-        "**Plan**: Within 3-4 weeks · with PET-CT report",
+        "**Findings**: **Dr Pankaj Shah (8 May '25)**: T3N2b stage IIIB colon Ca s/p hemicolectomy + adjuvant FOLFOX. Currently in surveillance phase.",
+        "**Findings**: **Dr Mithun Shah (11 Jun '25)**: Stage IIIB colon Ca, surveillance phase — **no evidence of recurrence at this review**.",
+        "**Findings**: **Dr Pankaj Shah (30 Sep '25)**: Stage IIIB colon Ca · **CEA back-up trend** plus pulmonary symptoms — suspicion for lung metastasis raised.",
+        "**Medications**: **Dr Pankaj Shah (8 May '25)**: No active oncology Rx | Continue supportive supplements | Iron supplementation continued for chemo-related anaemia.",
+        "**Medications**: **Dr Mithun Shah (11 Jun '25)**: Continue supportive only.",
+        "**Medications**: **Dr Pankaj Shah (30 Sep '25)**: No medication change today | Symptomatic Pantoprazole 40 mg OD for epigastric discomfort.",
+        "**Plan**: **Dr Pankaj Shah (8 May '25)**: 8 Jun 2025 · with CEA + imaging.",
+        "**Plan**: **Dr Mithun Shah (11 Jun '25)**: 8 Jul 2025.",
+        "**Plan**: **Dr Pankaj Shah (30 Sep '25)**: Within 3-4 weeks · with PET-CT report. (**Not booked — open loop**)",
       ],
       labResults: [
         { name: "CEA", value: "12.4", unit: "ng/mL", flag: "high", refRange: "<5.0 (non-smoker)", date: "30 Sep 2025", note: "Last measured Sep 2025. Re-test overdue per NCCN q3-6mo." },
@@ -525,12 +532,18 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "10 Jun - 18 Jul '25",
       consultationCount: 3,
       doctorsLabel: "Dr Kalpesh Shah / Dr Y. Saija",
-      // Verbatim from the most recent neurosurgery visit
-      // (18 Jul 2025, Dr Kalpesh Shah — final visit before Neurology takeover).
+      // Verbatim across all three neurosurgery visits — Dr Kalpesh Shah
+      // ran the initial + final visits; Dr Saija ran the next-day review.
       lines: [
-        "**Findings**: TN-like neuropathic pain — **responding adequately**; chronic management handover to Neurology",
-        "**Medications**: Continue Gabator NT 300 mg HS — Neurology will continue care from next visit",
-        "**Plan**: Neurology takeover — first visit booked 20 Dec 2025",
+        "**Findings**: **Dr Kalpesh Shah (10 Jun '25)**: Atypical neuropathic-pain pattern, **TN-like in distribution but peripheral location** — investigate for nutritional / metabolic substrate.",
+        "**Findings**: **Dr Saija (11 Jun '25)**: TN-like extremity pain, **early response to gabapentinoid + low-dose TCA**.",
+        "**Findings**: **Dr Kalpesh Shah (18 Jul '25)**: TN-like neuropathic pain — **responding adequately**; chronic management handover to Neurology.",
+        "**Medications**: **Dr Kalpesh Shah (10 Jun '25)**: **Gabator NT 300 mg HS** (Gabapentin 300 + Nortriptyline 10) — start dose | Bone-health supplements continued.",
+        "**Medications**: **Dr Saija (11 Jun '25)**: Continue Gabator NT 300 mg HS.",
+        "**Medications**: **Dr Kalpesh Shah (18 Jul '25)**: Continue Gabator NT 300 mg HS — Neurology will continue care from next visit.",
+        "**Plan**: **Dr Kalpesh Shah (10 Jun '25)**: 11 Jun 2025 (next-day review).",
+        "**Plan**: **Dr Saija (11 Jun '25)**: 10 Jul 2025.",
+        "**Plan**: **Dr Kalpesh Shah (18 Jul '25)**: Neurology takeover — first visit booked 20 Dec 2025.",
       ],
       // No open loops — ferritin + iron came back WNL on the 11 Jun + 18 Jul
       // follow-ups, gabapentinoid management was formally handed to
@@ -806,11 +819,13 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "11 - 12 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep Jain",
-      // Verbatim Findings / Plan lifted from the most recent oncology
-      // visit (12 May 2026, Dr Sandeep Jain — second-opinion sign-off).
+      // Verbatim Findings / Plan from BOTH oncology visits, attributed by
+      // doctor + date so the audit trail shows each opinion distinctly.
       lines: [
-        "**Findings**: **Concurrent with Dr Tahiliani** — pT1cN0 stage IA invasive ductal carcinoma, moderately differentiated. Resection-first pathway endorsed.",
-        "**Plan**: Re-engage jointly with Dr Tahiliani once pathology + IHC are back",
+        "**Findings**: **Dr Tahiliani (11 May)**: Right Breast Carcinoma — pT1cN0 stage IA, moderately differentiated invasive ductal carcinoma. ER/PR/HER2 status awaiting full IHC panel.",
+        "**Findings**: **Dr Jain (12 May)**: **Concurrent with Dr Tahiliani** — pT1cN0 stage IA confirmed, resection-first pathway endorsed.",
+        "**Plan**: **Dr Tahiliani (11 May)**: Post-surgical review within 7 days of resection · adjuvant decision after pathology + IHC.",
+        "**Plan**: **Dr Jain (12 May)**: Re-engage jointly with Dr Tahiliani once pathology + IHC are back.",
       ],
       openLoops: [
         "Oncology requested **cardiac fitness sign-off** from Cardiology on 11 May, sign-off not yet on record",
@@ -933,11 +948,15 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "27 Apr '26",
       consultationCount: 2,
       doctorsLabel: "Dr Bhavesh Roy / Dr Ketan Vekariya",
-      // Verbatim from the most recent cardiology visit (27 Apr 2026,
-      // Dr Bhavesh Roy — same-day Dr Ketan Vekariya cross-cover concurs).
+      // Verbatim from BOTH cardiology visits (same day, cross-cover) —
+      // each opinion shown distinctly.
       lines: [
-        "**Findings**: **Known IHD on chronic regimen**, functional capacity uncertain | HTN suboptimally controlled | OSA-related airway risk co-exists",
-        "**Plan**: Re-review with Echo result before any surgical clearance is issued",
+        "**Findings**: **Dr Bhavesh Roy (27 Apr)**: **Known IHD on chronic regimen**, functional capacity uncertain | HTN suboptimally controlled | OSA-related airway risk co-exists.",
+        "**Findings**: **Dr Vekariya (27 Apr)**: Concurs with Dr Roy — known IHD, sub-optimally controlled HTN, OSA-airway concern. Pre-op clearance pending Echo + functional capacity.",
+        "**Medications**: **Dr Bhavesh Roy (27 Apr)**: Continue **Aspirin 75 mg OD** | **Rosuvastatin 10 mg OD** | **Metoprolol 25 mg BID** | Add **Telmisartan 40 mg OD** (intensify HTN control) | Plan beta-blocker uptitration after Echo.",
+        "**Medications**: **Dr Vekariya (27 Apr)**: Endorses Dr Roy's regimen change.",
+        "**Plan**: **Dr Bhavesh Roy (27 Apr)**: Re-review with Echo result before any surgical clearance is issued.",
+        "**Plan**: **Dr Vekariya (27 Apr)**: Joint review with Dr Roy once Echo is in.",
       ],
       labResults: [
         { name: "LDL-C", value: "142", unit: "mg/dL", flag: "high", refRange: "<70 (IHD target)", date: "27 Apr 2026", note: "Above the secondary-prevention target for known IHD." },
@@ -1911,12 +1930,19 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       dateRangeLabel: "25 Aug '25 - 25 Mar '26",
       consultationCount: 8,
       doctorsLabel: "Dr Navneet Shah / Dr Nanavaty",
-      // Verbatim from the most recent Internal Medicine visit
-      // (25 Mar 2026, Dr Nanavaty — regimen-consolidation review).
+      // Verbatim across the three IM visits — Dr Navneet Shah ran the
+      // acute TG-2898 intervention + 6-day follow-up; Dr Nanavaty ran
+      // the consolidation review.
       lines: [
-        "**Findings**: Severe hypertriglyceridaemia, **acute phase resolved**; chronic surveillance phase | DM-II, HTN, dyslipidaemia all sub-optimal",
-        "**Medications**: Continue full regimen | Reinforce dietary discipline",
-        "**Plan**: After 2-3 weeks",
+        "**Findings**: **Dr Navneet Shah (11 Mar)**: **Severe hypertriglyceridaemia (TG 2898)** — pancreatitis-risk territory | Uncontrolled DM (HbA1c 8.5%) | Pre-existing HTN, sub-optimal control.",
+        "**Findings**: **Dr Navneet Shah (17 Mar)**: Hypertriglyceridaemia — **dramatic biochemical response**, still well above target | Pancreatitis risk still elevated, less acute.",
+        "**Findings**: **Dr Nanavaty (25 Mar)**: Severe hypertriglyceridaemia, **acute phase resolved**; chronic surveillance phase | DM-II, HTN, dyslipidaemia all sub-optimal.",
+        "**Medications**: **Dr Navneet Shah (11 Mar)**: Continue Rozavel EZ 20 | **Plan Fenofibrate add-on next visit** if no contraindication | Continue Valzaar 80 + Amlodac 5 + Inderal LA 20 | Aspirin 75 continued | **Strict diet · zero alcohol · no high-fat foods**.",
+        "**Medications**: **Dr Navneet Shah (17 Mar)**: Continue Rozavel EZ 20 | **Add Fenofibrate 145 mg OD** — formal initiation today.",
+        "**Medications**: **Dr Nanavaty (25 Mar)**: Continue full regimen | Reinforce dietary discipline.",
+        "**Plan**: **Dr Navneet Shah (11 Mar)**: 17 Mar 2026 · repeat TG.",
+        "**Plan**: **Dr Navneet Shah (17 Mar)**: 25 Mar 2026 · standard cadence review.",
+        "**Plan**: **Dr Nanavaty (25 Mar)**: After 2-3 weeks.",
       ],
       labResults: [
         { name: "Triglycerides", value: "2898", unit: "mg/dL", flag: "critical", refRange: "<150", date: "11 Mar 2026", note: "Pancreatitis-risk territory. Fibrate indicated above 500." },

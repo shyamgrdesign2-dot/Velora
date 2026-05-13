@@ -747,11 +747,27 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
 }
 
 // ═════════════════════════════════════════════════════════════════════════
-// LAKSHMI_IYER_BRIEF_MOCK  ·  P1 · person_id 1093717054960 · F · 76
+// LAKSHMI_IYER_BRIEF_MOCK  ·  P2 zip · person_id 1093717054960 · F · 76
 // ─────────────────────────────────────────────────────────────────────────
-// Scenario: 17-day intensive pre-op work-up burst for early-stage breast Ca
-// against a heavy cardio-renal-pulmonary co-morbidity stack. Surgery
-// pending. Demonstrates the "dense burst" case.
+// Rebuilt VERBATIM from the OMOP CDM export:
+//   · 21 visits across 16 providers (Apr 25 → May 12, 2026)
+//   · Every drug name pulled from drug_exposure.drug_source_value
+//   · Every diagnosis / symptom / exam / advice / follow-up pulled from
+//     observation.value_as_string (symptoms_text · examination_text ·
+//     advice_text · investigation_text · followup_advice · followup_date)
+//   · Every co-morbidity pulled from condition_occurrence (only Active rows)
+//   · No invented content. Where a doctor wrote nothing for a pointer, the
+//     pointer is omitted, not filled with a Velora summary.
+//
+// Scenario clarification: the oncologist's followup_advice on 12 May 2026
+// reads "Patient's all available relatives have been explained regarding
+// patient's advanced stage disease condition, Poor prognosis ... Follow up
+// after 1 year." The Letrozole + Denosumab + Calcium-Vit D regimen and
+// 1-year follow-up matches advanced ER+ breast cancer on hormonal therapy
+// with bone-protective cover, not surgical-first stage IA. The condition_
+// occurrence row "Ca Rt Breast pT1cN0 stage IA" is preserved as recorded,
+// but the prognosis sentence from the oncologist's note is the doctor's
+// final word and is rendered verbatim.
 // ═════════════════════════════════════════════════════════════════════════
 export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientName: "Lakshmi Iyer",
@@ -762,433 +778,448 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
   patientId: "1093717054960",
   medicalHistory: [
     {
-      title: "Primary problem",
-      tone: "primary",
-      items: [
-        { text: "**Right Breast Carcinoma** (pT1cN0 stage IA, moderately differentiated ductal)" },
-      ],
-      sources: [
-        { doctor: "Dr Tahiliani (Oncology)", date: "11 May 2026" },
-        { doctor: "Dr Tahiliani (Oncology)", date: "12 May 2026" },
-        { doctor: "Dr Pandya (Onco-surgery)", date: "30 Apr 2026" },
-        { doctor: "Dr Pandya (Onco-surgery)", date: "4 May 2026" },
-        { doctor: "Dr Pandya (Onco-surgery)", date: "11 May 2026" },
-      ],
-      reasoning:
-        "Small (T1c), node-negative right breast cancer caught early. Surveillance is well-defined; the immediate question is anaesthetic and chemotherapy fitness given the cardio-renal-pulmonary backdrop.",
-    },
-    {
       title: "Co-morbidities",
       tone: "neutral",
       items: [
-        { text: "**Hypertension**" },
-        { text: "**Dyslipidaemia**" },
-        { text: "**Ischaemic heart disease** (IHD/CAD)" },
-        { text: "**CKD** (acute on chronic)" },
-        { text: "**Severe Obstructive Sleep Apnea**" },
+        { text: "**Hypertension** (Active · 21 condition_occurrence rows)" },
+        { text: "**Dyslipidaemia** (Active · 17 rows)" },
+        { text: "**Ischaemic heart disease** (Active · 14 rows, also tagged IHD / CAD)" },
+        { text: "**Right Breast cancer** (Confirmed · pT1cN0 stage IA per one row; oncologist's 12 May note describes advanced-stage disease with poor prognosis)" },
+        { text: "**Severe Obstructive Sleep Apnea** (AHI 31.2 per PSG · Pulmonology 1 May 2026)" },
+        { text: "**Acute-on-chronic CKD** (HT + CAD + A/c on CKD · one row)" },
       ],
       sources: [
-        { doctor: "Dr Roy (Cardiology)", date: "27 Apr 2026" },
-        { doctor: "Dr Vekariya (Cardiology)", date: "27 Apr 2026" },
-        { doctor: "Dr Goplani (Nephrology)", date: "29 Apr 2026" },
-        { doctor: "Dr Singh (Pulmonology & Critical Care)", date: "29 Apr 2026" },
+        { doctor: "Dr Bhavesh Roy (Cardiology)", date: "27 Apr 2026" },
+        { doctor: "Dr Ketan Vekariya (Cardiology)", date: "27 Apr 2026" },
+        { doctor: "Dr Kamal Goplani (Nephrology)", date: "29 Apr 2026" },
+        { doctor: "Dr Manoj Singh (Pulmonology)", date: "29 Apr 2026" },
+        { doctor: "Dr Manoj Singh (Pulmonology)", date: "1 May 2026" },
+        { doctor: "Dr Nahush Tahiliani (Oncology)", date: "12 May 2026" },
       ],
       reasoning:
-        "HTN, Dyslipidaemia, and IHD form the cardiovascular substrate; CKD plus severe OSA add anaesthetic and renal-dosing constraints. All four are pre-op blockers.",
+        "Co-morbidity list pulled directly from condition_occurrence WHERE condition_status_source_value = 'Active' or where the source value clearly maps to a chronic diagnosis. Counts in parentheses reflect how many independent rows tagged each condition.",
     },
     {
       title: "Surgical history",
       tone: "neutral",
-      items: [{ text: "No surgical history found" }],
+      items: [{ text: "No surgical history found in condition_occurrence" }],
       sources: [],
-      reasoning: "No surgical procedures on record. The breast surgery is part of the upcoming plan and has not happened yet.",
+      reasoning: "No surgical procedure rows in condition_occurrence for this patient.",
     },
     {
       title: "Allergies & safety",
       tone: "neutral",
       items: [{ text: "Allergy review not explicitly verified" }],
       sources: [],
-      reasoning: "No explicit allergy verifications on record. Treat as unknown until reviewed; see Cardiology open loops.",
+      reasoning: "No allergy entry appears in condition_occurrence or observation rows.",
     },
   ],
   windowDays: 17,
   specialties: [
+    // ── 1 · Oncology · Dr Nahush Tahiliani (lead) + Dr Sandeep Jain (2nd opinion) ──
     {
-      source: { specialty: "Oncology", author: "Dr Tahiliani", date: "12 May 2026" },
-      reason: "Treatment plan being finalised this week.",
-      dateRangeLabel: "11 - 12 May '26",
+      source: { specialty: "Oncology", author: "Dr Nahush Tahiliani / Dr Sandeep Jain", date: "12 May 2026" },
+      reason: "Lead specialty · 2 visits same day · hormonal-therapy initiation + bone-protective regimen + palliative-discussion documented.",
+      dateRangeLabel: "12 May '26",
       consultationCount: 2,
-      doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep Jain",
-      // Verbatim Findings / Plan from BOTH oncology visits, attributed by
-      // doctor + date so the audit trail shows each opinion distinctly.
+      doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep jain",
       lines: [
-        "**Findings**: **Dr Tahiliani (11 May)**: Right Breast Carcinoma — pT1cN0 stage IA, moderately differentiated invasive ductal carcinoma. ER/PR/HER2 status awaiting full IHC panel.",
-        "**Findings**: **Dr Jain (12 May)**: **Concurrent with Dr Tahiliani** — pT1cN0 stage IA confirmed, resection-first pathway endorsed.",
-        "**Plan**: **Dr Tahiliani (11 May)**: Post-surgical review within 7 days of resection · adjuvant decision after pathology + IHC.",
-        "**Plan**: **Dr Jain (12 May)**: Re-engage jointly with Dr Tahiliani once pathology + IHC are back.",
-      ],
-      openLoops: [
-        "Oncology requested **cardiac fitness sign-off** from Cardiology on 11 May, sign-off not yet on record",
-        "Oncology requested **OSA airway plan** from Anaesthesia + Pulmonology, plan not yet documented",
+        "**Findings**: Right Breast cancer (Confirmed) · pT1cN0 stage IA per one condition_occurrence row.",
+        "**Medications**: **ONCOLET 2.5MG TABLET** (Letrozole 2.5 mg) M:1 A:0 E:0 N:0 · 2 months supply | **EFFECTOL TABLET** (Calcium 500 mg + Cholecalciferol 125 IU) M:1 A:0 E:0 N:0 daily | **SHELCAL 500MG TABLET** (composition source-coded as Denosumab 60 mg) M:0 A:0 E:0 N:1 daily | **DENOSTEOREL 60MG INJECTION** subcutaneous STAT today, then every 6-monthly",
+        "**Plan**: Patient's all available relatives have been explained regarding patient's **advanced stage disease condition, Poor prognosis** and all possible management options in detail in English (including side effect profile and financial aspects). **Follow up after 1 year.**",
       ],
       consultations: [
         {
-          date: "11 May 2026",
+          date: "12 May 2026",
           visitType: "OPD",
-          doctor: "Dr Tahiliani",
-          headline: "**T1cN0 stage IA ductal Ca** — first oncology consult after surgical referral",
-          symptoms:
-            "Self-detected right breast lump × 6 weeks | No nipple discharge | No skin changes | No pain | No constitutional symptoms",
-          examination:
-            "Right breast: 1.4 cm firm mobile mass at upper-outer quadrant, no overlying skin changes · No axillary lymphadenopathy on palpation · Left breast normal · Performance status ECOG 1",
-          diagnosis:
-            "**Right Breast Carcinoma — pT1cN0 stage IA, moderately differentiated invasive ductal carcinoma** (per core biopsy + staging imaging). ER/PR/HER2 status: awaiting full IHC panel.",
-          investigations:
-            "Core biopsy report reviewed | USG + mammogram reviewed | Pending: full IHC panel (ER/PR/HER2/Ki-67) | Baseline LFT/KFT/CBC | ECG already on file (Cardiology)",
+          doctor: "Dr Nahush Tahiliani",
+          headline: "**Letrozole 2.5 mg + Denosumab 60 mg s/c + Ca + Vit D** initiated · 1-year review · prognosis discussion",
+          diagnosis: "Right Breast cancer (Confirmed · pT1cN0 stage IA per condition_occurrence). Oncologist's follow-up note records advanced-stage disease with poor prognosis.",
           medications:
-            "No oncology Rx initiated yet | Continue all existing co-morbidity meds (Cardiology + Nephrology regimens unchanged)",
-          advice:
-            "Counselled re: surgical-first pathway for early-stage HR-pending disease | NCCN T1cN0 protocol explained | Family counselling on supportive role during pre-op work-up",
+            "**ONCOLET 2.5MG TABLET** (LETROZOLE-2.5MG) — M:1 A:0 E:0 N:0 daily × 2 months · qty 60 | **EFFECTOL TABLET** (CALCIUM MINERAL-500MG + CHOLECALCIFEROL-125IU) — M:1 A:0 E:0 N:0 daily | **SHELCAL 500MG TABLET** (composition source-coded as DENOSUMAB-60MG) — M:0 A:0 E:0 N:1 daily | **DENOSTEOREL 60MG INJECTION** — subcutaneous STAT today, then every 6 monthly",
           followUp:
-            "Post-surgical review within 7 days of resection · adjuvant decision after pathology + IHC",
-          additionalNotes:
-            "Cardio-renal-pulmonary backdrop is the rate-limiting step, not the oncology decision. Coordinated MDT pathway agreed.",
+            "Patient's all available relatives have been explained regarding patient's **advanced stage disease condition, Poor prognosis** and all possible management options in detail in English (including side effect profile and financial aspects). Follow up after 1 year.",
+          additionalNotes: "vid=9280116 · 4 distinct drug_exposure rows · 2 observation rows.",
         },
         {
           date: "12 May 2026",
           visitType: "OPD",
-          doctor: "Dr Sandeep Jain",
-          headline: "Second oncology opinion — confirms staging + plan",
-          symptoms: "No new symptoms since yesterday's consult | Patient anxious about surgical timeline",
-          examination:
-            "Independent palpation: 1.4 cm right breast mass confirmed at same location · No nodal involvement on exam · Vitals stable",
-          diagnosis:
-            "**Concurrent with Dr Tahiliani** — pT1cN0 stage IA invasive ductal carcinoma, moderately differentiated. Resection-first pathway endorsed.",
-          investigations: "No additional investigations beyond Dr Tahiliani's order set | IHC panel awaited",
-          medications: "No change to existing regimen",
-          advice:
-            "Re-explained surgical timeline contingent on Cardio + Nephro + Pulmo clearances | Reassurance on stage-IA prognosis (>95% 5-yr survival)",
-          followUp: "Re-engage jointly with Dr Tahiliani once pathology + IHC are back",
-          additionalNotes:
-            "Cross-coverage opinion captured to formalise MDT consensus before booking the surgical date.",
+          doctor: "Dr Sandeep jain",
+          headline: "Same-day oncology second-opinion · no medication prescribed at this visit",
+          diagnosis: "Oncology second-opinion consultation (no diagnosis_text recorded in observations).",
+          additionalNotes: "vid=9281423 · 0 drug_exposure rows · only followup_date observation logged.",
         },
       ],
     },
+
+    // ── 2 · Onco-surgery · Dr Dhara Girish Pandya (5 pre-op visits, 0 drugs) ──
     {
-      source: { specialty: "Onco-surgery", author: "Dr Pandya", date: "11 May 2026" },
-      reason: "Lead surgeon, booking pending.",
+      source: { specialty: "Onco-surgery", author: "Dr Dhara Girish Pandya", date: "11 May 2026" },
+      reason: "5 onco-surgery visits in the pre-op work-up window · no medications prescribed at any of them · Pre-Op Profile Major (Cancer) ordered on 4 May 2026.",
       dateRangeLabel: "30 Apr - 11 May '26",
       consultationCount: 5,
       doctorsLabel: "Dr Dhara Girish Pandya",
-      // Verbatim from the most recent onco-surgery visit
-      // (11 May 2026, Dr Dhara Girish Pandya).
       lines: [
-        "**Findings**: Right breast Ca, IA — surgical pathway confirmed | **Holding date** until Nephro contrast-protocol cleared",
-        "**Plan**: Date to be booked within 3-5 days of final clearance",
-      ],
-      openLoops: [
-        "Onco-surgery scheduled **resection** but date not yet booked in the system (held pending clearances)",
-        "Onco-surgery requested **renal-dose ceiling for contrast imaging** from Nephrology on 4 May, response not yet on record",
+        "**Findings**: All 5 visits record bilateral breast + bilateral axilla examination only (verbatim observation.examination_text: 'B/L BREAST  |  B/L AXILLA'). No textual diagnosis at any visit.",
+        "**Plan**: Pre Op Profile Major (Cancer) ordered on 4 May 2026 (verbatim investigation_text). No medications prescribed at any of the 5 visits.",
       ],
       consultations: [
         {
           date: "30 Apr 2026",
           visitType: "OPD",
           doctor: "Dr Dhara Girish Pandya",
-          headline: "Initial surgical assessment",
-          symptoms: "No fresh complaints | Pre-op work-up only | Patient asymptomatic at rest",
-          examination:
-            "General build moderate · BP 144/86 (concerning for unmedicated HTN burst) · HR 78 · SpO₂ 96 % room air · Cardiac and respiratory exam consistent with known IHD + OSA · Breast and axillary exam as per Oncology",
-          diagnosis: "Right breast Ca, pT1cN0 IA — **for resection, pending clearances**",
-          investigations:
-            "Pre-op CBC | KFT (CKD context) | LFT | Coag profile | Chest X-ray | ECG | 2D Echo (to coordinate with Cardiology) | Anaesthesia consult requested",
-          medications: "No new Rx today | Continue existing regimen",
-          advice:
-            "Counselled on procedure, recovery, OSA-related anaesthetic considerations | Asked patient to bring CPAP records (if any) at next visit",
-          followUp: "4 May 2026 — interim pre-op review",
-          additionalNotes:
-            "Surgical date intentionally not booked yet: cardio + nephro + anaesthesia clearances pending.",
+          headline: "Pre-op assessment #1 · bilateral breast + axilla exam · 0 drugs",
+          examination: "B/L BREAST  |  B/L AXILLA",
+          additionalNotes: "vid=9124235 · 0 drug rows.",
+        },
+        {
+          date: "30 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Dhara Girish Pandya",
+          headline: "Pre-op assessment #2 (same-day repeat visit) · 0 drugs",
+          examination: "B/L BREAST  |  B/L AXILLA",
+          additionalNotes: "vid=9124248 · 0 drug rows.",
+        },
+        {
+          date: "30 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Dhara Girish Pandya",
+          headline: "Pre-op assessment #3 (same-day repeat visit) · 0 drugs",
+          examination: "B/L BREAST  |  B/L AXILLA",
+          additionalNotes: "vid=9124249 · 0 drug rows.",
         },
         {
           date: "4 May 2026",
           visitType: "OPD",
           doctor: "Dr Dhara Girish Pandya",
-          headline: "Pre-op review — awaiting cardio clearance",
-          symptoms: "Mild fatigue × 2 days, no chest pain or dyspnoea at rest | No new complaints",
-          examination:
-            "BP 138/84 · HR 76 · SpO₂ 95 % room air · No fresh murmurs · No oedema · Chest clear",
-          diagnosis: "Right breast Ca, **still awaiting Cardiology sign-off + airway plan**",
-          investigations:
-            "Cardiology Echo report awaited | OSA-specific airway-risk note from Pulmonology / Anaesthesia awaited",
-          medications: "No change",
-          advice: "Patient counselled that the date will be set the day all three clearances are on file",
-          followUp: "11 May 2026 — final pre-op review",
+          headline: "**Pre Op Profile Major (Cancer)** ordered · 0 drugs",
+          investigations: "Pre Op Profile Major (Cancer) Remark: (per observation.investigation_text)",
+          additionalNotes: "vid=9164978 · 0 drug rows.",
         },
         {
           date: "11 May 2026",
           visitType: "OPD",
           doctor: "Dr Dhara Girish Pandya",
-          headline: "Most recent pre-op review · oncology plan now confirmed",
-          symptoms: "Asymptomatic | Patient ready, anxious about delay",
-          examination: "Unchanged from 4 May review · BP 140/86 (still above pre-op target) · No fresh signs",
-          diagnosis:
-            "Right breast Ca, IA — surgical pathway confirmed | **Holding date** until Nephro contrast-protocol cleared",
-          investigations:
-            "Repeat KFT requested for pre-op morning | Confirm anaesthesia airway plan in writing",
-          medications: "No change today",
-          advice: "Stay nil per oral discipline once date is set | Patient education re: post-op recovery + ward expectations",
-          followUp: "Date to be booked within 3-5 days of final clearance",
-          additionalNotes: "Onco-surgery has now received the formal oncology sign-off (Dr Tahiliani 11 May, Dr Jain 12 May).",
+          headline: "Final pre-op review · bilateral breast + axilla 'AS DESCRIBED' · 0 drugs",
+          examination: "B/L BREAST  |  AS DESCRIBED   ·   B/L AXILLA  |  AS DESCRIBED",
+          additionalNotes: "vid=9252712 · 0 drug rows.",
         },
       ],
     },
+
+    // ── 3 · Cardiology · Dr Bhavesh Roy + Dr Ketan Vekariya · same day, no drugs ──
     {
-      source: { specialty: "Cardiology", author: "Dr Bhavesh Roy", date: "27 Apr 2026" },
-      reason: "Pre-op cardiac risk in IHD + OSA patient.",
+      source: { specialty: "Cardiology", author: "Dr Bhavesh Roy / Dr Ketan Vekariya", date: "27 Apr 2026" },
+      reason: "Pre-op cardiac review · 2 visits same day · 0 drugs prescribed.",
       dateRangeLabel: "27 Apr '26",
       consultationCount: 2,
       doctorsLabel: "Dr Bhavesh Roy / Dr Ketan Vekariya",
-      // Verbatim from BOTH cardiology visits (same day, cross-cover) —
-      // each opinion shown distinctly.
       lines: [
-        "**Findings**: **Dr Bhavesh Roy (27 Apr)**: **Known IHD on chronic regimen**, functional capacity uncertain | HTN suboptimally controlled | OSA-related airway risk co-exists.",
-        "**Findings**: **Dr Vekariya (27 Apr)**: Concurs with Dr Roy — known IHD, sub-optimally controlled HTN, OSA-airway concern. Pre-op clearance pending Echo + functional capacity.",
-        "**Medications**: **Dr Bhavesh Roy (27 Apr)**: Continue **Aspirin 75 mg OD** | **Rosuvastatin 10 mg OD** | **Metoprolol 25 mg BID** | Add **Telmisartan 40 mg OD** (intensify HTN control) | Plan beta-blocker uptitration after Echo.",
-        "**Medications**: **Dr Vekariya (27 Apr)**: Endorses Dr Roy's regimen change.",
-        "**Plan**: **Dr Bhavesh Roy (27 Apr)**: Re-review with Echo result before any surgical clearance is issued.",
-        "**Plan**: **Dr Vekariya (27 Apr)**: Joint review with Dr Roy once Echo is in.",
-      ],
-      labResults: [
-        { name: "LDL-C", value: "142", unit: "mg/dL", flag: "high", refRange: "<70 (IHD target)", date: "27 Apr 2026", note: "Above the secondary-prevention target for known IHD." },
-        { name: "HDL-C", value: "32", unit: "mg/dL", flag: "low", refRange: ">40 (F)", date: "27 Apr 2026" },
-        { name: "Triglycerides", value: "218", unit: "mg/dL", flag: "high", refRange: "<150", date: "27 Apr 2026" },
-        { name: "NT-proBNP", value: "468", unit: "pg/mL", flag: "high", refRange: "<300 (age-adj)", date: "27 Apr 2026", note: "Mildly elevated; consistent with chronic stable IHD, no acute decompensation." },
-      ],
-      hiddenNormalLabCount: 6,
-      openLoops: [
-        "Cardiology advised a **resting Echo** on 27 Apr, no result on file",
-        "Cardiology advised a **functional capacity test** on 27 Apr, no result on file",
+        "**Findings**: DOE grade III since 4-5 months (verbatim symptoms_text · Dr Bhavesh Roy). Exam: s1s2+, chest clear, dp+ ankle flair (verbatim examination_text).",
+        "**Plan**: No medications prescribed at either cardiology visit (drug_exposure 0 rows).",
       ],
       consultations: [
         {
           date: "27 Apr 2026",
           visitType: "OPD",
           doctor: "Dr Bhavesh Roy",
-          headline: "Pre-op cardiac risk evaluation",
-          symptoms:
-            "**Dyspnoea on exertion grade III × 4-5 months** | No chest pain at rest | Orthopnoea + PND denied | Snoring + witnessed apnoea (OSA-suggestive)",
-          examination:
-            "BP **152/94** (above target on current regimen) · HR 82 regular · S1S2 normal, no murmur · Bilateral basal crepts on auscultation · No pedal oedema",
-          diagnosis: "**Known IHD on chronic regimen**, functional capacity uncertain | HTN suboptimally controlled | OSA-related airway risk co-exists",
-          investigations:
-            "Resting 2D Echo ordered | Functional capacity test (6-min walk + treadmill) ordered | Repeat lipid + HbA1c ordered",
-          medications:
-            "Continue **Aspirin 75 mg OD** | **Rosuvastatin 10 mg OD** | **Metoprolol 25 mg BID** | Add **Telmisartan 40 mg OD** (intensify HTN control) | Plan beta-blocker uptitration after Echo",
-          advice:
-            "Low-salt diet | Continue prescribed exercise as tolerated | Bring CPAP usage data + sleep-study report at next visit",
-          followUp: "Re-review with Echo result before any surgical clearance is issued",
-          labResults: [
-            { name: "LDL-C", value: "142", unit: "mg/dL", flag: "high", refRange: "<70 (IHD target)", date: "27 Apr 2026", note: "Above secondary-prevention target." },
-            { name: "HDL-C", value: "32", unit: "mg/dL", flag: "low", refRange: ">40 (F)", date: "27 Apr 2026" },
-            { name: "Triglycerides", value: "218", unit: "mg/dL", flag: "high", refRange: "<150", date: "27 Apr 2026" },
-            { name: "NT-proBNP", value: "468", unit: "pg/mL", flag: "high", refRange: "<300 (age-adj)", date: "27 Apr 2026", note: "Mildly elevated; chronic stable IHD." },
-          ],
-          hiddenNormalCount: 6,
+          headline: "Pre-op cardiology · DOE grade III × 4-5 months · 0 drugs",
+          symptoms: "DOE grade III since 4-5 months",
+          examination: "s1s2+, chest clear, dp+ ankle flair",
+          additionalNotes: "vid=9088327 · 0 drug rows.",
         },
         {
           date: "27 Apr 2026",
           visitType: "OPD",
           doctor: "Dr Ketan Vekariya",
-          headline: "Second cardiology opinion — same day cross-cover",
-          symptoms: "Same as Dr Roy's record — same-day review for cross-cover",
-          examination: "Concurrent — BP 150/92 on repeat · No fresh findings",
-          diagnosis: "Concurs with Dr Roy: known IHD, sub-optimally controlled HTN, OSA-airway concern. Pre-op clearance pending Echo + functional capacity.",
-          investigations: "Endorses Dr Roy's order set | No additional investigations today",
-          medications: "Endorses Dr Roy's regimen change",
-          advice: "Patient counselled on the staged-clearance process",
-          followUp: "Joint review with Dr Roy once Echo is in",
+          headline: "Same-day cardiology cross-cover · 0 drugs",
+          additionalNotes: "vid=9090166 · 0 drug rows · only followup_date logged.",
         },
       ],
     },
+
+    // ── 4 · Pulmonology & Critical Care · Dr Manoj Singh ──
     {
-      source: { specialty: "Pulmonology & Critical Care", author: "Dr Manoj Singh", date: "1 May 2026" },
-      reason: "Severe OSA + airway risk for anaesthesia.",
+      source: { specialty: "Pulmonology and Critical Care", author: "Dr Manoj Singh", date: "1 May 2026" },
+      reason: "OSA work-up · Foracort + Montair + Rantac D started 29 Apr · PSG result on 1 May (AHI 31.2, advised CPAP titration).",
       dateRangeLabel: "29 Apr - 1 May '26",
       consultationCount: 2,
       doctorsLabel: "Dr Manoj Singh",
-      // Verbatim from the most recent pulmonology visit
-      // (1 May 2026, Dr Manoj Singh).
       lines: [
-        "**Findings**: Severe OSA — formal documentation still pending",
-        "**Medications**: Continue **Foracort inhaler** (Budesonide 200 µg + Formoterol 6 µg) BID | Continue **Montelukast 10 mg HS** | **Hold sedatives + opioids** in peri-op window",
-        "**Plan**: Joint anaesthesia + pulmonology airway-plan visit before booking date",
-      ],
-      openLoops: [
-        "Pulmonology advised a **formal sleep study + CPAP titration** on 29 Apr, no report on file",
-        "Pulmonology requested a **difficult-airway plan** from Anaesthesia, response not yet documented",
+        "**Findings (1 May)**: PSG result — Sleep Efficiency normal, High WASO, Time spent in N1 + N3 high, N2 low, REM normal. **AHI 31.2 without desaturation.** Tachycardia noted during study. PLMS index high (verbatim followup_advice).",
+        "**Medications (29 Apr)**: **FORACORT 200MCG INHALER** (Budesonide 200 µg + Formoterol 6 µg) M:1 A:0 E:0 N:0 before food × 10 days · qty 10 | **MONTAIR 10MG TABLET** (Montelukast 10 mg) M:0 A:0 E:0 N:1 after food × 15 days · qty 15 | **RANTAC D 150MG TABLET** (Domperidone 10 mg + Ranitidine 150 mg) M:1 A:0 E:0 N:0 before food × 15 days · qty 15",
+        "**Plan (1 May)**: Lifestyle modification | CPAP titration and trial | Next review 1 Nov 2026.",
       ],
       consultations: [
         {
           date: "29 Apr 2026",
           visitType: "OPD",
           doctor: "Dr Manoj Singh",
-          headline: "Initial pulmonology + sleep review",
-          symptoms:
-            "**Loud snoring + witnessed apnoeic episodes** × years (per spouse) | Daytime sleepiness Epworth ~14 | Morning headaches | Restless sleep | No frank orthopnoea",
-          examination:
-            "Body habitus modified Mallampati class III · Crowded oropharynx · Neck circumference 38 cm · Chest clear on auscultation · SpO₂ 95 % room air",
-          diagnosis:
-            "**Severe Obstructive Sleep Apnea** (clinical) — high pre-op airway risk | Bronchial reactivity already on inhaled controller",
-          investigations:
-            "**Formal Type-I polysomnography ordered** | CPAP titration to follow | ABG (room-air baseline) | CXR",
+          headline: "Initial pulmonology · 3-drug regimen started · next-day review booked",
           medications:
-            "Continue **Foracort inhaler** (Budesonide 200 µg + Formoterol 6 µg) BID | Continue **Montelukast 10 mg HS** | **Hold sedatives + opioids** in peri-op window",
-          advice:
-            "Bring any prior sleep-study reports to next visit | Sleep posture education | Notify anaesthesia of severe-OSA airway risk *in writing*",
-          followUp: "1 May 2026 with sleep-study + ABG · joint airway-plan call with Anaesthesia",
+            "**FORACORT 200MCG INHALER** (BUDESONIDE-200MCG + FORMOTEROL-6MCG) — M:1 A:0 E:0 N:0 · before food × 10 days · qty 10 | **MONTAIR 10MG TABLET** (MONTELUKAST-10MG) — M:0 A:0 E:0 N:1 · after food × 15 days · qty 15 | **RANTAC D 150MG TABLET** (Domperidone 10 mg + Ranitidine 150 mg) — M:1 A:0 E:0 N:0 · before food × 15 days · qty 15",
+          followUp: "30 Apr 2026",
+          additionalNotes: "vid=9114521 · 3 distinct drug rows.",
         },
         {
           date: "1 May 2026",
           visitType: "OPD",
           doctor: "Dr Manoj Singh",
-          headline: "Follow-up · airway plan still pending",
-          symptoms: "No interval change in OSA symptoms | No fresh respiratory complaints",
-          examination: "Unchanged from 29 Apr review · Chest clear · SpO₂ 96 % room air",
-          diagnosis: "Severe OSA — formal documentation still pending",
-          investigations: "Sleep-study report **not yet retrieved** | ABG done, awaited",
-          medications: "No change",
-          advice: "Reinforced importance of formal CPAP titration data before surgery",
-          followUp: "Joint anaesthesia + pulmonology airway-plan visit before booking date",
-          additionalNotes: "**Open loop**: Anaesthesia difficult-airway plan not yet written into the record.",
+          headline: "PSG result review · **AHI 31.2** · CPAP titration advised · 0 drugs",
+          investigations:
+            "PSG: Sleep Efficiency normal · High WASO · Time spent in N1 and N3 Stage is high · Time Spent in N2 is low and REM sleep time is normal · **AHI 31.2 without desaturation** · Tachycardia noted during study · PLMS index high.",
+          advice: "Life Style modification | CPAP titration and trial",
+          followUp: "1 Nov 2026",
+          additionalNotes: "vid=9139731 · 0 drug rows · advice + PSG report in followup_advice.",
         },
       ],
     },
+
+    // ── 5 · Nephrology · Dr Kamal Goplani · 1 visit, 0 drugs, advised Renal Doppler ──
     {
-      source: { specialty: "Nephrology", author: "Dr Goplani", date: "29 Apr 2026" },
-      reason: "CKD + impending IV contrast for staging.",
+      source: { specialty: "Nephrology", author: "Dr Kamal Goplani", date: "29 Apr 2026" },
+      reason: "Pre-op nephrology · 1 visit · creatinine 1.39 · renal cortical cyst · 0 drugs · Renal Doppler advised.",
       dateRangeLabel: "29 Apr '26",
       consultationCount: 1,
       doctorsLabel: "Dr Kamal Goplani",
-      // Verbatim from the most recent nephrology visit
-      // (29 Apr 2026, Dr Kamal Goplani).
       lines: [
-        "**Findings**: **Acute-on-chronic CKD (G3b)** — baseline eGFR was ~52 in Feb, now 38 | Anaemia of chronic kidney disease (Hb 10.8) | Borderline hyperkalaemia",
-        "**Medications**: Continue ACEi at current dose | Start **N-acetylcysteine 600 mg BID × 48 h** around contrast | **Avoid NSAIDs** | Renal-dose review of every current medication done (no changes needed today)",
-        "**Plan**: Pre-op morning labs (creatinine + electrolytes) · Joint nephrology + onco-surgery review of clearance",
-      ],
-      labResults: [
-        { name: "Serum Creatinine", value: "1.6", unit: "mg/dL", flag: "high", refRange: "0.6–1.1 (F)", date: "29 Apr 2026", note: "Acute-on-chronic; up from baseline 1.2 in Feb." },
-        { name: "eGFR", value: "38", unit: "mL/min/1.73 m²", flag: "low", refRange: "≥90 (normal); ≥60 (G2)", date: "29 Apr 2026", note: "CKD G3b. Pre-contrast hydration mandated." },
-        { name: "Urea (BUN)", value: "48", unit: "mg/dL", flag: "high", refRange: "7–20", date: "29 Apr 2026" },
-        { name: "Serum Potassium", value: "5.2", unit: "mmol/L", flag: "high", refRange: "3.5–5.0", date: "29 Apr 2026", note: "Borderline. Recheck before chemo." },
-        { name: "Haemoglobin", value: "10.8", unit: "g/dL", flag: "low", refRange: "12.0–15.5 (F)", date: "29 Apr 2026", note: "CKD-associated anaemia." },
-      ],
-      hiddenNormalLabCount: 9,
-      openLoops: [
-        "Nephrology advised **repeat Serum creatinine + eGFR before surgery** on 29 Apr, no result on file",
-        "Nephrology advised **Urine PCR + ACR** on 29 Apr, no result on file",
+        "**Findings**: Creat-1.39 · Urine prot-nil · USG-bil N size kidney with simple renal cortical cyst (verbatim examination_text).",
+        "**Plan**: Renal Doppler (verbatim advice_text). No medications prescribed.",
       ],
       consultations: [
         {
           date: "29 Apr 2026",
           visitType: "OPD",
           doctor: "Dr Kamal Goplani",
-          headline: "Pre-op renal review · acute-on-chronic CKD",
-          symptoms: "No frank uraemic symptoms | Reduced urine output complaint denied | Mild fatigue, attributed to anaemia",
+          headline: "Pre-op nephrology · Creat 1.39 · Renal Doppler advised · 0 drugs",
+          examination: "Creat-1.39 Urine prot-nil  |  USG-bil N zise kidney with simple renal cortical cys",
+          advice: "Renal Doppler",
+          additionalNotes: "vid=9113562 · 0 drug rows.",
+        },
+      ],
+    },
+
+    // ── 6 · Orthopaedics · Dr Yatin Desai / Dr Vivek Jadawala ──
+    {
+      source: { specialty: "Orthopaedics", author: "Dr. YATIN DESAI / Dr.VIVEK JADAWALA", date: "28 Apr 2026" },
+      reason: "Neck pain + bilateral upper-limb radiculopathy + bilateral knee pain (grade IV arthritis) · 6 drug rows incl. opioid combination.",
+      dateRangeLabel: "28 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Yatin Desai / Dr Vivek Jadawala",
+      lines: [
+        "**Findings**: NECK PAIN WITH BILATERAL UPPER LIMB RADICULOPATHY · BILATERAL KNEE PAIN AFFECTING ADL LEFT > RIGHT · KNOWN CASE OF HTN AND IHD (verbatim symptoms_text). Spinal curvature normal, paraspinal muscle spasm present, medial joint line tenderness both knees, knee ROM 0°-90° bilaterally with terminal restriction, distal neurovascular status normal, power grade V bilateral EHL/EDL.",
+        "**Medications**: **CARTIGEN PRO TABLET** (Glucosamine 1500 mg + Undenatured Collagen II 40 mg + Astaxanthin 4 mg) × 1 month | **ULTRACET TABLET** (Acetaminophen 325 mg + Tramadol 37.5 mg) M:1 A:0 E:0 N:1 after food × 15 days | **PANTODAC 40MG TABLET** (Pantoprazole 40 mg) M:1 A:0 E:0 N:1 before food × 15 days | **BACGAB 30GM GEL** (Baclofen 2% + Gabapentin 6% + Lidocaine 5%) — apply after hot fomentation | **CERVICAL COLLAR SOFT (Large)** | **KNEE CAP**",
+        "**Plan**: HOT FOMENTATION · AVOID WALKING ON UNEVEN SURFACES, SUDDEN JERKY MOVEMENTS · AVOID SQUATTING / CLIMBING STAIRS / CROSS-LEGGED SITTING · AVOID LIFTING HEAVY WEIGHT · PHYSIOTHERAPY (Ultrasound therapy cervical + lumbosacral). **Imaging on file:** MRI suggestive of C3-C4, C4-C5, C5-C6 disc degeneration with compression · X-ray both knee AP+Lateral suggestive of grade IV arthritic changes bilaterally (verbatim followup_advice).",
+      ],
+      consultations: [
+        {
+          date: "28 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Yatin Desai / Dr Vivek Jadawala",
+          headline: "Cervical disc + bilateral knee grade IV OA · 6-item Rx",
+          symptoms: "NECK PAIN WITH BILATERAL UPPER LIMB RADICULOPATHY | BILATERAL KNEE PAIN AFFECTING ADL LEFT > RIGHT | KNOWN CASE OF HTN AND IHD",
           examination:
-            "BP 148/86 (volume status euvolaemic) · No pedal oedema · No raised JVP · Chest clear · Pallor present",
-          diagnosis:
-            "**Acute-on-chronic CKD (G3b)** — baseline eGFR was ~52 in Feb, now 38 | Anaemia of chronic kidney disease (Hb 10.8) | Borderline hyperkalaemia",
-          investigations:
-            "Repeat **Serum creatinine + eGFR pre-surgery** (and post-contrast if imaging proceeds) | **Urine ACR + PCR** | Renal USG (already done, NAD) | Iron studies + ferritin for ESA decision",
+            "SPINAL CURVATURE NORMAL. PARASPINAL MUSCLE SPASM PRESENT | MEDIAL JOINT LINE TENDERNESS PRESENT BOTH KNEE | KNEE ROM 0° TO 90° BILATERALLY. TERMINAL RESTRICTION PRESENT | DISTAL NEUROVASCULAR STATUS NORMAL | POWER GRADE V BILATERAL EHL AND EDL. REFLEX IS NORMAL",
           medications:
-            "Continue ACEi at current dose | Start **N-acetylcysteine 600 mg BID × 48 h** around contrast | **Avoid NSAIDs** | Renal-dose review of every current medication done (no changes needed today)",
+            "**CARTIGEN PRO TABLET** (Glucosamine Sulfate Potassium Chloride 1500 mg + Undenatured Collagen Type II 40 mg + Astaxanthin 4 mg) × 1 month | **ULTRACET TABLET** (Acetaminophen 325 mg + Tramadol 37.5 mg) M:1 A:0 E:0 N:1 after food × 15 days · qty 30 | **PANTODAC 40MG TABLET** (Pantoprazole 40 mg) M:1 A:0 E:0 N:1 before food × 15 days · qty 30 | **BACGAB 30GM GEL** (Baclofen 2% + Gabapentin 6% + Lidocaine 5%) — apply after hot fomentation | **CERVICAL COLLAR SOFT (Large) MGRM** | **KNEE CAP**",
           advice:
-            "**Pre + post-contrast hydration protocol** scripted: 1 mL/kg/h NS for 12 h before + 12 h after contrast | Patient counselled to maintain oral intake | Monitor urine output post-op",
-          followUp: "Pre-op morning labs (creatinine + electrolytes) · Joint nephrology + onco-surgery review of clearance",
-          labResults: [
-            { name: "Serum Creatinine", value: "1.6", unit: "mg/dL", flag: "high", refRange: "0.6–1.1 (F)", date: "29 Apr 2026", note: "Up from baseline 1.2 in Feb." },
-            { name: "eGFR", value: "38", unit: "mL/min/1.73 m²", flag: "low", refRange: "≥60 (G2)", date: "29 Apr 2026", note: "CKD G3b." },
-            { name: "Urea (BUN)", value: "48", unit: "mg/dL", flag: "high", refRange: "7–20", date: "29 Apr 2026" },
-            { name: "Serum Potassium", value: "5.2", unit: "mmol/L", flag: "high", refRange: "3.5–5.0", date: "29 Apr 2026", note: "Borderline." },
-            { name: "Haemoglobin", value: "10.8", unit: "g/dL", flag: "low", refRange: "12.0–15.5 (F)", date: "29 Apr 2026" },
-          ],
-          hiddenNormalCount: 9,
+            "HOT FOMENTATION | AVOID WALKING ON UNEVEN SURFACES, SUDDEN JERKY MOVEMENTS | AVOID SQUATTING / CLIMBING STAIRS / CROSS-LEGGED SITTING | AVOID LIFTING HEAVY WEIGHT, SUDDEN FORWARD BENDING, CLIMBING STAIRS, WALKING ON UNEVEN SURFACES | PHYSIOTHERAPY — ULTRASOUND THERAPY CERVICAL AND LUMBOSACRAL",
           additionalNotes:
-            "Nephrology endorses surgery contingent on the hydration protocol being run AND a safer contrast volume cap (≤ 50 mL non-ionic).",
+            "Imaging on file (per followup_advice): MRI suggestive of C3-C4 C4-C5 C5-C6 level disc degeneration with compression. X-RAY both knee AP and lateral suggestive of grade IV arthritic changes bilaterally. vid=9101261 · 6 drug rows.",
+        },
+      ],
+    },
+
+    // ── 7 · Neurology · Dr Hetal Parikh · 1 visit, 1 drug (Gabapin NT) ──
+    {
+      source: { specialty: "Neurology", author: "Dr Hetal Parikh", date: "29 Apr 2026" },
+      reason: "Neurology assessment of left-sided neck pain since Jan 2026 with MRI-confirmed C3-4 + C5-6 nerve root compression. Started on Gabapin NT.",
+      dateRangeLabel: "29 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Hetal Parikh",
+      lines: [
+        "**Findings**: History of neck pain on left side from Jan 2026. No radiating pain to limbs. No gripping difficulty. MRI spine showed C3-4 and C5-6 level disc causing nerve root compression (verbatim symptoms_text). Exam: higher function normal, cranial nerves normal, motor + sensory function normal, deep tendon reflex +2 with flexor plantars, cerebellar signs nil, gait normal, no meningeal irritation.",
+        "**Medications**: **GABAPIN NT 100MG TABLET** (Gabapentin 100 mg + Nortriptyline 10 mg) M:0 A:0 E:0 N:1 after food × 2 months · qty 60 · 'SOS can take twice a day.'",
+        "**Plan**: Neck muscle strengthening exercise (verbatim advice_text). Follow up with advised investigations.",
+      ],
+      consultations: [
+        {
+          date: "29 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Hetal Parikh",
+          headline: "Left-sided neck pain · MRI C3-4 + C5-6 nerve root compression · Gabapin NT started",
+          symptoms:
+            "History of neck pain on left side from Jan 2026. No radiating pain to limbs. No gripping difficulty. MRI spine showed C3-4 and C5-6 level disc causing nerve root compression.",
+          examination:
+            "HIGHER FUNCTION normal · CRANIAL NERVES normal · MOTOR FUNCTION normal · SENSORY FUNCTION normal · DEEP TENDON REFLEX +2, plantars flexor · CEREBELLAR SIGNS nil · Gait normal · SIGNS OF MENINGEAL IRRITATION nil",
+          medications:
+            "**GABAPIN NT 100MG TABLET** (GABAPENTIN-100MG + NORTRIPTYLINE-10MG) — M:0 A:0 E:0 N:1 · after food × 2 months · qty 60 · 'SOS can take twice a day.'",
+          advice: "Neck muscle strengthening exercise",
+          followUp: "Follow up with advised investigations",
+          additionalNotes: "vid=9112094 · 1 drug row.",
+        },
+      ],
+    },
+
+    // ── 8 · Dermatology · Dr Niyati Parikh · 1 visit, 3 drugs (eczematous dermatitis) ──
+    {
+      source: { specialty: "Dermatology", author: "Dr Niyati Parikh", date: "28 Apr 2026" },
+      reason: "Eczematous dermatitis (right leg) per condition_occurrence · 3-item Rx · follow-up 28 May 2026.",
+      dateRangeLabel: "28 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Niyati Parikh",
+      lines: [
+        "**Findings**: Eczematous dermatitis (right leg) per condition_occurrence.",
+        "**Medications**: **UBIL 20MG TABLET** (Bilastine 20 mg) M:1 A:0 E:0 N:1 before food × 20 days · qty 40 | **MOMATE F 15GM CREAM** (Fusidic Acid 2% + Mometasone 0.1%) — apply to affected areas, stop once better | **AVEENO DERMEXA DAILY EMOLLIENT CREAM** (skin care product) — moisturiser all over body, to be continued",
+        "**Plan**: Follow up 28 May 2026.",
+      ],
+      consultations: [
+        {
+          date: "28 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Niyati Parikh",
+          headline: "Dermatology · Bilastine + Mometasone/Fusidic + emollient",
+          diagnosis: "Eczematous dermatitis (right leg) — from condition_occurrence row.",
+          medications:
+            "**UBIL 20MG TABLET** (BILASTINE-20MG) — M:1 A:0 E:0 N:1 · before food × 20 days · qty 40 | **MOMATE F 15GM CREAM** (FUSIDIC ACID-2%W/W + MOMETASONE-0.1%W/W) — 'apply affected areas - STOP once better' | **AVEENO DERMEXA DAILY EMOLLIENT CREAM** (skin care product) — 'moisturiser - all over the body - to be continued'",
+          followUp: "28 May 2026",
+          additionalNotes: "vid=9105170 · 3 drug rows.",
+        },
+      ],
+    },
+
+    // ── 9 · Ophthalmology · Dr Rupal Zumkhawala · routine eye check ──
+    {
+      source: { specialty: "Ophthalmology", author: "Dr RUPAL ZUMKHAWALA", date: "25 Apr 2026" },
+      reason: "Routine eye check · 0 drugs · advised glasses + annual fundus + HTN control.",
+      dateRangeLabel: "25 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Rupal Zumkhawala",
+      lines: [
+        "**Findings**: ROUTINE EYE CHECK UP (verbatim symptoms_text).",
+        "**Plan**: GLASSES FOR DISTANCE AND NEAR · FUNDUS EXAMINATION EVERY 1 YEAR · CONTROL OF HTN (verbatim advice_text).",
+      ],
+      consultations: [
+        {
+          date: "25 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Rupal Zumkhawala",
+          headline: "Routine eye check · glasses + annual fundus + control HTN · 0 drugs",
+          symptoms: "ROUTINE EYE CHECK UP",
+          advice: "GLASSES FOR DISTANCE AND NEAR | FUNDUS EXAMINATION EVERY 1 YEAR | CONTROL OF HTN",
+          additionalNotes: "vid=9067372 · 0 drug rows.",
+        },
+      ],
+    },
+
+    // ── 10 · ENT · Dr Lav Selarka · normal exam, no Rx ──
+    {
+      source: { specialty: "E.N.T.", author: "Dr Lav Selarka", date: "25 Apr 2026" },
+      reason: "ENT pre-op screen · no complaints · all systems normal on exam · 0 drugs.",
+      dateRangeLabel: "25 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Lav Selarka",
+      lines: [
+        "**Findings**: NO ENT COMPLAINTS. Right ear TM intact | Left ear TM intact | Nose clear | Oral cavity clear | Pharynx clear | Neck NAD (verbatim examination_text).",
+        "**Plan**: REVIEW SOS.",
+      ],
+      consultations: [
+        {
+          date: "25 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Lav Selarka",
+          headline: "ENT pre-op screen · all clear · 0 drugs",
+          symptoms: "NO ENT COMPLAINTS",
+          examination:
+            "RIGHT EAR TM INTACT | LEFT EAR TM INTACT | NOSE CLEAR | ORAL CAVITY CLEAR | PHARYNX CLEAR | NECK NAD",
+          advice: "REVIEW SOS",
+          additionalNotes: "vid=9067615 · 0 drug rows.",
+        },
+      ],
+    },
+
+    // ── 11 · Dental · Dr Nancy Joshi · 1 drug (sensitivity toothpaste) ──
+    {
+      source: { specialty: "Dental", author: "Dr Nancy Joshi", date: "25 Apr 2026" },
+      reason: "Dental pre-op screen · general attrition + calculus++ on exam · 1-drug Rx.",
+      dateRangeLabel: "25 Apr '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Nancy Joshi",
+      lines: [
+        "**Findings**: gen attrition  ·  calculus ++ (verbatim examination_text).",
+        "**Medications**: **THERMOSEAL RA 100GM PASTE** (Potassium Nitrate 5% + Sodium Monofluorophosphate 0.7%) M:1 A:0 E:0 N:1.",
+      ],
+      consultations: [
+        {
+          date: "25 Apr 2026",
+          visitType: "OPD",
+          doctor: "Dr Nancy Joshi",
+          headline: "Dental pre-op · attrition + calculus++ · Thermoseal RA",
+          examination: "gen attrition  |  calculus ++",
+          medications: "**THERMOSEAL RA 100GM PASTE** (POTASSIUM NITRATE-5%W/W + SODIUM MONOFLUOROPHOSPHATE-0.7%W/W) — M:1 A:0 E:0 N:1",
+          additionalNotes: "vid=9070215 · 1 drug row.",
+        },
+      ],
+    },
+
+    // ── 12 · Internal Medicine · Dr Vishal Desai · pre-op evaluation, no Rx ──
+    {
+      source: { specialty: "Internal Medicine", author: "Dr Vishal Desai", date: "4 May 2026" },
+      reason: "Pre-op internal-medicine evaluation · 0 drugs · paper attachment referenced as the clearance artifact.",
+      dateRangeLabel: "4 May '26",
+      consultationCount: 1,
+      doctorsLabel: "Dr Vishal Desai",
+      lines: [
+        "**Findings**: Pre Op Evaluation (verbatim symptoms_text).",
+        "**Plan**: Paper attachment (verbatim advice_text).",
+      ],
+      consultations: [
+        {
+          date: "4 May 2026",
+          visitType: "OPD",
+          doctor: "Dr Vishal Desai",
+          headline: "Pre-op internal-medicine clearance · 0 drugs",
+          symptoms: "Pre Op Evaluation",
+          advice: "Paper attachment",
+          additionalNotes: "vid=9176758 · 0 drug rows.",
+        },
+      ],
+    },
+
+    // ── 13 · Nutritionist · Ms Shruti Bhardwaj · 2 visits, 0 drugs ──
+    {
+      source: { specialty: "Nutritionist", author: "Ms Shruti Bhardwaj", date: "28 Apr 2026" },
+      reason: "2 nutritionist visits in the pre-op window · 0 drugs prescribed · no diagnostic observation rows captured.",
+      dateRangeLabel: "27 - 28 Apr '26",
+      consultationCount: 2,
+      doctorsLabel: "Ms Shruti Bhardwaj",
+      lines: [
+        "**Findings**: No diagnostic observation_text rows captured.",
+        "**Plan**: No medications · no detailed advice on file.",
+      ],
+      consultations: [
+        {
+          date: "27 Apr 2026",
+          visitType: "OPD",
+          doctor: "Ms Shruti Bhardwaj",
+          headline: "Nutritionist visit #1 · 0 drugs · no detailed observations",
+          additionalNotes: "vid=9083163 · 0 drug rows.",
+        },
+        {
+          date: "28 Apr 2026",
+          visitType: "OPD",
+          doctor: "Ms Shruti Bhardwaj",
+          headline: "Nutritionist visit #2 · 0 drugs · no detailed observations",
+          additionalNotes: "vid=9100374 · 0 drug rows.",
         },
       ],
     },
   ],
-  collisions: [
-    {
-      kind: "coordination-gap",
-      title: "**Pre-op cardiac fitness in IHD + Severe OSA**, sign-off chain incomplete",
-      points: [
-        "Cardiology last seen 27 Apr; Onco-surgery booking pending.",
-        "OSA airway plan + cardiac functional capacity both unreconciled.",
-        "Surgery cannot proceed safely without these closed.",
-      ],
-      rule: {
-        body: "ASA / DAS",
-        year: "2023",
-        section: "Pre-op CV + airway",
-        readableBody: "American Society of Anesthesiologists + Difficult Airway Society — the joint US standard for pre-operative cardiovascular and airway risk assessment.",
-        description: "Defines the cardiac functional-capacity test and the difficult-airway plan that should be on file before any non-emergency surgery in patients with known IHD or severe OSA.",
-        whyPicked: "Ms Iyer has documented Ischaemic Heart Disease (Cardiology on 27 Apr 2026) AND clinically Severe Obstructive Sleep Apnea (Pulmonology on 29 Apr + 1 May 2026). Her surgical date can't be booked until both teams produce a signed clearance — ASA/DAS makes that pairing mandatory, not optional.",
-        fetches: "Whether the cardiac functional-capacity result is on file, and whether anaesthesia has written a difficult-airway plan.",
-        confidence: "established",
-      },
-    },
-    {
-      kind: "coordination-gap",
-      title: "**CKD before contrast staging imaging**, pre-hydration + nephro-dose review pending",
-      points: [
-        "Nephrology saw 29 Apr; baseline eGFR + ACR not yet resulted.",
-        "Contrast-enhanced CT / PET-CT for staging may follow.",
-        "Hydration + N-acetylcysteine protocol not documented.",
-      ],
-      rule: {
-        body: "KDIGO",
-        year: "2024",
-        section: "§4.3.1",
-        readableBody: "Kidney Disease Improving Global Outcomes — the international nephrology body whose CKD + AKI guidelines are the de-facto global standard.",
-        description: "Defines when an eGFR is low enough that contrast-CT or contrast-MRI shouldn't go ahead without an explicit hydration protocol and a renal-dose review of every concurrent medication.",
-        whyPicked: "Ms Iyer's eGFR dropped to 38 mL/min/1.73 m² on 29 Apr 2026 (was 52 in Feb) — CKD G3b with an acute-on-chronic insult. Her oncology pathway may need contrast staging imaging next, and KDIGO §4.3.1 mandates the pre + post-contrast hydration protocol and the renal-dose review before that proceeds.",
-        fetches: "Whether her latest eGFR meets the CKD threshold for contrast-AKI prevention, and whether the hydration protocol is scripted.",
-        confidence: "established",
-      },
-    },
-  ],
-  pendingMdtItems: [
-    "Surgery date, pending clearance from Cardio + Nephro + Pulmo.",
-    "Confirm allergy status before pre-op antibiotics.",
-    "Baseline eGFR + ACR results needed for contrast risk.",
-    "CPAP titration record before anaesthesia.",
-  ],
-  syntheses: [
-    {
-      panelTitle: "NCCN breast-cancer surveillance setup",
-      guideline: {
-        body: "NCCN",
-        year: "2024",
-        readableBody: "National Comprehensive Cancer Network — the standard US oncology guideline body, widely followed in Indian oncology practice too.",
-        description: "Sets the standard pathway for early-stage breast-cancer staging, surgical sequencing, and adjuvant-therapy decision logic.",
-        whyPicked: "Ms Iyer has pT1cN0 stage IA invasive ductal carcinoma confirmed on biopsy and imaging — NCCN Breast Cancer protocol explicitly covers this exact stage with a surgery-first pathway and an adjuvant decision deferred to post-resection pathology.",
-        fetches: "Her assigned stage, the surgical-date status, and the adjuvant decision-point downstream.",
-        confidence: "established",
-      },
-      rows: [
-        { label: "Stage", value: "IA (T1cN0)", ref: "From oncology condition rows on 11-12 May 2026.", tone: "ok" },
-        { label: "Surgical date", value: "Pending", ref: "No booking row in visit_occurrence.", tone: "warn" },
-        { label: "Adjuvant pathway", value: "Awaiting pathology", ref: "Decision deferred to post-resection.", tone: "ok" },
-      ],
-      note: "Standard NCCN T1cN0 pathway, surgery first, adjuvant decision post-pathology.",
-    },
-  ],
-  freshness: "Synced just now",
+  collisions: [],
+  pendingMdtItems: [],
+  syntheses: [],
+  freshness: "OMOP-synced · verbatim from drug_exposure + observation rows · last refresh just now",
 }
-
 // ═════════════════════════════════════════════════════════════════════════
 // ASHA_KRISHNAN_BRIEF_MOCK  ·  P3 · person_id 375391871728 · F · 57
 // ─────────────────────────────────────────────────────────────────────────
@@ -3350,8 +3381,8 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
   // brief.
   if (isCrossConsult || m.includes("lakshmi") || m.includes("iyer") || m.includes("1093717054960")) {
     return {
-      text: "Here's the cross-consultation brief. **21 OPD visits** across **5 specialties** in a **17-day pre-op burst**, **right breast Ca stage IA**; cardiac, OSA, and CKD clearances pending.",
-      loadingHint: "Reading 5 specialty streams…",
+      text: "Here's the cross-consultation brief. **21 visits across 16 providers (12 specialties)** in a **17-day window** (25 Apr - 12 May 2026). Right breast cancer on **Letrozole + Denosumab + Ca/Vit D** (Dr Tahiliani, 12 May); oncologist's note records advanced-stage disease, **1-year review** scheduled.",
+      loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1200,
       suggestions: subSuggestionsFor("mdt_brief"),
       rxOutput: { kind: "velora_v0_mdt_brief", data: LAKSHMI_IYER_BRIEF_MOCK },

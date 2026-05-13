@@ -60,7 +60,9 @@ function tokenise(input: string): Run[] {
 }
 
 function PipeDivider() {
-  return <span className="mx-[6px] text-tp-slate-200">|</span>
+  // Lighter divider — slate-100 keeps the pipe legible but recedes visually
+  // so the items it separates carry the eye instead of the glyph.
+  return <span className="mx-[7px] text-tp-slate-100">|</span>
 }
 
 function PlainRun({ text }: { text: string }) {

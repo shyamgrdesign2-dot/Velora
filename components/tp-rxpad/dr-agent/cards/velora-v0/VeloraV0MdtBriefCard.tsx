@@ -435,9 +435,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   tinted chip sits inline at the start (mr-[6px] gap to the
                   text), the joined item text flows after it and wraps below
                   naturally. No standalone row, no bullet dot — the chip IS
-                  the visual anchor. Saves vertical real estate, makes the
-                  card feel one continuous summary instead of a flex-grid. */}
-              <div className="flex flex-col gap-[6px] pl-[2px]">
+                  the visual anchor. Gap between paragraphs deliberately
+                  generous so the four sub-sections read as separate blocks
+                  rather than running together. */}
+              <div className="flex flex-col gap-[12px] pl-[2px]">
                 {data.medicalHistory.map((group, gi) => {
                   // Join items with " | ". HighlightLine renders the pipes
                   // as styled PipeDivider glyphs (slate-200 vertical bar).
@@ -491,7 +492,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   (The provenance paragraph that used to live above this body
                   is gone — its date-range / doctor / count content now lives
                   in the section heading's trailing slot.) */}
-              <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[5px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
+              <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined} className="flex flex-col gap-[10px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
                 {rec.lines.map((line, i) => {
                   const labelMatch = line.match(/^\*\*([^*]+)\*\*:\s*(.*)$/)
                   const label = labelMatch?.[1]

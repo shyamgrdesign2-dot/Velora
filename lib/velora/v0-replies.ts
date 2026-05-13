@@ -1348,12 +1348,12 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
         { text: "**Decompensated chronic liver disease** (ascites and cholestasis on the IPD admission)" },
       ],
       sources: [
-        { doctor: "Dr Provider 11764 (Hepatology, IPD admission)", date: "24 Feb 2026" },
-        { doctor: "Dr Provider 11764 (Hepatology, Discharge)", date: "26 Feb 2026" },
-        { doctor: "Dr Provider 11764 (Hepatology, OPD follow-up)", date: "3 Mar 2026" },
-        { doctor: "Dr Provider 11764 (Hepatology, OPD follow-up)", date: "10 Mar 2026" },
-        { doctor: "Dr Provider 19580 (Co-consultation)", date: "10 Mar 2026" },
-        { doctor: "Dr Provider 11764 (Hepatology, OPD follow-up)", date: "25 Mar 2026" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology, IPD admission)", date: "24 Feb 2026" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology, Discharge)", date: "26 Feb 2026" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "3 Mar 2026" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "10 Mar 2026" },
+        { doctor: "Dr Sejal Shah (Ophthalmology, KF-ring assessment)", date: "10 Mar 2026" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology, OPD follow-up)", date: "25 Mar 2026" },
       ],
       reasoning:
         "13 consultation records tagged HAV IgM POSITIVE across the IPD admission and 5 OPD follow-ups. Wilson's disease is inferred from the Cilamin (Penicillamine) plus Zinfate (Zinc) regimen, the classic chelation-plus-anti-absorption combination. The combination of Wilson's and acute HAV in a 14-year-old is what tipped the patient into hepatic decompensation requiring admission.",
@@ -1363,7 +1363,7 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       tone: "neutral",
       items: [{ text: "**Hypothyroidism** (on Thyroxine 125 mcg once daily)" }],
       sources: [
-        { doctor: "Dr Provider 11764 (Hepatology)", date: "across all visits" },
+        { doctor: "Dr Ajay Choksey (Gastroenterology)", date: "across all visits" },
       ],
       reasoning:
         "13 consultation records tagged HYPOTHYROIDISM as Active. On stable Thyroxine 125 mcg replacement; not the driver of the admission but relevant for chronic-care continuity.",
@@ -1387,11 +1387,11 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
   windowDays: 29,
   specialties: [
     {
-      source: { specialty: "Hepatology · IPD admission", author: "Dr Provider 11764", date: "24-26 Feb 2026" },
-      reason: "The index admission. 3-day stay with full discharge summary content available.",
+      source: { specialty: "Gastroenterology · IPD admission", author: "Dr Ajay Choksey", date: "24-26 Feb 2026" },
+      reason: "The index admission. 3-day stay managed by the hepatology arm of Gastroenterology.",
       dateRangeLabel: "24 → 26 Feb '26 (IPD)",
       consultationCount: 1,
-      doctorsLabel: "Dr Provider 11764",
+      doctorsLabel: "Dr Ajay Choksey",
       lines: [
         "**Findings**: H/O **jaundice** | **fever** | **abdominal pain** | burning micturition | decreased oral intake | **itching over body × 1-1.5 months** | HAV IgM positive on admission",
         "**Medications**: **Wysolone 10 mg** (Prednisolone, taper started) | **Cilamin 250 mg** (Penicillamine) | **Zinfate** (Zinc) | **Ursocol 300** (UDCA) | **Hepamerz sachet** (L-ornithine L-aspartate) | **Aldactone 25** (Spironolactone for ascites) | **Looz syrup** (Lactulose for HE prophylaxis) | **Thyrox 125 mcg** continued",
@@ -1404,11 +1404,11 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       ],
     },
     {
-      source: { specialty: "Hepatology · OPD follow-up series", author: "Dr Provider 11764", date: "25 Mar 2026" },
+      source: { specialty: "Gastroenterology · OPD follow-up series", author: "Dr Ajay Choksey", date: "25 Mar 2026" },
       reason: "Post-discharge surveillance, five reviews over the month after admission.",
       dateRangeLabel: "24 Feb → 25 Mar '26",
       consultationCount: 5,
-      doctorsLabel: "Dr Provider 11764",
+      doctorsLabel: "Dr Ajay Choksey",
       lines: [
         "**Findings**: Serial LFT monitoring across 5 visits | Bilirubin Total + Direct + Indirect + SGPT/ALT trended at every visit | clinical recovery, discharge condition documented as 'BETTER'",
         "**Medications (ongoing)**: **Cilamin 250 mg** | **Zinfate** | **Wysolone** taper schedule | **Ursocol 300** | **Folimax D3 Forte** | **Nusam 400** (SAMe) | **Hepamerz** | **ProHance LIV** | **Ostocalcium** | **Pregaba 50** (neuropathic component) | **Thyrox 125 mcg**",
@@ -1422,18 +1422,18 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
       ],
     },
     {
-      source: { specialty: "Co-consultation", author: "Dr Provider 19580", date: "10 Mar 2026" },
-      reason: "Single co-consultation during one OPD visit, specialty not resolved from the export.",
+      source: { specialty: "Ophthalmology · Kayser-Fleischer ring assessment", author: "Dr Sejal Shah", date: "10 Mar 2026" },
+      reason: "Wilson's disease slit-lamp screening for KF rings. The classic ocular sign of copper deposition and a routine part of Wilson's workup.",
       dateRangeLabel: "10 Mar '26",
       consultationCount: 1,
-      doctorsLabel: "Dr Provider 19580",
+      doctorsLabel: "Dr Sejal Shah",
       lines: [
-        "**Findings**: Specialty not resolved (provider table not in export)",
-        "**Plan**: Likely cross-team opinion during an OPD review, content not surfaced in structured data",
+        "**Findings**: Slit-lamp examination for **Kayser-Fleischer ring** (Wilson's-related copper deposition in Descemet's membrane). Result narrative not captured in structured data.",
+        "**Plan**: Result feeds back into Gastroenterology's chelation-monitoring loop. Repeat slit-lamp annually until KF ring resolves on adequate chelation.",
       ],
       openLoops: [
-        "**Provider → specialty lookup** missing for this provider",
-        "**Co-consultation reason** not in `observation` rows",
+        "KF-ring presence or absence not in structured data (only the visit fact is recorded)",
+        "Slit-lamp photo / report not on file",
       ],
     },
   ],

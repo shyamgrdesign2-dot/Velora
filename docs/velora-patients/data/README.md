@@ -21,6 +21,23 @@ standard 6-8 CSV files emitted by the source ETL (`person`,
 2. **Drift detection.** When the data team re-exports a patient, dropping the new archive here and comparing against the previous version reveals exactly what changed. The cross-verification record lives in [`CROSS-VERIFICATION.md`](../CROSS-VERIFICATION.md).
 3. **Single source of truth.** All Velora documentation references these archives directly — no copies floating around the user's desktop.
 
+## Provider lookup
+
+`provider.csv` is the OMOP `provider` table for the source hospital — the
+authoritative `provider_id → provider_name + specialty` map. Use this to
+resolve any numeric provider IDs that appear in a patient's
+`visit_occurrence.provider_id` column. Schema follows the OMOP CDM v5.4
+`provider` table.
+
+When the OMOP export for a patient doesn't ship the provider table inline
+(none of the patient archives currently do), this is the file to join
+against. Example:
+
+```bash
+awk -F',' 'NR==1 || $1==11764' docs/velora-patients/data/provider.csv
+# → 11764,Dr Ajay Choksey,…,Gastroenterology,…
+```
+
 ## File-naming convention
 
 `P{position-in-catalogue}-{anonymised-name-kebab}-{person_id}.zip`

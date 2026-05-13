@@ -1,0 +1,313 @@
+provider_id,provider_name,npi,dea,specialty_concept_id,care_site_id,year_of_birth,gender_concept_id,provider_source_value,specialty_source_value,specialty_source_concept_id,gender_source_value,gender_source_concept_id
+1157,Dr Vishal Desai,G-53001,,0,,,0,UM_1157,Internal Medicine,14,,0
+11765,DR KAMAL GOPLANI,,,0,,,0,UM_11765,Nephrology,30,,0
+11766,Dr Kalpesh Talati / Dr Rushikesh Shah,G44247,,0,,,0,UM_11766,Diabetology,111,,0
+11767,Dr manohar chari,G26744,,0,,,0,UM_11767,Oncology,21,,0
+11768,Dr DIPEN PATEL,,,0,,,0,UM_11768,Onco-surgery,22,,0
+11769,Dr Supreet Bhatt,,,0,,,0,UM_11769,Onco-surgery,22,,0
+11770,Dr Nidhi Jain,2006/04/2048,,0,,,0,UM_11770,Hemato-oncology,33,,0
+12020,DR.VISHAL SONI,,,0,,,0,UM_12020,Gastroenterology,18,,0
+12022,Dr RAMAN PATEL,G-7130,,0,,,0,UM_12022,Gynaecology,8,,0
+12023,Dr TEJAS THAKKER,,,0,,,0,UM_12023,Orthopaedics,7,,0
+12024,Dr DIPAK D PATEL,,,0,,,0,UM_12024,Neurosurgery,20,,0
+12026,Dr ARVIND SHARMA,,,0,,,0,UM_12026,Neurology,10,,0
+12028,Dr NIRAJ VASAVADA,,,0,,,0,UM_12028,Spine Surgeon,127,,0
+12029,Dr RIDDHI J SHAH,,,0,,,0,UM_12029,Gynaecology,8,,0
+12095,Dr Ankit Mehta,,,0,,,0,UM_12095,Paediatrics,9,,0
+12437,DR KALPESH SHAH / DR.YAGNESHKUMAR SAIJA,,,0,,,0,UM_12437,Neurosurgery,20,,0
+12438,Dr Tejas Modi,G37544,,0,,,0,UM_12438,Gastroenterology,18,,0
+12547,Dr Lav Selarka,G14608,,0,,,0,UM_12547,E.N.T.,19,,0
+12695,Dr Navneet Shah,G-1301,,0,,,0,UM_12695,Internal Medicine,14,,0
+12696,Dr Abhisheka Tripathi,,,0,,,0,UM_12696,Cardiology,31,,0
+12774,Dr Hardik Kotecha,G15287,,0,,,0,UM_12774,Gastroenterology,18,,0
+14730,Dr Kunal Chandwar,53682,,0,,,0,UM_14730,Clinical Immunology and Rheumatology,118,,0
+14751,Dr Monark Shah,G-29897,,0,,,0,UM_14751,E.N.T.,19,,0
+14752,Dr Avadh Vithlani,,,0,,,0,UM_14752,Pulmonology,37,,0
+14753,Dr Nikhil Dave,G-40233,,0,,,0,UM_14753,Neurology,10,,0
+14754,Dr Maulik Patwa,,,0,,,0,UM_14754,Orthopaedics,7,,0
+14755,Dr Shivang Sharma,G-28181,,0,,,0,UM_14755,Infectious diseases,32,,0
+14756,Dr Mayank Gurjar,G-45137,,0,,,0,UM_14756,Gastroenterology,18,,0
+14757,Dr Kamlesh Patel,G19986,,0,,,0,UM_14757,Urology,11,,0
+14981,Dr Siddharth Shah,,,0,,,0,UM_14981,Onco-surgery,22,,0
+14982,Dr. Raj Patel,,,0,,,0,UM_14982,Oncology,21,,0
+14983,Dr Mona Shah,,,0,,,0,UM_14983,Gynaecology,8,,0
+15013,Dr Akanksha Garg,DMC/R/05189,,0,,,0,UM_15013,Hemato-oncology,33,,0
+15014,Dr Nahush Tahiliani,G-27414,,0,,,0,UM_15014,Oncology,21,,0
+15239,Dr Priyanka Chiripal,,,0,,,0,UM_15239,Onco-surgery,22,,0
+15247,Dr Sandeep jain,,,0,,,0,UM_15247,Oncology,21,,0
+15363,Dr Bhavin Patel,,,0,,,0,UM_15363,Gastroenterology,18,,0
+15773,Dr Dinesh Saini,,,0,,,0,UM_15773,Neurology,10,,0
+16124,Dr Harshil Patel,,,0,,,0,UM_16124,Paediatrics,9,,0
+16168,Dr Hitesh Modi,,,0,,,0,UM_16168,Spine Surgeon,127,,0
+16217,Dr Ruchi Shah,,,0,,,0,UM_16217,Dental,26,,0
+16218,Dr Bhavesh Roy,,,0,,,0,UM_16218,Cardiology,31,,0
+16219,Dr Rajesh Desai,,,0,,,0,UM_16219,Cardiology,31,,0
+16242,Dr Yatin Desai,,,0,,,0,UM_16242,Orthopaedics,7,,0
+16243,Dr Dhaivat Vaishnav,G 37117,,0,,,0,UM_16243,Gastroenterology,18,,0
+16244,Dr Kaustubh Patel,,,0,,,0,UM_16244,Urology,11,,0
+16245,Dr Vivek Iyer,,,0,,,0,UM_16245,Paediatrics,9,,0
+16246,Dr Namita Shah,,,0,,,0,UM_16246,Gynaecology,8,,0
+16248,Dr Satish Patel,30200,,0,,,0,UM_16248,Orthopaedics,7,,0
+16249,Dr Samir Nanavati,,,0,,,0,UM_16249,Orthopaedics,7,,0
+16441,Dr Ava Desai,,,0,,,0,UM_16441,Gynaecology,8,,0
+16442,Dr Mahesh D Patel/ Dr S. Das,,,0,,,0,UM_16442,Onco-surgery,22,,0
+16443,Dr PANKAJ SHAH /Dr MITHUN SHAH,G36266,,0,,,0,UM_16443,Oncology,21,,0
+16473,Ms Shruti Bhardwaj,,,0,,,0,UM_16473,Nutritionist,103,,0
+16585,Dr Sunil Thanvi,G-8321,,0,,,0,UM_16585,Cardiology,31,,0
+16586,Dr Girish Amlani,G15502,,0,,,0,UM_16586,Plastic Surgery,109,,0
+16587,Dr Asha Shah,,,0,,,0,UM_16587,Internal Medicine,14,,0
+16588,Dr. Pranav Nanavaty /Dr.Tapan Kotadia,G18698,,0,,,0,UM_16588,Internal Medicine,14,,0
+16589,Dr Reitu Patel,G-34360,,0,,,0,UM_16589,Gynaecology,8,,0
+16639,Dr Niraj Yadav,,,0,,,0,UM_16639,Cardiology,31,,0
+16656,Dr Dhwani R Shah,,,0,,,0,UM_16656,Dermatology,16,,0
+16688,Dr Sunny Gandhi,,,0,,,0,UM_16688,Oncology,21,,0
+16693,Dr Pooja Vashishth Patel,,,0,,,0,UM_16693,Oncology,21,,0
+16755,Dr Sandeep Agarwala,,,0,,,0,UM_16755,Cardiology,31,,0
+16760,Dr Raghuvir Solanki / Dr. Jatinkumar Bhojani,,,0,,,0,UM_16760,Onco-surgery,22,,0
+16847,Dr Manoj Singh,G-28315,,0,,,0,UM_16847,Pulmonology and Critical Care,126,,0
+16898,Dr V. N. Shah,,,0,,,0,UM_16898,Diabetology,111,,0
+17242,Dr Simmy,,,0,,,0,UM_17242,Gynaecology,8,,0
+17248,Dr DIPAK DANTARA,G3390,,0,,,0,UM_17248,Diabetology,111,,0
+17533,Dr Prakash Darji,,,0,,,0,UM_17533,Nephrology,30,,0
+17964,Dr Hetal Parikh,,,0,,,0,UM_17964,Neurology,10,,0
+18547,Jasmin Shah,,,0,,,0,UM_18547,,0,,0
+18933,Dr Bhargesh Patel,,,0,,,0,UM_18933,Neurology,10,,0
+32539,Dr Bhavya Shroff,,,0,,,0,UM_32539,Paediatrics,9,,0
+16883,Kavita Tiwari,,,0,,,0,UM_16883,,0,,0
+18934,Dr Milan Mehta,,,0,,,0,UM_18934,Pain Specialist,25,,0
+18935,Dr Niyati Parikh,G-22992,,0,,,0,UM_18935,Dermatology,16,,0
+18937,Dr Divyesh Dadhania,G-47500,,0,,,0,UM_18937,Radiology,23,,0
+18938,Dr Saketh Rao,G – 31101,,0,,,0,UM_18938,Radiology,23,,0
+18993,Dr Archit Joshi,G-42254,,0,,,0,UM_18993,Oncology,21,,0
+19009,Dr Pratibha Dileep,,,0,,,0,UM_19009,Critical Medicine,107,,0
+19425,Dr Ajit Sowani,,,0,,,0,UM_19425,Neurology,10,,0
+19426,Dr Prachi Parth Desai,,,0,,,0,UM_19426,Dental,26,,0
+19427,Dr SUNIL MEHTA,G14120,,0,,,0,UM_19427,Internal Medicine,14,,0
+19429,Dr Mukesh Patel,,,0,,,0,UM_19429,Urology,11,,0
+19430,Dr Himanshu Patel,G-18563,,0,,,0,UM_19430,Nephrology,30,,0
+19431,Dr Devang Patwari,G23679,,0,,,0,UM_19431,Nephrology,30,,0
+19432,Dr Nilay Mehta,,,0,,,0,UM_19432,Gastroenterology,18,,0
+19433,Dr Shailendra Singh,,,0,,,0,UM_19433,Plastic Surgery,109,,0
+19434,Dr Krunal Gohil,,,0,,,0,UM_19434,Vascular Surgeon,115,,0
+19436,Dr Vishal Waghmare,,,0,,,0,UM_19436,Critical Medicine,107,,0
+19439,Dr Anita Srinivasan,,,0,,,0,UM_19439,Neonatology,122,,0
+19440,Dr Anand Khakhar,,,0,,,0,UM_19440,Transplant Surgery,123,,0
+19458,Dr Rushikesh shah,,,0,,,0,UM_19458,Diabetology,111,,0
+19579,Dr RUPAL ZUMKHAWALA,,,0,,,0,UM_19579,Ophthalmology,17,,0
+19580,Dr SEJAL SHAH,,,0,,,0,UM_19580,Ophthalmology,17,,0
+20772,Dr Dhara Girish Pandya,,,0,,,0,UM_20772,Onco-surgery,22,,0
+19437,Dr Bikas Mishra,,,0,,,0,UM_19437,Critical Medicine,107,,0
+20850,Dr Harshkumar Patel,,,0,,,0,UM_20850,Paediatrics,9,,0
+20952,Dr Shweta Thakkar,,,0,,,0,UM_20952,Radiology,23,,0
+20953,Dr Amee Panchal,,,0,,,0,UM_20953,Radiology,23,,0
+20954,Dr Jaimin Babaria,,,0,,,0,UM_20954,Radiology,23,,0
+20955,Dr Urvashi Gohil,,,0,,,0,UM_20955,Radiology,23,,0
+21044,Dr EMR TEST,,,0,,,0,UM_21044,Oncology,21,,0
+19767,Dr Vandit Desai,,,0,,,0,UM_19767,Gastroenterology,18,,0
+21152,Ground floor OPD,,,0,,,0,UM_21152,Oncology,21,,0
+21153,1st floor OPD,,,0,,,0,UM_21153,Oncology,21,,0
+21154,Basement Radiation OPD,,,0,,,0,UM_21154,Oncology,21,,0
+21184,Dr MAHESH H PATEL,,,0,,,0,UM_21184,Onco-surgery,22,,0
+21379,Dr. Gaurav Goswami,,,0,,,0,UM_21379,Radiology,23,,0
+21469,Dr Bijal Parikh,,,0,,,0,UM_21469,Plastic Surgery,109,,0
+21534,Dr Chintan Dhebar,,,0,,,0,UM_21534,Critical Care,125,,0
+22111,Dr Taral Parikh,G 38136,,0,,,0,UM_22111,Rheumatology,29,,0
+22115,DR VISHWA MOHAN THAKUR,,,0,,,0,UM_22115,Psychiatry,6,,0
+22116,DR KETAN K PATEL,,,0,,,0,UM_22116,Infectious diseases,32,,0
+23136,DR. DEEP PATEL,,,0,,,0,UM_23136,General Surgery,13,,0
+23137,DR. KEYUR SHAH,,,0,,,0,UM_23137,Internal Medicine,14,,0
+23138,DR. JIGAR PATEL,,,0,,,0,UM_23138,Nephrology,30,,0
+23139,DR. CHATURBHUJ RATHORE,,,0,,,0,UM_23139,Neurology,10,,0
+23140,DR. TUSHAR MANKAD,,,0,,,0,UM_23140,Orthopaedics,7,,0
+23141,Dr. KARTIK KUMAR PUROHIT,,,0,,,0,UM_23141,Hematologist,112,,0
+23142,DR. GURU PRASAD MOHANTY,,,0,,,0,UM_23142,Oncology,21,,0
+23143,DR. SANJAY SONI,,,0,,,0,UM_23143,Orthopaedics,7,,0
+23144,DR. KAUSHIK RANA,,,0,,,0,UM_23144,Neurology,10,,0
+23146,DR. RAHUL SHAH,,,0,,,0,UM_23146,Onco-surgery,22,,0
+23147,DR. PRUTHA PATEL,,,0,,,0,UM_23147,Oncology,21,,0
+23148,Dr. NIRAV PATEL,,,0,,,0,UM_23148,Internal Medicine,14,,0
+23149,DR. BHAGWATI SALGOTRA,,,0,,,0,UM_23149,Neurosurgery,20,,0
+23150,DR.AESHHA BATHVAR,,,0,,,0,UM_23150,Paediatrics,9,,0
+23151,DR. JATIN AGRAWAL,,,0,,,0,UM_23151,Gastroenterology,18,,0
+23152,DR. RUCHIR GOHIL,,,0,,,0,UM_23152,Gastroenterology,18,,0
+23153,Dr. YATIN JOSHI,,,0,,,0,UM_23153,Pulmonology,37,,0
+23154,DR. MIHIR DHOLAKIA,,,0,,,0,UM_23154,Orthopaedics,7,,0
+23157,Dr. MANAN MUKUNDLAL SHAH,29583,,0,,,0,UM_23157,Onco-surgery,22,,0
+23158,Dr. AMIT CHADHA,24706,,0,,,0,UM_23158,Urology,11,,0
+23159,Dr. JATIN DESAI,24715,,0,,,0,UM_23159,Onco-surgery,22,,0
+23160,Dr. RESHMI BANERJEE,30268,,0,,,0,UM_23160,Gynaecology,8,,0
+23163,Dr. HITESH GANGANI,26312,,0,,,0,UM_23163,E.N.T.,19,,0
+23164,Dr. PRACHI SABNIS,26102,,0,,,0,UM_23164,Gynaecology,8,,0
+23165,Dr. SAMEER MEHTA,32130,,0,,,0,UM_23165,General Surgery,13,,0
+23166,Dr. MRUGESH DESAI,30330,,0,,,0,UM_23166,Pulmonology,37,,0
+23169,Dr. HARESH THUMMAR,26160,,0,,,0,UM_23169,Urology,11,,0
+23171,Dr. NITIN PATEL,24711,,0,,,0,UM_23171,General Surgery,13,,0
+23172,Dr. SUHAS SADASHIV LELE,24702,,0,,,0,UM_23172,Cardiology,31,,0
+23173,Dr. TYRONE FERNANDES,24714,,0,,,0,UM_23173,Internal Medicine,14,,0
+23175,Mr Webson Baby,,,0,,,0,UM_23175,,0,,0
+23194,Dr. ANKITA PATEL,,,0,,,0,UM_23194,Internal Medicine,14,,0
+23228,Lavanya Kumar,,,0,,,0,UM_23228,,0,,0
+19438,Dr. Sangeeta Rewatkar,,,0,,,0,UM_19438,Health Check Up,124,,0
+32575,Dr Aayushi Shah,,,0,,,0,UM_32575,Dental,26,,0
+23167,Dr. NEENU ALEXANDER,28660,,0,,,0,UM_23167,Neurology,10,,0
+23168,Dr. MAHIMA CHHAJER,24701,,0,,,0,UM_23168,Cardiology,31,,0
+23472,Dr. ROHIT REBELLO,,,0,,,0,UM_23472,Oncology,21,,0
+23653,MALAY SHAH,,,0,,,0,UM_23653,,0,,0
+23699,Reny,123456,,0,,,0,UM_23699,Gynaecology,8,,0
+23700,Renu,123456,,0,,,0,UM_23700,Dermatology,16,,0
+24261,Harshil Shah,,,0,,,0,UM_24261,,0,,0
+24487,DR ASHISH SONEJI,,,0,,,0,UM_24487,Critical Care,125,,0
+24620,DR LOMA   PARIKH,,,0,,,0,UM_24620,,0,,0
+24744,Dr Payal Shah,,,0,,,0,UM_24744,Endocrinology,28,,0
+24971,Receptionist,,,0,,,0,UM_24971,Gynaecology,8,,0
+25077,Dr Piyush Doshi,,,0,,,0,UM_25077,Plastic Surgery,109,,0
+25340,DR NEEL THAKKAR,,,0,,,0,UM_25340,Pulmonology,37,,0
+25766,DR UPENDRA PATEL,,,0,,,0,UM_25766,Internal Medicine,14,,0
+25980,DR VISMIT JOSHIPURA,,,0,,,0,UM_25980,Surgical Gastroenterology,128,,0
+25981,DR SURIL VITHLANI,,,0,,,0,UM_25981,Surgical Gastroenterology,128,,0
+25982,DR AMIT SHAH,,,0,,,0,UM_25982,Surgical Gastroenterology,128,,0
+26005,Dr Amit Damodariya,,,0,,,0,UM_26005,Ayurveda,120,,0
+26045,viralba,,,0,,,0,UM_26045,Health Check Up,124,,0
+26047,Disha Shyara,,,0,,,0,UM_26047,Health Check Up,124,,0
+26066,Permal Shah,,,0,,,0,UM_26066,Health Check Up,124,,0
+26067,Ashish Patel,,,0,,,0,UM_26067,Health Check Up,124,,0
+26068,Leena Oza,,,0,,,0,UM_26068,Health Check Up,124,,0
+26070,Dhruvika Bagdai,,,0,,,0,UM_26070,Health Check Up,124,,0
+26071,Krishna Trivedi,,,0,,,0,UM_26071,Health Check Up,124,,0
+26072,Razaabbas Momin,,,0,,,0,UM_26072,Health Check Up,124,,0
+26963,Dr. VIVEK KAKKAD,,,0,,,0,UM_26963,Gynaecology,8,,0
+27001,Prajol Vyas,,,0,,,0,UM_27001,Health Check Up,124,,0
+27287,EMR MT,,,0,,,0,UM_27287,,0,,0
+27510,Dr. YATIN DESAI / Dr.VIVEK JADAWALA,,,0,,,0,UM_27510,Orthopaedics,7,,0
+27700,Prashant patel,,,0,,,0,UM_27700,,0,,0
+28027,Dr RAJIV PALIWAL,,,0,,,0,UM_28027,Pulmonology,37,,0
+28028,Dr DARPAN GANDHI,,,0,,,0,UM_28028,Pulmonology,37,,0
+28029,Dr VILKESH BHIKHA PATEL,,,0,,,0,UM_28029,Orthopaedics,7,,0
+28031,JIMMYKUMAR MUKESHBHAI PATEL,,,0,,,0,UM_28031,Gastroenterology,18,,0
+28032,SIDDHARTH DIPAKBHAI MISTRY,,,0,,,0,UM_28032,Neurosurgery,20,,0
+28033,Dr Rutvik Trivedi,G12996,,0,,,0,UM_28033,Cardiology,31,,0
+28034,Dr DHVANI JATINKUMAR SHAH,,,0,,,0,UM_28034,E.N.T.,19,,0
+28035,Dr BHOOSHAN DODIA,,,0,,,0,UM_28035,Urology,11,,0
+28036,Dr RAUSHAN RANJAN,,,0,,,0,UM_28036,Cardiology,31,,0
+28038,Dr Priyank Patel,mrc_certificate,,0,,,0,UM_28038,Neurology,10,,0
+28088,BIJU THANKAPPAN,,,0,,,0,UM_28088,,0,,0
+28368,Dr Nancy Joshi,,,0,,,0,UM_28368,Dental,26,,0
+28579,Dr VENKAT BANERJEE,,,0,,,0,UM_28579,Orthopaedics,7,,0
+28581,Dr YOGESHKUMAR SHUKLA,,,0,,,0,UM_28581,Cardiology,31,,0
+28584,Dr MEHUL PRAJAPATI,,,0,,,0,UM_28584,Internal Medicine,14,,0
+28585,Dr SUJA GHOGHARA,,,0,,,0,UM_28585,Internal Medicine,14,,0
+28586,DR VIREN SHAH,G-3924,,0,,,0,UM_28586,Internal Medicine,14,,0
+28589,Dr SACHIN UDWANI,,,0,,,0,UM_28589,Neurology,10,,0
+28590,Dr Vivek  Parikh,,,0,,,0,UM_28590,Paediatrics,9,,0
+28592,Dr Maulik Shah,G 34863,,0,,,0,UM_28592,Nephrology,30,,0
+28595,Dr ARPIT JOSHI,,,0,,,0,UM_28595,Neurosurgery,20,,0
+28596,Dr JIGNESH RATHOD,,,0,,,0,UM_28596,General Surgery,13,,0
+28597,Dr NEET LAKHANI,,,0,,,0,UM_28597,Internal Medicine,14,,0
+28599,Dr BHUMI CHAUHAN,,,0,,,0,UM_28599,Dental,26,,0
+28601,Dr PRINA BHAVSAR,,,0,,,0,UM_28601,Ophthalmology,17,,0
+28665,Dr Raj Changela,,,0,,,0,UM_28665,General/ Family Physician,110,,0
+28692,Pinkal,,,0,,,0,UM_28692,,0,,0
+28884,Hardik Modi,,,0,,,0,UM_28884,Health Check Up,124,,0
+28887,Kaushal Bhatt,,,0,,,0,UM_28887,Health Check Up,124,,0
+28890,Hiral Maliwad,,,0,,,0,UM_28890,Health Check Up,124,,0
+28946,Dr Prachi,,,0,,,0,UM_28946,,0,,0
+29153,Bhargav Barot,,,0,,,0,UM_29153,Health Check Up,124,,0
+29155,Shruti Rangani,,,0,,,0,UM_29155,Health Check Up,124,,0
+29156,Vishal Kansara,,,0,,,0,UM_29156,Health Check Up,124,,0
+29157,Vijaykumar Sharma,,,0,,,0,UM_29157,Health Check Up,124,,0
+29158,Hemaxi Bhatt,,,0,,,0,UM_29158,Health Check Up,124,,0
+29159,Sona Kobad,,,0,,,0,UM_29159,Health Check Up,124,,0
+29161,Virendra Khant,,,0,,,0,UM_29161,Health Check Up,124,,0
+29162,Avani Doshi,,,0,,,0,UM_29162,Health Check Up,124,,0
+29176,Kishan Panchal,,,0,,,0,UM_29176,Health Check Up,124,,0
+29177,Nikita Damor,,,0,,,0,UM_29177,Health Check Up,124,,0
+29178,Pratik Bagadia,,,0,,,0,UM_29178,Health Check Up,124,,0
+29179,Vatsal Vaidya,,,0,,,0,UM_29179,Health Check Up,124,,0
+29180,Nitesh Makvana,,,0,,,0,UM_29180,Health Check Up,124,,0
+15245,Dr Vikas Admin,,,0,,,0,UM_15245,Oncology,21,,0
+29181,Anandi Hirapara,,,0,,,0,UM_29181,Health Check Up,124,,0
+29182,Srushitben Patamari,,,0,,,0,UM_29182,Health Check Up,124,,0
+29183,Adarsh Panchal,,,0,,,0,UM_29183,Health Check Up,124,,0
+29184,Aditi Vyas,,,0,,,0,UM_29184,Health Check Up,124,,0
+29186,Rahul Panchal,,,0,,,0,UM_29186,Health Check Up,124,,0
+29193,Shubham Patel,,,0,,,0,UM_29193,Health Check Up,124,,0
+29194,Nikul Prajapati,,,0,,,0,UM_29194,Health Check Up,124,,0
+29195,Ree Bagadiya,,,0,,,0,UM_29195,Health Check Up,124,,0
+29197,Ronil Patel,,,0,,,0,UM_29197,Health Check Up,124,,0
+29200,Bhumi Nanavaty,,,0,,,0,UM_29200,Health Check Up,124,,0
+29201,Nency Kanani,,,0,,,0,UM_29201,Health Check Up,124,,0
+29204,Mansi Purswami,,,0,,,0,UM_29204,Health Check Up,124,,0
+29205,Khushbu Pathan,,,0,,,0,UM_29205,Health Check Up,124,,0
+29206,Rajan Panchal,,,0,,,0,UM_29206,Health Check Up,124,,0
+29207,Priyanshu makwana,,,0,,,0,UM_29207,Health Check Up,124,,0
+29208,Dipika Raval,,,0,,,0,UM_29208,Health Check Up,124,,0
+29209,Keya Chaudhary,,,0,,,0,UM_29209,Health Check Up,124,,0
+29210,Devika Prajapati,,,0,,,0,UM_29210,Health Check Up,124,,0
+29211,Rinkal Vala,,,0,,,0,UM_29211,Health Check Up,124,,0
+29212,Bhavika Bambhaniya,,,0,,,0,UM_29212,Health Check Up,124,,0
+29214,Vaishali Shah,,,0,,,0,UM_29214,Health Check Up,124,,0
+29215,Jolly Patel,,,0,,,0,UM_29215,Health Check Up,124,,0
+29216,Bharti Visani,,,0,,,0,UM_29216,Health Check Up,124,,0
+29217,Rinkal Solanki,,,0,,,0,UM_29217,Health Check Up,124,,0
+29218,Sweta Bhatia,,,0,,,0,UM_29218,Health Check Up,124,,0
+29219,Shital Sheth,,,0,,,0,UM_29219,Health Check Up,124,,0
+29220,Avani Patel,,,0,,,0,UM_29220,Health Check Up,124,,0
+29222,Tarlika Kalasva,,,0,,,0,UM_29222,Health Check Up,124,,0
+29235,Parth Patel,,,0,,,0,UM_29235,Health Check Up,124,,0
+29236,Nilshyam Hadwani,,,0,,,0,UM_29236,Health Check Up,124,,0
+29237,Krishna Barot,,,0,,,0,UM_29237,Health Check Up,124,,0
+29240,Yashvi Raval,,,0,,,0,UM_29240,Health Check Up,124,,0
+29241,Mansi Desai,,,0,,,0,UM_29241,Health Check Up,124,,0
+29242,Rupa Shah,,,0,,,0,UM_29242,Health Check Up,124,,0
+29243,Bhavna Tewnani,,,0,,,0,UM_29243,Health Check Up,124,,0
+29244,Nikunj Patel,,,0,,,0,UM_29244,Health Check Up,124,,0
+29245,Vandana Solanki,,,0,,,0,UM_29245,Health Check Up,124,,0
+29246,Dr Vatsal Limbani,,,0,,,0,UM_29246,Health Check Up,124,,0
+29247,Nikita Zalavadiya,,,0,,,0,UM_29247,Health Check Up,124,,0
+29248,Nargisbanu Akram,,,0,,,0,UM_29248,Health Check Up,124,,0
+29249,Smit Pathar,,,0,,,0,UM_29249,Health Check Up,124,,0
+29250,Vivek Thakar,,,0,,,0,UM_29250,Health Check Up,124,,0
+29251,Rahul Prajapati,,,0,,,0,UM_29251,Health Check Up,124,,0
+29252,Parth Rathod,,,0,,,0,UM_29252,Health Check Up,124,,0
+29253,Alpesh Gauswami,,,0,,,0,UM_29253,Health Check Up,124,,0
+29254,Nikhil Patel,,,0,,,0,UM_29254,Health Check Up,124,,0
+29255,Sapna santoki,,,0,,,0,UM_29255,Health Check Up,124,,0
+29303,DR RAKESH SHAH,,,0,,,0,UM_29303,Neurology,10,,0
+29304,DR ANAND VAISHNAV,,,0,,,0,UM_29304,Neurology,10,,0
+29306,DR. MIHIR ACHARYA,,,0,,,0,UM_29306,Neurology,10,,0
+29307,DR. MAULIK PANCHAL,,,0,,,0,UM_29307,Neurology,10,,0
+29308,DR. SUVORIT BHOWMICK,,,0,,,0,UM_29308,Neurology,10,,0
+29309,DR. SURESH NAYAK,,,0,,,0,UM_29309,Neurosurgery,20,,0
+29310,DR. VIRAL MEHTA,,,0,,,0,UM_29310,Neurosurgery,20,,0
+29311,DR. RAKESH JASANI,,,0,,,0,UM_29311,Neurosurgery,20,,0
+29312,DR. PRATIK PAREKH,,,0,,,0,UM_29312,Neurosurgery,20,,0
+29321,DR FORAM VORA,,,0,,,0,UM_29321,Gynaecology,8,,0
+29322,DR SURAJ AMBRE,,,0,,,0,UM_29322,Vascular Surgeon,115,,0
+29405,Dr PRATIK SATISHKUMAR SHAH,,,0,,,0,UM_29405,General Surgery,13,,0
+29406,Mr Amit Gandhi,,,0,,,0,UM_29406,,0,,0
+29645,Ashutosh,,,0,,,0,UM_29645,Health Check Up,124,,0
+29986,DR. KAVYASHRI H.C,,,0,,,0,UM_29986,Gynaecology,8,,0
+30085,GULSHAN GAUR,,,0,,,0,UM_30085,,0,,0
+30086,VIMAL MADRASI,,,0,,,0,UM_30086,,0,,0
+30088,SHIVANGI JOSHI,,,0,,,0,UM_30088,,0,,0
+30089,MITALI KUBAWAT,,,0,,,0,UM_30089,,0,,0
+30090,ALICE MITRA,,,0,,,0,UM_30090,,0,,0
+30091,BINA PANCHAL,,,0,,,0,UM_30091,,0,,0
+30092,BHUMI TRIVEDI,,,0,,,0,UM_30092,,0,,0
+31223,Dr Vaishali Patel,,,0,,,0,UM_31223,Gynaecology,8,,0
+31687,Lab Department,,,0,,,0,UM_31687,,0,,0
+3933,Dr Maulin Shah,G-40485,,0,,,0,UM_3933,Nephrology,30,,0
+4158,Dr Manish Dabhi,G -26053,,0,,,0,UM_4158,Nephrology,30,,0
+6404,Dr Jitendra Kotadiya,G-15093,,0,,,0,UM_6404,Pulmonology,37,,0
+7863,Dr Javed Habib Khan,123456,,0,,,0,UM_7863,Gynaecology,8,,0
+11664,Dr Nageswara Reddy,,,0,,,0,UM_11664,General Practice,15,,0
+11761,Dr PRARTHAN JOSHI,,,0,,,0,UM_11761,Urology,11,,0
+11762,Dr NIMIT SHAH,,,0,,,0,UM_11762,Diabetology,111,,0
+11763,Dr Ketan Vekariya,G37684,,0,,,0,UM_11763,Cardiology,31,,0
+11764,Dr Ajay Choksey,G35338,,0,,,0,UM_11764,Gastroenterology,18,,0
+30093,HIREN PANCHAL,,,0,,,0,UM_30093,,0,,0
+30201,DR KETAN MAKWANA,,,0,,,0,UM_30201,Oncology,21,,0
+30554,KAMINI,,,0,,,0,UM_30554,,0,,0
+30657,DR. BRIJESH BARAIYA,,,0,,,0,UM_30657,Internal Medicine,14,,0
+30920,Healthcheckup MT,,,0,,,0,UM_30920,Health Check Up,124,,0
+31193,Dr. Soaham Desai,,,0,,,0,UM_31193,Neurology,10,,0

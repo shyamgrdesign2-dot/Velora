@@ -1,8 +1,10 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
+import { Eye, EyeSlash } from "iconsax-reactjs"
 import { cn } from "@/lib/utils"
 import type { DoctorViewType, DrAgentVariant, SpecialtyTabId } from "../types"
+import { useVeloraViewMode } from "./VeloraViewModeContext"
 
 // -----------------------------------------------------------------
 // Specialty → Auto-switch patient mapping
@@ -86,6 +88,7 @@ export function AgentHeader({
   brandTitle,
 }: AgentHeaderProps) {
   const isV0 = variant === "v0"
+  const { viewMode, toggleViewMode } = useVeloraViewMode()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -157,6 +160,27 @@ export function AgentHeader({
               {brandTitle ?? "Velora"}
             </span>
           </span>
+
+          {/* Detailed ↔ Concise view-mode toggle — icon only, no label.
+              Eye = Detailed (every visit verbatim); EyeSlash = Concise
+              (summary). Drives every brief card on this surface via
+              VeloraViewModeContext. */}
+          <button
+            type="button"
+            onClick={toggleViewMode}
+            className={cn(
+              "inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] transition-colors",
+              "text-tp-slate-500 hover:bg-tp-slate-100 hover:text-tp-slate-800",
+            )}
+            aria-label={viewMode === "detailed" ? "Switch to concise view" : "Switch to detailed view"}
+            title={viewMode === "detailed" ? "Detailed view (click for concise)" : "Concise view (click for detailed)"}
+          >
+            {viewMode === "detailed" ? (
+              <Eye size={16} variant="Linear" />
+            ) : (
+              <EyeSlash size={16} variant="Linear" />
+            )}
+          </button>
 
           {/* Unified Dropdown — Specialty + Doctor Type + Intake (removed — demo only) */}
           {false && <div className="relative" ref={dropdownRef}>

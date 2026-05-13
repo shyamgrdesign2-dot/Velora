@@ -30,6 +30,7 @@ import {
   Activity, Clock, SecuritySafe,
 } from "iconsax-reactjs"
 import { AgentHeader } from "./shell/AgentHeader"
+import { VeloraViewModeProvider } from "./shell/VeloraViewModeContext"
 import { ChatThread } from "./chat/ChatThread"
 import { PillBar } from "./chat/PillBar"
 import { SuggestionBar } from "./chat/SuggestionBar"
@@ -990,6 +991,7 @@ export function DrAgentPanelV0({
   const hasPatient = !!selectedPatientId && !!patient
 
   return (
+    <VeloraViewModeProvider>
     <div id="dr-agent-panel-root" className="relative flex h-full flex-col bg-white" style={{ minWidth: 350, maxWidth: 400 }}>
       {/* ── Header ── */}
       <AgentHeader
@@ -1160,5 +1162,6 @@ export function DrAgentPanelV0({
         .da-chat-scroll { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.12) transparent; }
       `}</style>
     </div>
+    </VeloraViewModeProvider>
   )
 }

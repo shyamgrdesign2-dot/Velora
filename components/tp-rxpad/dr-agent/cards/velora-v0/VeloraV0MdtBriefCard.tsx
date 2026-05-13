@@ -8,6 +8,7 @@ import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
 import { GuidelineChip } from "./VeloraStack"
 import { FloatingTooltip, HighlightLine, InfoTip, SourceInfoTip, shortDate } from "./highlight"
+import { useVeloraViewMode } from "../../shell/VeloraViewModeContext"
 import type {
   VeloraV0MdtBriefData,
   VeloraV0Attribution,
@@ -744,26 +745,31 @@ function SynthesisBullet({ row }: { row: VeloraV0Synthesis["rows"][number] }) {
   )
 }
 
-/** Per-visit Detailed-view renderer for one specialty.
+/** Label-major Detailed-view renderer for one specialty.
  *
- *  Mirrors the rule: every doctor's note shows up verbatim, never
- *  rephrased. For each consultation in the specialty's `consultations`
- *  array we render a block grouped by the doctor + date, and inside
- *  each block:
+ *  Top-level chips are FINDINGS / MEDICATIONS / PLAN. Under each chip,
+ *  one bullet per visit, attributed by doctor + date. So a specialty
+ *  with 3 visits will render:
  *
- *    FINDINGS       diagnosis (or legacy `findings`) verbatim
- *    MEDICATIONS    medications verbatim
+ *    FINDINGS
+ *      • Dr X (date): {diagnosis verbatim}
+ *      • Dr Y (date): {diagnosis verbatim}
+ *      • Dr Z (date): {diagnosis verbatim}
+ *    MEDICATIONS
+ *      • Dr X (date): {medications verbatim}
+ *      • Dr Y (date): {medications verbatim}
+ *      • Dr Z (date): {medications verbatim}
  *    PLAN
- *      Follow-up           followUp                  (when set)
- *      Investigations      investigations            (when set)
- *      Advice              advice                    (when set)
- *      Planned surgery     surgery                   (when set)
- *      Vaccinations        vaccinations              (when set)
- *      Additional notes    additionalNotes           (when set)
+ *      • Dr X (date)
+ *          Follow-up:        {followUp}
+ *          Investigations:   {investigations}
+ *          Advice:           {advice}
+ *          Planned surgery:  {surgery}
+ *          Additional notes: {additionalNotes}
+ *      • Dr Y (date) … (same nested shape)
  *
- *  Lab results render after the consultation blocks using the existing
- *  aggregate LabResultsBlock so the specialty's abnormal labs stay one
- *  consolidated row at the team level.
+ *  Only visits where the doctor actually wrote that field appear under
+ *  each chip — empty cells are skipped, not rendered as blanks.
  */
 function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
   const consultations = rec.consultations ?? []
@@ -781,75 +787,110 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
     )
   }
 
+  // Collect visits that have content for each category.
+  const findingsVisits = consultations.filter((c) => !!(c.diagnosis ?? c.findings))
+  const medicationsVisits = consultations.filter((c) => !!c.medications)
+  const planVisits = consultations.filter(
+    (c) => c.followUp || c.investigations || c.advice || c.surgery || c.vaccinations || c.additionalNotes || c.plan,
+  )
+
+  const ChipLabel = ({ text }: { text: string }) => (
+    <span className="inline-flex w-fit items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+      {text}
+    </span>
+  )
+
+  /** A doctor-attributed bullet — used inside Findings / Medications. */
+  const AttributedBullet = ({
+    doctor,
+    date,
+    content,
+  }: {
+    doctor: string
+    date: string
+    content: string
+  }) => (
+    <li className="flex gap-[6px]">
+      <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+      <span className="min-w-0">
+        <span className="font-semibold text-tp-slate-900">{doctor}</span>
+        <span className="text-tp-slate-500"> ({date})</span>
+        <span className="text-tp-slate-500">: </span>
+        <HighlightLine text={content} />
+      </span>
+    </li>
+  )
+
   return (
-    <div className="flex flex-col gap-[14px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
-      {consultations.map((c, ci) => {
-        const findings = c.diagnosis ?? c.findings
-        const planRows: Array<{ label: string; content: string }> = []
-        if (c.followUp) planRows.push({ label: "Follow-up", content: c.followUp })
-        if (c.investigations) planRows.push({ label: "Investigations", content: c.investigations })
-        if (c.advice) planRows.push({ label: "Advice", content: c.advice })
-        if (c.surgery) planRows.push({ label: "Planned surgery", content: c.surgery })
-        if (c.vaccinations) planRows.push({ label: "Vaccinations", content: c.vaccinations })
-        if (c.additionalNotes) planRows.push({ label: "Additional notes", content: c.additionalNotes })
-        const hasAnything = !!(findings || c.medications || planRows.length > 0)
-        if (!hasAnything) return null
-        return (
-          <div key={ci} className="flex flex-col gap-[6px]">
-            {/* Visit identity strip — doctor + date attribution. Always
-                shown so the doctor reads each block as "this is what Dr X
-                wrote on this date" before any clinical content. */}
-            <div className="flex flex-wrap items-center gap-[8px] text-[12px] font-semibold text-tp-slate-700">
-              <span className="rounded-[4px] bg-tp-slate-100 px-[6px] py-[1px] text-tp-slate-700">
-                {c.doctor}
-              </span>
-              <span className="text-tp-slate-500">{c.date}</span>
-              {c.visitType === "IPD" && (
-                <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
-                  IPD
-                </span>
-              )}
-            </div>
-            {findings && (
-              <p className="min-w-0">
-                <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                  Findings
-                </span>
-                <HighlightLine text={findings} />
-              </p>
-            )}
-            {c.medications && (
-              <p className="min-w-0">
-                <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                  Medications
-                </span>
-                <HighlightLine text={c.medications} />
-              </p>
-            )}
-            {planRows.length > 0 && (
-              <div className="flex flex-col gap-[3px]">
-                <span className="inline-flex w-fit items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-                  Plan
-                </span>
-                <ul className="ml-[2px] flex flex-col gap-[2px] pl-[8px]">
-                  {planRows.map((p, pi) => (
-                    <li key={pi} className="flex gap-[6px]">
-                      <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-                      <span className="min-w-0">
-                        <span className="font-medium text-tp-slate-600">{p.label}: </span>
-                        <HighlightLine text={p.content} />
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {c.labResults && c.labResults.length > 0 && (
-              <ConsultationLabsRow labs={c.labResults} hiddenNormalCount={c.hiddenNormalCount} />
-            )}
-          </div>
-        )
-      })}
+    <div className="flex flex-col gap-[12px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
+      {findingsVisits.length > 0 && (
+        <div className="flex flex-col gap-[4px]">
+          <ChipLabel text="Findings" />
+          <ul className="ml-[2px] flex flex-col gap-[4px] pl-[8px]">
+            {findingsVisits.map((c, ci) => (
+              <AttributedBullet
+                key={ci}
+                doctor={c.doctor}
+                date={c.date}
+                content={c.diagnosis ?? c.findings ?? ""}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {medicationsVisits.length > 0 && (
+        <div className="flex flex-col gap-[4px]">
+          <ChipLabel text="Medications" />
+          <ul className="ml-[2px] flex flex-col gap-[4px] pl-[8px]">
+            {medicationsVisits.map((c, ci) => (
+              <AttributedBullet
+                key={ci}
+                doctor={c.doctor}
+                date={c.date}
+                content={c.medications ?? ""}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {planVisits.length > 0 && (
+        <div className="flex flex-col gap-[4px]">
+          <ChipLabel text="Plan" />
+          <ul className="ml-[2px] flex flex-col gap-[6px] pl-[8px]">
+            {planVisits.map((c, ci) => {
+              const subRows: Array<{ label: string; content: string }> = []
+              if (c.followUp) subRows.push({ label: "Follow-up", content: c.followUp })
+              if (c.investigations) subRows.push({ label: "Investigations", content: c.investigations })
+              if (c.advice) subRows.push({ label: "Advice", content: c.advice })
+              if (c.surgery) subRows.push({ label: "Planned surgery", content: c.surgery })
+              if (c.vaccinations) subRows.push({ label: "Vaccinations", content: c.vaccinations })
+              if (c.additionalNotes) subRows.push({ label: "Additional notes", content: c.additionalNotes })
+              if (subRows.length === 0 && c.plan) subRows.push({ label: "Plan", content: c.plan })
+              return (
+                <li key={ci} className="flex gap-[6px]">
+                  <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+                  <div className="flex min-w-0 flex-col gap-[2px]">
+                    <span>
+                      <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
+                      <span className="text-tp-slate-500"> ({c.date})</span>
+                    </span>
+                    <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
+                      {subRows.map((r, ri) => (
+                        <li key={ri} className="min-w-0">
+                          <span className="font-medium text-tp-slate-600">{r.label}: </span>
+                          <HighlightLine text={r.content} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
@@ -861,11 +902,9 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   // Which specialty (by index) has its sidebar open? -1 means none.
   const [openSidebarIdx, setOpenSidebarIdx] = useState<number>(-1)
   const openRec = openSidebarIdx >= 0 ? data.specialties[openSidebarIdx] ?? null : null
-  // View-mode toggle. Default = "detailed" — every doctor's note rendered
-  // verbatim, per-visit, no AI rephrasing. Toggle to "concise" surfaces
-  // the legacy 2-line-per-pointer reframed view kept from commit 8102d9c
-  // for doctors who want the at-a-glance summary.
-  const [viewMode, setViewMode] = useState<"detailed" | "concise">("detailed")
+  // View-mode read from the agent-shell context. Single icon toggle next
+  // to the Velora brand-tag drives every brief card on the surface.
+  const { viewMode } = useVeloraViewMode()
 
   return (
     <div className="flex flex-col gap-[10px]" data-mdt-card="root">
@@ -883,39 +922,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
         ]}
       >
         <div className="flex flex-col gap-[10px]">
-          {/* View-mode toggle — Detailed (verbatim per-visit) vs Concise
-              (legacy 2-line summary). Sits at the top of the card body
-              so it reads as a card-level affordance, not a chrome
-              control. Default Detailed; Concise is opt-in. */}
-          <div className="flex items-center justify-between gap-[10px]">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
-              View
-            </span>
-            <div className="inline-flex shrink-0 items-center rounded-[6px] border border-tp-slate-200 bg-tp-slate-50 p-[2px] text-[11px] font-medium">
-              <button
-                type="button"
-                onClick={() => setViewMode("detailed")}
-                className={`rounded-[4px] px-[8px] py-[3px] transition-colors ${
-                  viewMode === "detailed"
-                    ? "bg-white text-tp-slate-800 shadow-sm"
-                    : "text-tp-slate-500 hover:text-tp-slate-700"
-                }`}
-              >
-                Detailed
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("concise")}
-                className={`rounded-[4px] px-[8px] py-[3px] transition-colors ${
-                  viewMode === "concise"
-                    ? "bg-white text-tp-slate-800 shadow-sm"
-                    : "text-tp-slate-500 hover:text-tp-slate-700"
-                }`}
-              >
-                Concise
-              </button>
-            </div>
-          </div>
+          {/* The view-mode toggle (Detailed ↔ Concise) lives next to the
+              Velora brand-tag in the agent header, not inside the card.
+              The card just reads `viewMode` from the shell context and
+              switches its specialty-body renderer accordingly. */}
 
           {/* ── Section 1 · Medical issues ──────────────────────────────
               Surfaced once at the top so per-specialty sections only describe

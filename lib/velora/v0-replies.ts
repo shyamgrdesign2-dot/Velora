@@ -837,13 +837,15 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
         { text: "**Essential Hypertension**" },
         { text: "**Obesity**" },
         { text: "**NAFLD** (non-alcoholic fatty liver disease)" },
+        { text: "**Recent MDR-resistant UTI** (treated with Nitrofurantoin for 1 month under Dr Shivang Sharma)" },
       ],
       sources: [
         { doctor: "Dr Nimit Shah (Diabetology)", date: "across consultations" },
         { doctor: "Dr Payal Shah (Endocrinology)", date: "Feb to Mar 2026" },
+        { doctor: "Dr Shivang Sharma (UTI management)", date: "1-month course" },
       ],
       reasoning:
-        "Classic metabolic syndrome layered onto cardiovascular disease. High event-recurrence risk; aggressive multi-target prevention needed.",
+        "Classic metabolic syndrome layered onto cardiovascular disease. The recent MDR UTI in a diabetic with renal-stone history is a clinically significant addition; high event-recurrence risk and aggressive multi-target prevention needed.",
     },
     {
       title: "Surgical history",
@@ -1074,9 +1076,9 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       title: "Allergies & safety",
       tone: "positive",
-      items: [{ text: "**Allergy review under-recorded** (only 7 narrative entries across 33 visits)" }],
+      items: [{ text: "**Allergy review not explicitly documented**" }],
       sources: [],
-      reasoning: "Almost no symptom or exam narrative is captured for this patient. Treat allergy status as unknown until reviewed.",
+      reasoning: "Narrative notes are now well-captured (284 entries) but allergy status was never spelled out as 'no known drug allergy' across those notes. Treat as unknown until reviewed at next visit.",
     },
   ],
   windowDays: 517,
@@ -1088,13 +1090,13 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
       consultationCount: 8,
       doctorsLabel: "Dr Navneet Shah / Dr Nanavaty",
       lines: [
-        "**Findings**: RBS 220 → 279 on serial visits | **TG 2898 mg/dL** documented in narrative | S.Cr 0.85 (preserved)",
+        "**Findings**: **TG 2898 mg/dL** (11 Mar) responding to therapy (TG 798 mg/dL on 17 Mar, ~73% reduction in 6 days) | **HbA1c 8.5%** with fasting 191 mg/dL | S. creatinine 0.85 (preserved) | random sugar 98 mg/dL",
         "**Medications**: **Valzaar 80** (Valsartan) | **Amlodac 5** | **Inderal LA 20** (Propranolol) | **Ecospin 75** | **Rozavel EZ 20** (Rosuvastatin + Ezetimibe)",
-        "**Plan**: Lipid-lowering escalation overdue (no fibrate) | aggressive HTN reconciliation needed",
+        "**Plan**: TG trajectory positive; consider fibrate add-on if rebound | aggressive HTN reconciliation needed",
       ],
       openLoops: [
-        "**TG 2898 mg/dL** lives in symptom narrative, not measurement, flagged",
-        "**HbA1c** not in lab table",
+        "Critical lab values (TG, HbA1c, S. creatinine, RBS) live in narrative rather than structured lab rows",
+        "Structured lab pipeline still needs to land for these values",
       ],
     },
     {
@@ -1305,9 +1307,9 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
         "**Plan**: Discharged on **26 Feb in BETTER condition** | review LFTs at every OPD | continue chelation + zinc | symptomatic + hepatoprotective regimen | OPD review **3 Mar 2026**",
       ],
       openLoops: [
-        "**Hospital Course narrative** captured as 2 note rows only (Presenting Complaints + Discharge Condition); full course-in-hospital + treatment timeline not in OMOP `note`",
-        "**OT Notes / Operative Notes** section absent, confirm no procedures during stay",
-        "**Warning Signs + Discharge Advice** narrative not in `note` table, patient counselled verbally?",
+        "**Hospital Course chronological summary** not in record (day-by-day progress notes from the admission)",
+        "**Operative Notes** section absent (consistent with no procedures during stay)",
+        "**Warning Signs narrative** not on file (discharge advice diet captured separately as a structured entry)",
       ],
     },
     {

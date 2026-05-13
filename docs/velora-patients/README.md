@@ -1,6 +1,8 @@
 # Velora canonical patients
 
-Five real OMOP CDM v5.4 exports — one MD per patient documents the cross-consultation brief grounding and the gaps the card chooses NOT to surface (the no-data-loss audit trail).
+Six real OMOP CDM v5.4 exports — one MD per patient documents the cross-consultation brief grounding and the gaps the card chooses NOT to surface (the no-data-loss audit trail).
+
+> Source archives live in [`data/`](./data/) under canonical names. Drift between exports is tracked in [`CROSS-VERIFICATION.md`](./CROSS-VERIFICATION.md).
 
 ## Roster
 

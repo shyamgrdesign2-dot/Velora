@@ -511,7 +511,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Nahush Tahiliani / Dr Sandeep jain",
       lines: [
         "**Findings**: Right Breast cancer (Confirmed) · pT1cN0 stage IA per one condition_occurrence row.",
-        "**Medications**: **ONCOLET 2.5MG TABLET** (Letrozole 2.5 mg) M:1 A:0 E:0 N:0 · 2 months supply | **EFFECTOL TABLET** (Calcium 500 mg + Cholecalciferol 125 IU) M:1 A:0 E:0 N:0 daily | **SHELCAL 500MG TABLET** (composition source-coded as Denosumab 60 mg) M:0 A:0 E:0 N:1 daily | **DENOSTEOREL 60MG INJECTION** subcutaneous STAT today, then every 6-monthly",
+        "**Medications**: **ONCOLET 2.5MG TABLET** | **EFFECTOL TABLET** | **SHELCAL 500MG TABLET** | **DENOSTEOREL 60MG INJECTION**",
         "**Plan**: Patient's all available relatives have been explained regarding patient's **advanced stage disease condition, Poor prognosis** and all possible management options in detail in English (including side effect profile and financial aspects). **Follow up after 1 year.**",
       ],
       consultations: [
@@ -522,7 +522,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           headline: "**Letrozole 2.5 mg + Denosumab 60 mg s/c + Ca + Vit D** initiated",
           diagnosis: "Right Breast cancer (Confirmed · pT1cN0 stage IA per condition_occurrence)",
           medications:
-            "**ONCOLET 2.5MG TABLET** (LETROZOLE-2.5MG) — M:1 A:0 E:0 N:0 daily × 2 months · qty 60 | **EFFECTOL TABLET** (CALCIUM MINERAL-500MG + CHOLECALCIFEROL-125IU) — M:1 A:0 E:0 N:0 daily | **SHELCAL 500MG TABLET** (composition source-coded as DENOSUMAB-60MG) — M:0 A:0 E:0 N:1 daily | **DENOSTEOREL 60MG INJECTION** — subcutaneous STAT today, then every 6 monthly",
+            "**ONCOLET 2.5MG TABLET** | **EFFECTOL TABLET** | **SHELCAL 500MG TABLET** | **DENOSTEOREL 60MG INJECTION**",
           additionalNotes:
             "Patient's all available relatives have been explained regarding patient's **advanced stage disease condition, Poor prognosis** and all possible management options in detail in English (including side effect profile and financial aspects). Follow up after 1 year.",
         },
@@ -624,7 +624,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Manoj Singh",
       lines: [
         "**Findings (1 May)**: PSG result — Sleep Efficiency normal, High WASO, Time spent in N1 + N3 high, N2 low, REM normal. **AHI 31.2 without desaturation.** Tachycardia noted during study. PLMS index high (verbatim followup_advice).",
-        "**Medications (29 Apr)**: **FORACORT 200MCG INHALER** (Budesonide 200 µg + Formoterol 6 µg) M:1 A:0 E:0 N:0 before food × 10 days · qty 10 | **MONTAIR 10MG TABLET** (Montelukast 10 mg) M:0 A:0 E:0 N:1 after food × 15 days · qty 15 | **RANTAC D 150MG TABLET** (Domperidone 10 mg + Ranitidine 150 mg) M:1 A:0 E:0 N:0 before food × 15 days · qty 15",
+        "**Medications (29 Apr)**: **FORACORT 200MCG INHALER** | **MONTAIR 10MG TABLET** | **RANTAC D 150MG TABLET**",
         "**Plan (1 May)**: Lifestyle modification | CPAP titration and trial | Next review 1 Nov 2026.",
       ],
       consultations: [
@@ -634,7 +634,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           doctor: "Dr Manoj Singh",
           headline: "Initial pulmonology · 3-drug regimen started · next-day review booked",
           medications:
-            "**FORACORT 200MCG INHALER** (BUDESONIDE-200MCG + FORMOTEROL-6MCG) — M:1 A:0 E:0 N:0 · before food × 10 days · qty 10 | **MONTAIR 10MG TABLET** (MONTELUKAST-10MG) — M:0 A:0 E:0 N:1 · after food × 15 days · qty 15 | **RANTAC D 150MG TABLET** (Domperidone 10 mg + Ranitidine 150 mg) — M:1 A:0 E:0 N:0 · before food × 15 days · qty 15",
+            "**FORACORT 200MCG INHALER** | **MONTAIR 10MG TABLET** | **RANTAC D 150MG TABLET**",
           followUp: "30 Apr 2026",
         },
         {
@@ -682,7 +682,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Yatin Desai / Dr Vivek Jadawala",
       lines: [
         "**Findings**: NECK PAIN WITH BILATERAL UPPER LIMB RADICULOPATHY · BILATERAL KNEE PAIN AFFECTING ADL LEFT > RIGHT · KNOWN CASE OF HTN AND IHD (verbatim symptoms_text). Spinal curvature normal, paraspinal muscle spasm present, medial joint line tenderness both knees, knee ROM 0°-90° bilaterally with terminal restriction, distal neurovascular status normal, power grade V bilateral EHL/EDL.",
-        "**Medications**: **CARTIGEN PRO TABLET** (Glucosamine 1500 mg + Undenatured Collagen II 40 mg + Astaxanthin 4 mg) × 1 month | **ULTRACET TABLET** (Acetaminophen 325 mg + Tramadol 37.5 mg) M:1 A:0 E:0 N:1 after food × 15 days | **PANTODAC 40MG TABLET** (Pantoprazole 40 mg) M:1 A:0 E:0 N:1 before food × 15 days | **BACGAB 30GM GEL** (Baclofen 2% + Gabapentin 6% + Lidocaine 5%) — apply after hot fomentation | **CERVICAL COLLAR SOFT (Large)** | **KNEE CAP**",
+        "**Medications**: **CARTIGEN PRO TABLET** | **ULTRACET TABLET** | **PANTODAC 40MG TABLET** | **BACGAB 30GM GEL** | **CERVICAL COLLAR SOFT** | **KNEE CAP**",
         "**Plan**: HOT FOMENTATION · AVOID WALKING ON UNEVEN SURFACES, SUDDEN JERKY MOVEMENTS · AVOID SQUATTING / CLIMBING STAIRS / CROSS-LEGGED SITTING · AVOID LIFTING HEAVY WEIGHT · PHYSIOTHERAPY (Ultrasound therapy cervical + lumbosacral). **Imaging on file:** MRI suggestive of C3-C4, C4-C5, C5-C6 disc degeneration with compression · X-ray both knee AP+Lateral suggestive of grade IV arthritic changes bilaterally (verbatim followup_advice).",
       ],
       consultations: [
@@ -695,7 +695,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           examination:
             "SPINAL CURVATURE NORMAL. PARASPINAL MUSCLE SPASM PRESENT | MEDIAL JOINT LINE TENDERNESS PRESENT BOTH KNEE | KNEE ROM 0° TO 90° BILATERALLY. TERMINAL RESTRICTION PRESENT | DISTAL NEUROVASCULAR STATUS NORMAL | POWER GRADE V BILATERAL EHL AND EDL. REFLEX IS NORMAL",
           medications:
-            "**CARTIGEN PRO TABLET** (Glucosamine Sulfate Potassium Chloride 1500 mg + Undenatured Collagen Type II 40 mg + Astaxanthin 4 mg) × 1 month | **ULTRACET TABLET** (Acetaminophen 325 mg + Tramadol 37.5 mg) M:1 A:0 E:0 N:1 after food × 15 days · qty 30 | **PANTODAC 40MG TABLET** (Pantoprazole 40 mg) M:1 A:0 E:0 N:1 before food × 15 days · qty 30 | **BACGAB 30GM GEL** (Baclofen 2% + Gabapentin 6% + Lidocaine 5%) — apply after hot fomentation | **CERVICAL COLLAR SOFT (Large) MGRM** | **KNEE CAP**",
+            "**CARTIGEN PRO TABLET** | **ULTRACET TABLET** | **PANTODAC 40MG TABLET** | **BACGAB 30GM GEL** | **CERVICAL COLLAR SOFT** | **KNEE CAP**",
           advice:
             "HOT FOMENTATION | AVOID WALKING ON UNEVEN SURFACES, SUDDEN JERKY MOVEMENTS | AVOID SQUATTING / CLIMBING STAIRS / CROSS-LEGGED SITTING | AVOID LIFTING HEAVY WEIGHT, SUDDEN FORWARD BENDING, CLIMBING STAIRS, WALKING ON UNEVEN SURFACES | PHYSIOTHERAPY — ULTRASOUND THERAPY CERVICAL AND LUMBOSACRAL",
           additionalNotes:
@@ -713,7 +713,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Hetal Parikh",
       lines: [
         "**Findings**: History of neck pain on left side from Jan 2026. No radiating pain to limbs. No gripping difficulty. MRI spine showed C3-4 and C5-6 level disc causing nerve root compression (verbatim symptoms_text). Exam: higher function normal, cranial nerves normal, motor + sensory function normal, deep tendon reflex +2 with flexor plantars, cerebellar signs nil, gait normal, no meningeal irritation.",
-        "**Medications**: **GABAPIN NT 100MG TABLET** (Gabapentin 100 mg + Nortriptyline 10 mg) M:0 A:0 E:0 N:1 after food × 2 months · qty 60 · 'SOS can take twice a day.'",
+        "**Medications**: **GABAPIN NT 100MG TABLET**",
         "**Plan**: Neck muscle strengthening exercise (verbatim advice_text). Follow up with advised investigations.",
       ],
       consultations: [
@@ -727,7 +727,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           examination:
             "HIGHER FUNCTION normal · CRANIAL NERVES normal · MOTOR FUNCTION normal · SENSORY FUNCTION normal · DEEP TENDON REFLEX +2, plantars flexor · CEREBELLAR SIGNS nil · Gait normal · SIGNS OF MENINGEAL IRRITATION nil",
           medications:
-            "**GABAPIN NT 100MG TABLET** (GABAPENTIN-100MG + NORTRIPTYLINE-10MG) — M:0 A:0 E:0 N:1 · after food × 2 months · qty 60 · 'SOS can take twice a day.'",
+            "**GABAPIN NT 100MG TABLET**",
           advice: "Neck muscle strengthening exercise",
           followUp: "Follow up with advised investigations",
         },
@@ -743,7 +743,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Niyati Parikh",
       lines: [
         "**Findings**: Eczematous dermatitis (right leg) per condition_occurrence.",
-        "**Medications**: **UBIL 20MG TABLET** (Bilastine 20 mg) M:1 A:0 E:0 N:1 before food × 20 days · qty 40 | **MOMATE F 15GM CREAM** (Fusidic Acid 2% + Mometasone 0.1%) — apply to affected areas, stop once better | **AVEENO DERMEXA DAILY EMOLLIENT CREAM** (skin care product) — moisturiser all over body, to be continued",
+        "**Medications**: **UBIL 20MG TABLET** | **MOMATE F 15GM CREAM** | **AVEENO DERMEXA DAILY EMOLLIENT CREAM**",
         "**Plan**: Follow up 28 May 2026.",
       ],
       consultations: [
@@ -754,7 +754,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           headline: "Dermatology · Bilastine + Mometasone/Fusidic + emollient",
           diagnosis: "Eczematous dermatitis (right leg) — from condition_occurrence row.",
           medications:
-            "**UBIL 20MG TABLET** (BILASTINE-20MG) — M:1 A:0 E:0 N:1 · before food × 20 days · qty 40 | **MOMATE F 15GM CREAM** (FUSIDIC ACID-2%W/W + MOMETASONE-0.1%W/W) — 'apply affected areas - STOP once better' | **AVEENO DERMEXA DAILY EMOLLIENT CREAM** (skin care product) — 'moisturiser - all over the body - to be continued'",
+            "**UBIL 20MG TABLET** | **MOMATE F 15GM CREAM** | **AVEENO DERMEXA DAILY EMOLLIENT CREAM**",
           followUp: "28 May 2026",
         },
       ],
@@ -817,7 +817,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
       doctorsLabel: "Dr Nancy Joshi",
       lines: [
         "**Findings**: gen attrition  ·  calculus ++ (verbatim examination_text).",
-        "**Medications**: **THERMOSEAL RA 100GM PASTE** (Potassium Nitrate 5% + Sodium Monofluorophosphate 0.7%) M:1 A:0 E:0 N:1.",
+        "**Medications**: **THERMOSEAL RA 100GM PASTE**",
       ],
       consultations: [
         {
@@ -826,7 +826,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
           doctor: "Dr Nancy Joshi",
           headline: "Dental pre-op · attrition + calculus++ · Thermoseal RA",
           examination: "gen attrition  |  calculus ++",
-          medications: "**THERMOSEAL RA 100GM PASTE** (POTASSIUM NITRATE-5%W/W + SODIUM MONOFLUOROPHOSPHATE-0.7%W/W) — M:1 A:0 E:0 N:1",
+          medications: "**THERMOSEAL RA 100GM PASTE**",
         },
       ],
     },

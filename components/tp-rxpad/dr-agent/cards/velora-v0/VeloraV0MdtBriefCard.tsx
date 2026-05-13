@@ -805,6 +805,9 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
         if (c.vaccinations) planRows.push({ label: "Vaccinations", content: c.vaccinations })
         if (c.additionalNotes) planRows.push({ label: "Additional notes", content: c.additionalNotes })
         if (planRows.length === 0 && c.plan) planRows.push({ label: "Plan", content: c.plan })
+        // Symptoms / examination are visit-level too. Surface them when set.
+        const hasAnyData =
+          !!findings || !!c.medications || planRows.length > 0 || !!c.symptoms || !!c.examination
         return (
           <div key={ci} className="relative flex flex-col gap-[4px]">
             {/* Timeline dot pinned to the left rail */}
@@ -824,6 +827,18 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
                 </span>
               )}
             </div>
+            {c.symptoms && (
+              <p className="min-w-0">
+                <ChipLabel text="Symptoms" />
+                <HighlightLine text={c.symptoms} />
+              </p>
+            )}
+            {c.examination && (
+              <p className="min-w-0">
+                <ChipLabel text="Examination" />
+                <HighlightLine text={c.examination} />
+              </p>
+            )}
             {findings && (
               <p className="min-w-0">
                 <ChipLabel text="Findings" />
@@ -848,6 +863,16 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
                   ))}
                 </ul>
               </div>
+            )}
+            {/* When the doctor wrote nothing for ANY F / M / P field for this
+                visit, surface a soft amber placeholder so the doctor reading
+                the card knows the visit happened but no Rx-pad data is on
+                file — different from "the field was empty" which we just
+                skip. */}
+            {!hasAnyData && (
+              <p className="min-w-0 rounded-[4px] bg-tp-warning-50/60 px-[8px] py-[3px] text-[12px] italic text-tp-warning-800">
+                No data available to display for this visit.
+              </p>
             )}
           </div>
         )
@@ -932,6 +957,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 <SectionSummaryBar
                   label="Medical history"
                   icon="medical-service"
+                  variant="specialty"
                   trailing={<MedicalHistorySectionTooltip groups={filteredHistory} />}
                 />
                 <div className="flex flex-col gap-[12px] pl-[2px]">
@@ -976,6 +1002,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 <SectionSummaryBar
                   label={rec.source.specialty}
                   icon="medical-service"
+                  variant="specialty"
                   trailing={
                     <span className="flex shrink-0 items-center gap-[6px]">
                       <SpecialtySectionTooltip rec={rec} />
@@ -1186,6 +1213,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               <SectionSummaryBar
                 label={s.panelTitle}
                 icon="medical-report"
+                variant="specialty"
                 trailing={<GuidelineChip {...s.guideline} />}
               />
               <ul className="flex flex-col gap-[3px] pl-[8px]">
@@ -1200,7 +1228,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
 
           {data.pendingMdtItems && data.pendingMdtItems.length > 0 && (
             <div data-mdt-anchor="pending" className="flex flex-col gap-[4px]">
-              <SectionSummaryBar label="Pending MDT" icon="emergency" />
+              <SectionSummaryBar label="Pending MDT" icon="emergency" variant="specialty" />
               <ul className="flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
                 {data.pendingMdtItems.map((item, i) => (
                   <li key={i} className="flex gap-[6px]">

@@ -745,31 +745,30 @@ function SynthesisBullet({ row }: { row: VeloraV0Synthesis["rows"][number] }) {
   )
 }
 
-/** Label-major Detailed-view renderer for one specialty.
+/** Visit-major Detailed-view renderer for one specialty.
  *
- *  Top-level chips are FINDINGS / MEDICATIONS / PLAN. Under each chip,
- *  one bullet per visit, attributed by doctor + date. So a specialty
- *  with 3 visits will render:
+ *  Renders each consultation as its own self-contained block on a
+ *  vertical timeline, so a doctor reading the specialty sees:
  *
- *    FINDINGS
- *      • Dr X (date): {diagnosis verbatim}
- *      • Dr Y (date): {diagnosis verbatim}
- *      • Dr Z (date): {diagnosis verbatim}
- *    MEDICATIONS
- *      • Dr X (date): {medications verbatim}
- *      • Dr Y (date): {medications verbatim}
- *      • Dr Z (date): {medications verbatim}
- *    PLAN
- *      • Dr X (date)
- *          Follow-up:        {followUp}
- *          Investigations:   {investigations}
- *          Advice:           {advice}
- *          Planned surgery:  {surgery}
- *          Additional notes: {additionalNotes}
- *      • Dr Y (date) … (same nested shape)
+ *    Dr Doctor A · 12 May 2026 · [IPD?]
+ *      Findings:        {diagnosis verbatim}
+ *      Medications:     {drug list verbatim}
+ *      Plan
+ *        Follow-up:        {date / text}
+ *        Investigations:   {text}
+ *        Advice:           {text}
+ *        Planned surgery:  {text}
+ *        Additional notes: {text}
  *
- *  Only visits where the doctor actually wrote that field appear under
- *  each chip — empty cells are skipped, not rendered as blanks.
+ *    Dr Doctor B · 12 May 2026
+ *      Findings: ...
+ *      (no medications)
+ *      (no plan)
+ *
+ *  Sub-rows for a visit only render when the doctor actually wrote
+ *  that field — empty cells are skipped, not back-filled with blanks.
+ *  Each visit block is separated by a hairline divider so the eye reads
+ *  the specialty as a chronological list of consultations.
  */
 function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
   const consultations = rec.consultations ?? []
@@ -787,110 +786,72 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
     )
   }
 
-  // Collect visits that have content for each category.
-  const findingsVisits = consultations.filter((c) => !!(c.diagnosis ?? c.findings))
-  const medicationsVisits = consultations.filter((c) => !!c.medications)
-  const planVisits = consultations.filter(
-    (c) => c.followUp || c.investigations || c.advice || c.surgery || c.vaccinations || c.additionalNotes || c.plan,
-  )
-
+  /** Small chip label, inline-flow. */
   const ChipLabel = ({ text }: { text: string }) => (
-    <span className="inline-flex w-fit items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] text-[10.5px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+    <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
       {text}
     </span>
   )
 
-  /** A doctor-attributed bullet — used inside Findings / Medications. */
-  const AttributedBullet = ({
-    doctor,
-    date,
-    content,
-  }: {
-    doctor: string
-    date: string
-    content: string
-  }) => (
-    <li className="flex gap-[6px]">
-      <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-      <span className="min-w-0">
-        <span className="font-semibold text-tp-slate-900">{doctor}</span>
-        <span className="text-tp-slate-500"> ({date})</span>
-        <span className="text-tp-slate-500">: </span>
-        <HighlightLine text={content} />
-      </span>
-    </li>
-  )
-
   return (
-    <div className="flex flex-col gap-[12px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
-      {findingsVisits.length > 0 && (
-        <div className="flex flex-col gap-[4px]">
-          <ChipLabel text="Findings" />
-          <ul className="ml-[2px] flex flex-col gap-[4px] pl-[8px]">
-            {findingsVisits.map((c, ci) => (
-              <AttributedBullet
-                key={ci}
-                doctor={c.doctor}
-                date={c.date}
-                content={c.diagnosis ?? c.findings ?? ""}
-              />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {medicationsVisits.length > 0 && (
-        <div className="flex flex-col gap-[4px]">
-          <ChipLabel text="Medications" />
-          <ul className="ml-[2px] flex flex-col gap-[4px] pl-[8px]">
-            {medicationsVisits.map((c, ci) => (
-              <AttributedBullet
-                key={ci}
-                doctor={c.doctor}
-                date={c.date}
-                content={c.medications ?? ""}
-              />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {planVisits.length > 0 && (
-        <div className="flex flex-col gap-[4px]">
-          <ChipLabel text="Plan" />
-          <ul className="ml-[2px] flex flex-col gap-[6px] pl-[8px]">
-            {planVisits.map((c, ci) => {
-              const subRows: Array<{ label: string; content: string }> = []
-              if (c.followUp) subRows.push({ label: "Follow-up", content: c.followUp })
-              if (c.investigations) subRows.push({ label: "Investigations", content: c.investigations })
-              if (c.advice) subRows.push({ label: "Advice", content: c.advice })
-              if (c.surgery) subRows.push({ label: "Planned surgery", content: c.surgery })
-              if (c.vaccinations) subRows.push({ label: "Vaccinations", content: c.vaccinations })
-              if (c.additionalNotes) subRows.push({ label: "Additional notes", content: c.additionalNotes })
-              if (subRows.length === 0 && c.plan) subRows.push({ label: "Plan", content: c.plan })
-              return (
-                <li key={ci} className="flex gap-[6px]">
-                  <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-                  <div className="flex min-w-0 flex-col gap-[2px]">
-                    <span>
-                      <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
-                      <span className="text-tp-slate-500"> ({c.date})</span>
-                    </span>
-                    <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
-                      {subRows.map((r, ri) => (
-                        <li key={ri} className="min-w-0">
-                          <span className="font-medium text-tp-slate-600">{r.label}: </span>
-                          <HighlightLine text={r.content} />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
+    <div className="relative ml-[8px] flex flex-col gap-[12px] border-l border-tp-slate-200 pl-[14px] text-[13.5px] leading-[1.55] text-tp-slate-700">
+      {consultations.map((c, ci) => {
+        const findings = c.diagnosis ?? c.findings
+        const planRows: Array<{ label: string; content: string }> = []
+        if (c.followUp) planRows.push({ label: "Follow-up", content: c.followUp })
+        if (c.investigations) planRows.push({ label: "Investigations", content: c.investigations })
+        if (c.advice) planRows.push({ label: "Advice", content: c.advice })
+        if (c.surgery) planRows.push({ label: "Planned surgery", content: c.surgery })
+        if (c.vaccinations) planRows.push({ label: "Vaccinations", content: c.vaccinations })
+        if (c.additionalNotes) planRows.push({ label: "Additional notes", content: c.additionalNotes })
+        if (planRows.length === 0 && c.plan) planRows.push({ label: "Plan", content: c.plan })
+        return (
+          <div key={ci} className="relative flex flex-col gap-[4px]">
+            {/* Timeline dot pinned to the left rail */}
+            <span
+              className={`absolute -left-[20px] top-[6px] inline-block h-[8px] w-[8px] rounded-full ring-[3px] ring-white ${
+                c.visitType === "IPD" ? "bg-tp-error-500" : "bg-tp-slate-400"
+              }`}
+              aria-hidden="true"
+            />
+            {/* Visit identity strip — doctor (semibold) + date (muted) + optional IPD chip */}
+            <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[2px] text-[13px]">
+              <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
+              <span className="text-tp-slate-500">{c.date}</span>
+              {c.visitType === "IPD" && (
+                <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+                  IPD
+                </span>
+              )}
+            </div>
+            {findings && (
+              <p className="min-w-0">
+                <ChipLabel text="Findings" />
+                <HighlightLine text={findings} />
+              </p>
+            )}
+            {c.medications && (
+              <p className="min-w-0">
+                <ChipLabel text="Medications" />
+                <HighlightLine text={c.medications} />
+              </p>
+            )}
+            {planRows.length > 0 && (
+              <div className="flex flex-col gap-[2px]">
+                <ChipLabel text="Plan" />
+                <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
+                  {planRows.map((r, ri) => (
+                    <li key={ri} className="min-w-0">
+                      <span className="font-medium text-tp-slate-600">{r.label}: </span>
+                      <HighlightLine text={r.content} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

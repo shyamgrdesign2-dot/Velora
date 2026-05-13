@@ -307,18 +307,24 @@ function SpecialtySidebar({
   rec,
   patientLabel,
   onClose,
+  initialExpandedIdx,
 }: {
   open: boolean
   rec: VeloraV0Attribution | null
   patientLabel: string
   onClose: () => void
+  /** When the sidebar opens via "View other details" on a specific
+   *  visit, we auto-expand that visit so the doctor lands directly
+   *  on the right consultation rather than the collapsed list. */
+  initialExpandedIdx?: number
 }) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
     if (!open) setExpandedIdx(null)
-  }, [open])
+    else if (typeof initialExpandedIdx === "number") setExpandedIdx(initialExpandedIdx)
+  }, [open, initialExpandedIdx])
   if (!mounted || !open || !rec) return null
 
   const consultations = rec.consultations ?? []
@@ -770,7 +776,15 @@ function SynthesisBullet({ row }: { row: VeloraV0Synthesis["rows"][number] }) {
  *  Each visit block is separated by a hairline divider so the eye reads
  *  the specialty as a chronological list of consultations.
  */
-function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
+function DetailedSpecialtyBody({
+  rec,
+  onOpenVisit,
+}: {
+  rec: VeloraV0Attribution
+  /** Open the specialty sidebar with a specific visit auto-expanded.
+   *  Powers the "View other details" link on empty visit blocks. */
+  onOpenVisit?: (visitIdx: number) => void
+}) {
   const consultations = rec.consultations ?? []
   // When there are no per-visit consultations, fall back to a minimal
   // verbatim render from the team-level `lines` array.
@@ -809,71 +823,87 @@ function DetailedSpecialtyBody({ rec }: { rec: VeloraV0Attribution }) {
         const hasAnyData =
           !!findings || !!c.medications || planRows.length > 0 || !!c.symptoms || !!c.examination
         return (
-          <div key={ci} className="relative flex flex-col gap-[4px]">
-            {/* Timeline dot pinned to the left rail */}
+          <div key={ci} className="relative">
+            {/* Timeline dot pinned to the left rail (sits outside the
+                bordered card so the timeline reads as a single thread
+                of cards strung along the rail). */}
             <span
-              className={`absolute -left-[20px] top-[6px] inline-block h-[8px] w-[8px] rounded-full ring-[3px] ring-white ${
+              className={`absolute -left-[20px] top-[10px] inline-block h-[8px] w-[8px] rounded-full ring-[3px] ring-white ${
                 c.visitType === "IPD" ? "bg-tp-error-500" : "bg-tp-slate-400"
               }`}
               aria-hidden="true"
             />
-            {/* Visit identity strip — doctor (semibold) + date (muted) + optional IPD chip */}
-            <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[2px] text-[13px]">
-              <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
-              <span className="text-tp-slate-500">{c.date}</span>
-              {c.visitType === "IPD" && (
-                <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
-                  IPD
-                </span>
+            {/* Bordered card per visit — groups everything the doctor
+                wrote at that visit into one visually-contained block. */}
+            <div className="flex flex-col gap-[4px] rounded-[8px] border border-tp-slate-200 bg-white px-[10px] py-[8px]">
+              {/* Visit identity strip — doctor (semibold) + date (muted) + optional IPD chip */}
+              <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[2px] text-[13px]">
+                <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
+                <span className="text-tp-slate-500">{c.date}</span>
+                {c.visitType === "IPD" && (
+                  <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+                    IPD
+                  </span>
+                )}
+              </div>
+              {c.symptoms && (
+                <p className="min-w-0">
+                  <ChipLabel text="Symptoms" />
+                  <HighlightLine text={c.symptoms} />
+                </p>
+              )}
+              {c.examination && (
+                <p className="min-w-0">
+                  <ChipLabel text="Examination" />
+                  <HighlightLine text={c.examination} />
+                </p>
+              )}
+              {findings && (
+                <p className="min-w-0">
+                  <ChipLabel text="Findings" />
+                  <HighlightLine text={findings} />
+                </p>
+              )}
+              {c.medications && (
+                <p className="min-w-0">
+                  <ChipLabel text="Medications" />
+                  <HighlightLine text={c.medications} />
+                </p>
+              )}
+              {planRows.length > 0 && (
+                <div className="flex flex-col gap-[2px]">
+                  <ChipLabel text="Plan" />
+                  <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
+                    {planRows.map((r, ri) => (
+                      <li key={ri} className="min-w-0">
+                        <span className="font-medium text-tp-slate-600">{r.label}: </span>
+                        <HighlightLine text={r.content} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {/* When the doctor wrote nothing in any F / M / P field for
+                  this visit, surface a polite placeholder + a "View other
+                  details" link that opens the specialty sidebar with this
+                  visit auto-expanded. The sidebar may surface lab rows,
+                  visit-type metadata, or other context that didn't fit any
+                  of the top-line rendering slots. */}
+              {!hasAnyData && (
+                <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
+                  No findings, medications or plan recorded for this Rx.{" "}
+                  {onOpenVisit && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenVisit(ci)}
+                      className="text-tp-violet-600 underline-offset-2 hover:underline focus:outline-none focus:underline"
+                    >
+                      View other details
+                    </button>
+                  )}
+                </p>
               )}
             </div>
-            {c.symptoms && (
-              <p className="min-w-0">
-                <ChipLabel text="Symptoms" />
-                <HighlightLine text={c.symptoms} />
-              </p>
-            )}
-            {c.examination && (
-              <p className="min-w-0">
-                <ChipLabel text="Examination" />
-                <HighlightLine text={c.examination} />
-              </p>
-            )}
-            {findings && (
-              <p className="min-w-0">
-                <ChipLabel text="Findings" />
-                <HighlightLine text={findings} />
-              </p>
-            )}
-            {c.medications && (
-              <p className="min-w-0">
-                <ChipLabel text="Medications" />
-                <HighlightLine text={c.medications} />
-              </p>
-            )}
-            {planRows.length > 0 && (
-              <div className="flex flex-col gap-[2px]">
-                <ChipLabel text="Plan" />
-                <ul className="ml-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
-                  {planRows.map((r, ri) => (
-                    <li key={ri} className="min-w-0">
-                      <span className="font-medium text-tp-slate-600">{r.label}: </span>
-                      <HighlightLine text={r.content} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {/* When the doctor wrote nothing for ANY F / M / P field for this
-                visit, surface a soft amber placeholder so the doctor reading
-                the card knows the visit happened but no Rx-pad data is on
-                file — different from "the field was empty" which we just
-                skip. */}
-            {!hasAnyData && (
-              <p className="min-w-0 rounded-[4px] bg-tp-warning-50/60 px-[8px] py-[3px] text-[12px] italic text-tp-warning-800">
-                No data available to display for this visit.
-              </p>
-            )}
           </div>
         )
       })}
@@ -887,6 +917,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   const hasHeadlines = headlines.length > 0
   // Which specialty (by index) has its sidebar open? -1 means none.
   const [openSidebarIdx, setOpenSidebarIdx] = useState<number>(-1)
+  // When the sidebar opens via "View other details" on a specific visit,
+  // we auto-expand that visit so the doctor lands directly on the right
+  // consultation. -1 means "no auto-expand, just render collapsed list".
+  const [sidebarInitialVisitIdx, setSidebarInitialVisitIdx] = useState<number>(-1)
   const openRec = openSidebarIdx >= 0 ? data.specialties[openSidebarIdx] ?? null : null
   // View-mode read from the agent-shell context. Single icon toggle next
   // to the Velora brand-tag drives every brief card on the surface.
@@ -935,20 +969,16 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             //   · Drop "Primary problem" — the chief diagnosis lives in
             //     each specialty's first-row Findings; keeping it here
             //     duplicated it.
-            //   · Drop any "Surgical history" group that's just a
-            //     "No surgical history found" placeholder — when there's
-            //     no data to show, the row is noise.
-            //   · Drop any "Allergies & safety" group that's just an
-            //     "Allergy review not …" placeholder — same logic.
-            //   · Family / Social history kept when present.
-            const isPlaceholderText = (txt: string) =>
-              /^no\b/i.test(txt) || /^allergy review (not|not on file)/i.test(txt)
-            const filteredHistory = data.medicalHistory.filter((g) => {
-              if (g.title === "Primary problem") return false
-              const allPlaceholder = g.items.every((it) => isPlaceholderText(it.text))
-              if (allPlaceholder) return false
-              return true
-            })
+            //
+            // Every other group renders — Co-morbidities, Surgical history,
+            // Allergies & safety, Family / Social history, Additional
+            // history. When a group has only the placeholder row ("No
+            // surgical history found", "Allergy review not on file") we
+            // still render it so the doctor sees the explicit absence
+            // rather than wondering if the section was checked.
+            const filteredHistory = data.medicalHistory.filter(
+              (g) => g.title !== "Primary problem",
+            )
             if (filteredHistory.length === 0) return null
             return (
               <div data-mdt-anchor="medical-history" className="flex flex-col gap-[4px]">
@@ -1032,7 +1062,13 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   the grouped-by-label lines render below. */}
               {viewMode === "detailed" ? (
                 <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined}>
-                  <DetailedSpecialtyBody rec={rec} />
+                  <DetailedSpecialtyBody
+                    rec={rec}
+                    onOpenVisit={(visitIdx) => {
+                      setSidebarInitialVisitIdx(visitIdx)
+                      setOpenSidebarIdx(idx)
+                    }}
+                  />
                   {/* Lab results aggregate row stays in Detailed mode too,
                       after the per-visit blocks, so the team-level
                       abnormal-labs picture sits at the bottom. */}
@@ -1251,7 +1287,11 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
         open={openSidebarIdx >= 0}
         rec={openRec}
         patientLabel={patientLine}
-        onClose={() => setOpenSidebarIdx(-1)}
+        initialExpandedIdx={sidebarInitialVisitIdx >= 0 ? sidebarInitialVisitIdx : undefined}
+        onClose={() => {
+          setOpenSidebarIdx(-1)
+          setSidebarInitialVisitIdx(-1)
+        }}
       />
     </div>
   )

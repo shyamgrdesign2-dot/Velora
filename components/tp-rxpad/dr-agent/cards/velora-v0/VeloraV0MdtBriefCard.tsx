@@ -59,6 +59,23 @@ function formatPatientStrip(data: {
   return `${data.patientName} (${inner.join(", ")})`
 }
 
+/**
+ * Compact a possibly-multi-doctor label into one-doctor-plus-overflow.
+ *
+ *   "Dr Tahiliani"                          → "Dr Tahiliani"
+ *   "Dr Tahiliani / Dr Sandeep Jain"        → "Dr Tahiliani  +1"
+ *   "Dr Sowani / Dr Nikhil Dave / Dr X"     → "Dr Sowani  +2"
+ *
+ * The trailing has to fit on one row alongside date + visit-count + chevron,
+ * so the second / third doctor name is folded into an overflow count. The
+ * sidebar (opened by the chevron) shows the full doctor list.
+ */
+function compactDoctorsLabel(raw: string): string {
+  const list = raw.split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean)
+  if (list.length <= 1) return raw
+  return `${list[0]}  +${list.length - 1}`
+}
+
 function HeaderTrailing({
   rec,
   onOpenSidebar,
@@ -66,28 +83,41 @@ function HeaderTrailing({
   rec: VeloraV0Attribution
   onOpenSidebar: () => void
 }) {
-  // Rich trailing: date range + doctors + consultation count + chevron.
-  // The chevron is a clickable affordance that opens the specialty sidebar
-  // (per-consultation timeline). It replaces the old info icon — the info
-  // icon's content has moved into the sidebar where the doctor can see the
-  // full per-visit Rx instead of a static tooltip blurb.
+  // Compact bracketed trailing: ( date | N visits | first doctor +N ) →
+  //
+  // The parens anchor the metadata visually so the eye reads it as a self-
+  // contained tag, leaving the chevron clearly outside as the click target.
+  // Lighter slate-300 pipes between segments so the dividers recede and the
+  // values carry the eye.
+  //
+  // Multi-doctor specialty labels are compacted to "Dr First +N" — the full
+  // doctor list lives in the sidebar that the chevron opens.
   const hasStructured = rec.dateRangeLabel || rec.doctorsLabel || typeof rec.consultationCount === "number"
   const segments: string[] = []
   if (hasStructured) {
     if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
     if (typeof rec.consultationCount === "number") segments.push(`${rec.consultationCount} visit${rec.consultationCount === 1 ? "" : "s"}`)
-    if (rec.doctorsLabel) segments.push(rec.doctorsLabel)
+    if (rec.doctorsLabel) segments.push(compactDoctorsLabel(rec.doctorsLabel))
   } else {
-    segments.push(`(${shortDate(rec.source.date)})`)
+    segments.push(shortDate(rec.source.date))
   }
   return (
     <button
       type="button"
       onClick={onOpenSidebar}
-      className="flex shrink-0 items-center gap-[6px] rounded-[4px] px-[6px] py-[2px] text-[12px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
+      className="flex shrink-0 items-center gap-[5px] rounded-[4px] px-[6px] py-[2px] text-[12px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
       aria-label={`Open ${rec.source.specialty} consultation timeline`}
     >
-      <span>{segments.join(" · ")}</span>
+      <span className="flex items-center">
+        <span className="text-tp-slate-300">(</span>
+        {segments.map((s, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <span className="mx-[6px] text-tp-slate-300">|</span>}
+            <span>{s}</span>
+          </React.Fragment>
+        ))}
+        <span className="text-tp-slate-300">)</span>
+      </span>
       <ArrowRight2 size={14} variant="Linear" />
     </button>
   )

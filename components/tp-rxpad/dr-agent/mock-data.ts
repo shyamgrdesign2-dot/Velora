@@ -12,49 +12,53 @@ export const SMART_SUMMARY_BY_CONTEXT: Record<string, SmartSummaryData> = {
   // specialtyTags is intentionally [] for all five so the panel's auto-intro
   // ("Here's the situation at a glance.") never fires — the welcome screen with
   // the 4 V0 intent cards stays visible after a patient is selected.
-  "ravi-shankar": {
+  // 5 OMOP-backed patients — see docs/velora-patients/ for the full per-patient
+  // walkthrough. The minimal summaries here only need to exist so detectSpecialties
+  // + buildIntroMessages don't crash; full cross-consultation brief data lives
+  // in lib/velora/v0-replies.ts (SURESH_PATEL_BRIEF_MOCK + future siblings).
+  "lakshmi-iyer": {
     specialtyTags: [],
     followUpOverdueDays: 0,
-    patientNarrative: "64M · MDT brief exemplar. Touched by 3 specialties in last 90 days (Cardio · Endo · Nephro).",
-    chronicConditions: ["AFib (since Mar 2026)", "T2DM (5yr)", "CKD G3a"],
+    patientNarrative: "76F · person_id 1093717054960 · OMOP-backed. Right breast Ca stage IA pre-op work-up + CAD + CKD + severe OSA. 15 specialties in a 17-day burst.",
+    chronicConditions: ["Right Breast Ca (pT1cN0 stage IA)", "Hypertension", "Dyslipidaemia", "IHD/CAD", "CKD (acute on chronic)", "Severe OSA"],
     allergies: [],
-    activeMeds: ["Apixaban 5mg BID", "Bisoprolol 5mg OD", "Metformin 1000mg BD", "Empagliflozin 10mg OD"],
+    activeMeds: [],
     labFlagCount: 0,
   },
-  "lakshmi-pandey": {
+  "suresh-patel": {
     specialtyTags: [],
     followUpOverdueDays: 0,
-    patientNarrative: "58F · Open loops exemplar. 4 unclosed chains.",
-    chronicConditions: ["Hypertension", "Hypothyroid"],
+    patientNarrative: "60M · person_id 843373981236 · OMOP-backed. Colon Ca (T3N2b stage IIIB) s/p hemicolectomy + 6 cycles adjuvant chemo, lung metastasis flagged. 12 specialties over 13 months. LIVE cross-consultation brief.",
+    chronicConditions: ["Carcinoma Hepatic Flexure (T3N2b)", "T2DM", "HTN", "Hypothyroidism", "Diabetic neuropathy"],
     allergies: [],
-    activeMeds: ["Telmisartan 40mg OD", "Levothyroxine 50mcg OD"],
+    activeMeds: ["Dulotin 10mg (status pending)", "Gabantin GRS 300 (status pending)", "CCM tablet"],
     labFlagCount: 0,
   },
-  "suresh-iyer": {
+  "asha-krishnan": {
     specialtyTags: [],
     followUpOverdueDays: 0,
-    patientNarrative: "71M · Active meds & safety exemplar. NSAID on a DOAC — Naproxen × Apixaban.",
-    chronicConditions: ["AFib", "Post-MI", "T2DM"],
+    patientNarrative: "57F · person_id 375391871728 · OMOP-backed. Narrow specialty footprint (4 providers, 59 visits) — HTN + post-Achilles tendon repair + recurrent intercurrent viral fevers. Counter-example case for the brief design.",
+    chronicConditions: ["Hypertension"],
     allergies: [],
-    activeMeds: ["Apixaban 5mg BID", "Bisoprolol 5mg OD", "Atorvastatin 40mg N", "Metformin 1000mg BD", "Pantoprazole 40mg M", "Naproxen 500mg PRN"],
+    activeMeds: [],
     labFlagCount: 0,
   },
-  "anita-mehta": {
+  "meera-joshi": {
     specialtyTags: [],
     followUpOverdueDays: 0,
-    patientNarrative: "54F · Trends-across-visits exemplar. HbA1c trending up over 4 visits.",
-    chronicConditions: ["T2DM", "Hypertension"],
+    patientNarrative: "58F · person_id 241381057447 · OMOP-backed. Dense cardio-cerebro-metabolic stack — CAD + prior CVA + T2DM + Hypothyroid + NAFLD + obesity + LSCS/TL/renal-stone surgical history. 40 visits across 11 specialties.",
+    chronicConditions: ["CAD", "Prior CVA", "Type-2 DM", "Hypothyroidism", "Dyslipidaemia", "Essential HTN", "Obesity", "NAFLD"],
     allergies: [],
-    activeMeds: ["Metformin 1000mg BD", "Glimepiride 2mg OD", "Telmisartan 40mg OD"],
+    activeMeds: [],
     labFlagCount: 0,
   },
-  "ramesh-kumar": {
+  "anita-desai": {
     specialtyTags: [],
     followUpOverdueDays: 0,
-    patientNarrative: "76M · Why-flagged-today exemplar. Discharged 4 days ago after AKI episode.",
-    chronicConditions: ["Post-AKI recovery", "T2DM", "Hypertension", "CKD G3"],
+    patientNarrative: "64F · person_id 714696991886 · OMOP-backed. Classic metabolic syndrome + severe hypertriglyceridaemia (TG 2898 mg/dL documented) driving 13 episodes of recurrent acute pancreatitis. Heaviest polypharmacy of all 5 patients.",
+    chronicConditions: ["Type-2 DM", "Hypertension", "Dyslipidaemia (hyper-TG dominant)", "Bronchial Asthma", "Hypothyroidism", "Recurrent acute pancreatitis", "Past cholecystectomy"],
     allergies: [],
-    activeMeds: ["Furosemide 20mg OD", "Telmisartan 20mg OD", "Metformin 500mg BD", "Atorvastatin 20mg N", "Pantoprazole 40mg M", "Aspirin 75mg OD", "Vitamin D 60K weekly"],
+    activeMeds: [],
     labFlagCount: 0,
   },
 

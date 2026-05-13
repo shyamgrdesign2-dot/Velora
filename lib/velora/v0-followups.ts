@@ -543,7 +543,7 @@ export const VELORA_PARENT_INTENTS: VeloraParentIntent[] = [
 /** Doctor-facing short label for each parent intent. */
 export function veloraParentLabel(parent: VeloraParentIntent): string {
   switch (parent) {
-    case "mdt_brief":   return "MDT brief"
+    case "mdt_brief":   return "Cross-consultation brief"
     case "patient_journey":  return "Patient journey"
     case "active_meds": return "Active meds & safety"
     case "why_flagged": return "Why flagged today"
@@ -553,7 +553,7 @@ export function veloraParentLabel(parent: VeloraParentIntent): string {
 /** The message that triggers each parent intent through the reply override. */
 export function veloraParentMessage(parent: VeloraParentIntent): string {
   switch (parent) {
-    case "mdt_brief":   return "Show MDT brief"
+    case "mdt_brief":   return "Show cross-consultation brief"
     case "patient_journey":  return "Show patient journey"
     case "active_meds": return "Show active meds and safety"
     case "why_flagged": return "Why is this patient flagged today"

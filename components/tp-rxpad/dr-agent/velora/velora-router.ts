@@ -12,11 +12,13 @@ import { isVeloraPatientId, type VeloraPatientId } from "./velora-patients"
 const BRIEF_PREAMBLE: Record<VeloraPatientId, string> = {
   "velora-priya": "Quick brief on Priya — one gap, three silos.",
   "velora-rajesh": "Quick brief on Rajesh — one chain, three specialists.",
+  "velora-suresh": "Cross-consultation brief on Mr Suresh Patel — colon Ca survivor, 12 teams, surveillance overdue.",
 }
 
 const FULL_PREAMBLE: Record<VeloraPatientId, string> = {
   "velora-priya": "Full clinical assessment — pathway, gaps, and what matters clinically.",
   "velora-rajesh": "Full correlation assessment — KT/V ↔ BNP pair with the three specialist views.",
+  "velora-suresh": "Full cross-consultation brief — every specialty, every collision, every guideline anchor.",
 }
 
 // ─── Suggestions per phase ───────────────────────────────────────

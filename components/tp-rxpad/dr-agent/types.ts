@@ -790,6 +790,65 @@ export interface VeloraV0Attribution {
   /** Why Velora picked this specific note out of the EMR — surfaced via the
    *  eye-icon tooltip next to the section heading's date. */
   reason?: string
+  /** Trust-layer provenance line shown immediately under the specialty
+   *  heading (e.g. "Based on 5 consultations · 30 Apr → 11 May · Dr Pandya").
+   *  Tells the doctor exactly how many records this synthesis is grounded
+   *  in, so they can challenge or verify before acting. */
+  provenance?: string
+  /** Anti-data-loss disclosure — surfaced as a small "Open loops on this
+   *  specialty" block below the body. Each entry is one short sentence
+   *  describing something captured upstream but NOT surfaced in this brief
+   *  (e.g. "Investigations advised but no result row · CEA, PET-CT") or a
+   *  guideline-anchored gap (e.g. "No oncology contact since 30 Sep 2025
+   *  — surveillance overdue per NCCN Colon Ca v.2.2024 §SURV-2"). */
+  openLoops?: string[]
+  /** Compact label for the specialty heading trailing — describes the date
+   *  span of visits with this team. Example: "8 May → 30 Sep '25". When
+   *  present, renders in the header trailing INSTEAD of the legacy single
+   *  date so the doctor sees the engagement window at a glance. */
+  dateRangeLabel?: string
+  /** Total consultation count with this team. Renders in the header trailing
+   *  alongside the date range (e.g. "12 visits"). */
+  consultationCount?: number
+  /** Compact doctor-name label for the header trailing. For single-doctor
+   *  specialties pass the full name ("Dr Pankaj Shah"); for multi-doctor
+   *  use a join or summarised form ("Dr Pankaj Shah / Dr Mithun Shah"). */
+  doctorsLabel?: string
+}
+
+/** One sub-section in the structured Section 1 · Medical history view.
+ *
+ *  `tone` drives the visual emphasis:
+ *    primary  — the headline diagnosis (e.g. active cancer). Stronger label.
+ *    neutral  — standard list (co-morbidities, surgical history).
+ *    positive — explicit-negative verifications ("No known drug allergy").
+ *               Rendered with a green ✓ to make the absence read as data,
+ *               not a gap.
+ *
+ *  Each item carries an optional `sourceCount` — the number of OMOP rows
+ *  backing the claim. Surfaced as a small caption ("5 rows") so the
+ *  doctor can see the evidence strength inline. */
+export interface VeloraV0MedicalHistoryGroup {
+  title: string
+  tone?: "primary" | "neutral" | "positive"
+  items: Array<{
+    text: string
+    /** Legacy field — was rendered inline as "N rows" caption. No longer
+     *  shown. Kept for back-compat; prefer group-level `sources` instead. */
+    sourceCount?: number
+    /** Legacy per-item tooltip text — no longer used by the card. Sources
+     *  are now consolidated at the group level. */
+    source?: string
+  }>
+  /** Group-level source attribution — surfaces in a tooltip on the
+   *  subheading info icon. Each entry is one OMOP-grounded consultation that
+   *  contributed to this group. The doctor hovers the ⓘ to see exactly which
+   *  visits feed the synthesis below it. */
+  sources?: Array<{ doctor: string; date: string }>
+  /** Group-level reasoning — surfaces beneath the sources list in the same
+   *  tooltip. Tells the doctor *why* this group is in the medical history
+   *  (e.g. "Six independent recordings confirm T3N2b stage IIIB colon Ca…"). */
+  reasoning?: string
 }
 
 export interface VeloraV0Synthesis {
@@ -806,10 +865,37 @@ export interface VeloraV0Synthesis {
   note?: string
 }
 
-// ── Intent ① · MDT brief ────────────────────────────────────────────────
+// ── Intent ① · Cross-consultation brief (a.k.a. "MDT brief" internally) ─
+//
+// User-facing label is "Cross-consultation brief". Internal identifiers
+// (`velora_v0_mdt_brief`, `MDT_BRIEF_MOCK`, file names) intentionally keep
+// the older `mdt` token — renaming them would balloon the diff with no
+// user impact. Treat the two terms as synonyms for V0.
 export interface VeloraV0MdtBriefData {
   patientName: string
+  /** Legacy single-line meta. Still rendered as a fallback when the
+   *  structured fields below are not supplied. */
   patientMeta: string
+  /** Structured patient-context strip. When any of these are present the
+   *  card renders a richer line: "{name} · F · 65 · +91 98765 54960 · 1093…".
+   *  patientId is the canonical KG `person_id` (string, not numeric). */
+  patientGender?: "M" | "F"
+  patientAge?: string | number
+  patientMobile?: string
+  patientId?: string
+  /** Top-of-card "Headlines" section: chronic conditions + concerning
+   *  diagnoses surfaced once so per-specialty sections only describe what
+   *  *that* team did about them. Pulled from drug-signature inference +
+   *  free-text symptom strings when `:DIAGNOSED` edges are sparse.
+   *  Flat-list legacy form; prefer the structured `medicalHistory` below. */
+  chronicConditions?: string[]
+  /** Structured "Section 1 · Medical history" — multiple grouped sub-sections
+   *  (Active oncology, Co-morbidities, Surgical history, Allergies, Family /
+   *  Social, etc.). When present, the card renders the grouped layout
+   *  instead of the flat `chronicConditions` list. Designed for richer
+   *  cases like Mr Suresh Patel (843373981236) where one flat list would
+   *  bury the surgical history and allergy verifications. */
+  medicalHistory?: VeloraV0MedicalHistoryGroup[]
   windowDays: number
   /** Stack 1 — per-specialty attributed notes from EMR. */
   specialties: VeloraV0Attribution[]

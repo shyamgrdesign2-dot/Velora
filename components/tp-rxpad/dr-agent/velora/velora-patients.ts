@@ -2,8 +2,9 @@ import React from "react"
 import { Flash, Clock, Stickynote, InfoCircle, Diagram, Activity, Chart, Hospital, ClipboardText, ShieldTick, SearchStatus } from "iconsax-reactjs"
 import type { RxAgentChatMessage } from "../types"
 import { VELORA_BRIEF_OUTPUT } from "./velora-scenarios"
+import { SURESH_PATEL_BRIEF_MOCK } from "@/lib/velora/v0-replies"
 
-export type VeloraPatientId = "velora-priya" | "velora-rajesh"
+export type VeloraPatientId = "velora-priya" | "velora-rajesh" | "velora-suresh"
 
 export interface VeloraAppointmentRow {
   id: VeloraPatientId
@@ -55,16 +56,38 @@ export const VELORA_APPOINTMENTS: VeloraAppointmentRow[] = [
     dateKey: "today",
     hasSymptoms: true,
   },
+  // Suresh Patel — full OMOP CDM export. Clicking this row auto-seeds the
+  // chat with his cross-consultation brief card (no welcome screen, straight
+  // to the data). Mobile + age + gender are real OMOP values.
+  {
+    id: "velora-suresh",
+    serial: 3,
+    name: "Suresh Patel",
+    gender: "M",
+    age: 60,
+    contact: "+91-9833383625",
+    visitType: "Follow-up",
+    visitTags: [{ text: "Colon Ca · IIIB · Surveillance overdue", tone: "warning" }],
+    slotTime: "10:40 am",
+    slotDate: "9 Mar'26",
+    hasVideo: false,
+    status: "queue",
+    dateKey: "today",
+    hasSymptoms: true,
+  },
 ]
 
 const VELORA_USER_PROMPT: Record<VeloraPatientId, string> = {
   "velora-priya": "Run clinical insight scan for Priya Reddy.",
   "velora-rajesh": "Run clinical insight scan for Rajesh Iyer.",
+  "velora-suresh": "Open Mr Suresh Patel's cross-consultation brief.",
 }
 
 const VELORA_BRIEF_PREAMBLE: Record<VeloraPatientId, string> = {
   "velora-priya": "Quick brief on Priya: one gap, three silos.",
   "velora-rajesh": "Quick brief on Rajesh: one chain, three specialists.",
+  "velora-suresh":
+    "Here's the cross-consultation brief — 12 specialties touched in the last 13 months. Oncology surveillance gap + polypharmacy flags surfaced.",
 }
 
 const VELORA_BRIEF_SUGGESTIONS: Record<VeloraPatientId, RxAgentChatMessage["suggestions"]> = {
@@ -80,6 +103,12 @@ const VELORA_BRIEF_SUGGESTIONS: Record<VeloraPatientId, RxAgentChatMessage["sugg
     { label: "Predicted outcomes if untreated", message: "Predicted outcomes if untreated" },
     { label: "What would escalating PD do?", message: "What would escalating PD do?" },
   ],
+  "velora-suresh": [
+    { label: "Show patient journey", message: "Show patient journey" },
+    { label: "Active meds & safety", message: "Show active meds and safety" },
+    { label: "Why flagged today", message: "Why is this patient flagged today" },
+    { label: "Show trends", message: "Show trends" },
+  ],
 }
 
 /** Seeded Dr. Agent thread for a Velora patient:
@@ -88,6 +117,30 @@ const VELORA_BRIEF_SUGGESTIONS: Record<VeloraPatientId, RxAgentChatMessage["sugg
  *  replyOverride and appended as new turns. */
 export function buildVeloraThread(patientId: VeloraPatientId): RxAgentChatMessage[] {
   const now = new Date().toISOString()
+  // Suresh Patel — special case. Clicking him in the appointment queue should
+  // open straight into his cross-consultation brief card, not a generic
+  // welcome scan. The card itself is the brief; no extra pill required.
+  if (patientId === "velora-suresh") {
+    return [
+      {
+        id: `velora-user-${patientId}`,
+        role: "user",
+        text: VELORA_USER_PROMPT[patientId],
+        createdAt: now,
+      },
+      {
+        id: `velora-assistant-${patientId}`,
+        role: "assistant",
+        text: VELORA_BRIEF_PREAMBLE[patientId],
+        createdAt: now,
+        rxOutput: {
+          kind: "velora_v0_mdt_brief",
+          data: SURESH_PATEL_BRIEF_MOCK,
+        },
+        suggestions: VELORA_BRIEF_SUGGESTIONS[patientId],
+      },
+    ]
+  }
   return [
     {
       id: `velora-user-${patientId}`,
@@ -107,7 +160,7 @@ export function buildVeloraThread(patientId: VeloraPatientId): RxAgentChatMessag
 }
 
 export function isVeloraPatientId(id: string): id is VeloraPatientId {
-  return id === "velora-priya" || id === "velora-rajesh"
+  return id === "velora-priya" || id === "velora-rajesh" || id === "velora-suresh"
 }
 
 /**
@@ -125,9 +178,9 @@ const icon = (Cmp: React.ComponentType<{ size?: number; variant?: "Bulk" }>) =>
 const VELORA_V0_INTENT_ACTIONS = [
   {
     icon: icon(Hospital),
-    title: "MDT brief",
+    title: "Cross-consultation brief",
     subtitle: "What each specialty thinks, and where they collide",
-    message: "Show MDT brief",
+    message: "Show cross-consultation brief",
   },
   {
     icon: icon(ClipboardText),
@@ -151,11 +204,11 @@ const VELORA_V0_INTENT_ACTIONS = [
 
 const VELORA_V0_PATIENT_IDS = new Set([
   "__homepage_common__",
-  "ravi-shankar",
-  "lakshmi-pandey",
-  "suresh-iyer",
-  "anita-mehta",
-  "ramesh-kumar",
+  "lakshmi-iyer",
+  "suresh-patel",
+  "asha-krishnan",
+  "meera-joshi",
+  "anita-desai",
 ])
 
 export function getVeloraWelcomeActions(patientId: string) {

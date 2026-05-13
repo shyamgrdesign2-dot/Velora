@@ -38,9 +38,9 @@ const CONTEXT_ACTIONS: Record<PageContext, QuickAction[]> = {
   homepage: [
     {
       icon: <Hospital size={ICON_SIZE} variant="Bulk" />,
-      title: "MDT brief",
+      title: "Cross-consultation brief",
       subtitle: "What each specialty thinks, and where they collide",
-      message: "Show MDT brief",
+      message: "Show cross-consultation brief",
     },
     {
       icon: <ClipboardText size={ICON_SIZE} variant="Bulk" />,
@@ -348,7 +348,18 @@ export function WelcomeScreen({
           <button
             key={i}
             type="button"
-            onClick={() => onActionClick(action.message)}
+            onClick={() => {
+              // For the cross-consultation brief pill specifically, append the
+              // selected patient's name to the message so the v0-replies router
+              // can keyword-route to the right patient's brief (Ravi → MDT mock,
+              // Suresh → OMOP-backed mock). Without this the pill always
+              // resolves to the router default regardless of who's selected.
+              let outgoing = action.message
+              if (outgoing === "Show cross-consultation brief" && patientName) {
+                outgoing = `Show cross-consultation brief for ${patientName}`
+              }
+              onActionClick(outgoing)
+            }}
             className="welcome-canned-card group relative flex flex-col items-start text-left transition-all overflow-hidden"
             style={{
               borderRadius: 14,

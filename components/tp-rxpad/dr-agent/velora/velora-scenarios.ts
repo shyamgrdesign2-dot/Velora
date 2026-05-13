@@ -265,15 +265,22 @@ const RAJESH_BRIEF: VeloraBriefCardData = {
 
 // ─── Exports ──────────────────────────────────────────────────────
 
+// Mr Suresh Patel uses the velora_v0_mdt_brief flow (cross-consultation brief
+// from OMOP data), not the legacy velora_brief format. The entries below are
+// type-stub placeholders so the Record<VeloraPatientId, …> shape stays valid;
+// they are never read at runtime because buildVeloraThread special-cases
+// velora-suresh and returns its own thread before these are accessed.
 export const VELORA_BRIEFS: Record<VeloraPatientId, VeloraBriefCardData> = {
   "velora-priya": PRIYA_BRIEF,
   "velora-rajesh": RAJESH_BRIEF,
+  "velora-suresh": PRIYA_BRIEF, // placeholder · see comment above
 }
 
 /** Full extensive cards — routed from the brief card via "Show full …" pill. */
 export const VELORA_FULL: Record<VeloraPatientId, RxAgentOutput> = {
   "velora-priya": { kind: "care_gap_window", data: PRIYA_FULL },
   "velora-rajesh": { kind: "clinical_correlation_chain", data: RAJESH_FULL },
+  "velora-suresh": { kind: "care_gap_window", data: PRIYA_FULL }, // placeholder · see comment above
 }
 
 /** Back-compat alias so existing callers keep working. */
@@ -282,4 +289,5 @@ export const VELORA_SCENARIOS = VELORA_FULL
 export const VELORA_BRIEF_OUTPUT: Record<VeloraPatientId, RxAgentOutput> = {
   "velora-priya": { kind: "velora_brief", data: PRIYA_BRIEF },
   "velora-rajesh": { kind: "velora_brief", data: RAJESH_BRIEF },
+  "velora-suresh": { kind: "velora_brief", data: PRIYA_BRIEF }, // placeholder · see comment above
 }

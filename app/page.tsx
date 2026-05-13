@@ -41,7 +41,7 @@ export default function VeloraHomePage() {
         <div className="h-full w-full">
           <DrAgentPanel
             mode="homepage"
-            initialPatientId="ravi-shankar"
+            initialPatientId="suresh-patel"
             onClose={() => {
               /* Standalone product — closing the panel is a no-op. */
             }}

@@ -20,21 +20,37 @@ import type { RxContextOption, SpecialtyTabId } from "./types"
 
 // ═══════════════ PATIENT CONTEXT OPTIONS ═══════════════
 
-// ── Velora v0 panel — 5 canonical patients, one per intent (per Velora_V0_Intent_Spec) ──
-//   Ravi Shankar (T2)    → MDT brief flagship
-//   Lakshmi Pandey (T1)  → Open loops
-//   Suresh Iyer (T1)     → Active meds & safety
-//   Anita Mehta (T1)     → Trends across visits / Why flagged
-//   Ramesh Kumar (T1)    → Why flagged today (post-AKI)
+// ── Velora v0 panel — 5 canonical OMOP-backed patients ──
+//
+// Every patient in this list has a real OMOP CDM v5.4 export sitting on disk
+// (see /Users/shyamsundar/Documents/Archive*.zip and docs/velora-patients/).
+// The display name is anonymised; the person_id, gender, age (DOB-derived),
+// and mobile (real for Suresh, deterministic-from-suffix for the rest) match
+// the underlying records.
+//
+// No legacy / placeholder patients. The user explicitly scoped the Velora demo
+// surface to these five so every interaction is grounded in real data.
+//
+// Meta string format: each "·"-separated chunk renders as a "|"-divided
+// segment in the PatientSelector dropdown — gender · age · mobile · person_id.
+//
+//   P1  Lakshmi Iyer   F · 76 · breast Ca stage IA + CAD + CKD + OSA
+//   P2  Suresh Patel   M · 60 · colon Ca T3N2b + lung mets + polypharmacy  (LIVE brief)
+//   P3  Asha Krishnan  F · 57 · HTN + post-Achilles repair + intercurrent viral fevers
+//   P4  Meera Joshi    F · 58 · CAD + CVA + DM + Hypothyroid + NAFLD + obesity
+//   P5  Anita Desai    F · 64 · DM + HTN + hypertriglyceridaemia + recurrent pancreatitis + asthma
 export const RX_CONTEXT_OPTIONS: RxContextOption[] = [
-  { id: "ravi-shankar",   label: "Ravi Shankar",    meta: "M, 64y · MRN-78214 · GenMed OPD",     kind: "patient", isToday: true, gender: "M", age: 64 },
-  { id: "lakshmi-pandey", label: "Lakshmi Pandey",  meta: "F, 58y · MRN-44103 · GenMed F/U",     kind: "patient", isToday: true, gender: "F", age: 58 },
-  { id: "suresh-iyer",    label: "Suresh Iyer",     meta: "M, 71y · MRN-29117 · Cardio + GenMed", kind: "patient", isToday: true, gender: "M", age: 71 },
-  { id: "anita-mehta",    label: "Anita Mehta",     meta: "F, 54y · MRN-66208 · Endo + GenMed",  kind: "patient", isToday: true, gender: "F", age: 54 },
-  { id: "ramesh-kumar",   label: "Ramesh Kumar",    meta: "M, 76y · MRN-90342 · Post-AKI brief", kind: "patient", isToday: true, gender: "M", age: 76 },
+  { id: "lakshmi-iyer",   label: "Lakshmi Iyer",   meta: "F, 76y · +91 98765 54960 · 1093717054960", kind: "patient", isToday: true, gender: "F", age: 76 },
+  { id: "suresh-patel",   label: "Suresh Patel",   meta: "M, 60y · +91 98333 83625 · 843373981236", kind: "patient", isToday: true, gender: "M", age: 60 },
+  { id: "asha-krishnan",  label: "Asha Krishnan",  meta: "F, 57y · +91 98765 71728 · 375391871728", kind: "patient", isToday: true, gender: "F", age: 57 },
+  { id: "meera-joshi",    label: "Meera Joshi",    meta: "F, 58y · +91 98765 57447 · 241381057447", kind: "patient", isToday: true, gender: "F", age: 58 },
+  { id: "anita-desai",    label: "Anita Desai",    meta: "F, 64y · +91 98765 91886 · 714696991886", kind: "patient", isToday: true, gender: "F", age: 64 },
 ]
 
-export const CONTEXT_PATIENT_ID = "ravi-shankar"
+// Default selection — Suresh Patel is the LIVE cross-consultation brief case
+// with a complete `SURESH_PATEL_BRIEF_MOCK` mock. Opening the Velora panel
+// without an explicit selection lands on his card.
+export const CONTEXT_PATIENT_ID = "suresh-patel"
 
 /** Auto-sent from appointment-row AI icon — must match panel handling for quick snapshot vs full summary */
 export const QUICK_CLINICAL_SNAPSHOT_PROMPT = "Quick clinical snapshot"

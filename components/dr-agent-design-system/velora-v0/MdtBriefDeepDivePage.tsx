@@ -213,13 +213,13 @@ export function MdtBriefDeepDivePage() {
                 Velora v0
               </Link>
               <span className="text-[11px] text-tp-slate-300">/</span>
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-tp-slate-500">Intent ① — MDT brief</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-tp-slate-500">Intent ① — Cross-consultation brief</span>
             </div>
             <h1
               className="truncate text-[18px] font-bold leading-tight"
               style={{ background: AI_GRADIENT, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
             >
-              MDT brief — Deep dive
+              Cross-consultation brief — Deep dive
             </h1>
             <p className="truncate text-[11px] text-tp-slate-400">
               The actual chat card · every section annotated · data sources, selection rules, and the trust contract.

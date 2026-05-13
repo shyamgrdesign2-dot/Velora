@@ -197,11 +197,15 @@ export function PatientSelector({
             <div className="flex flex-col gap-[1px] pt-[4px]">
               {filteredPatients.map((option) => {
                 const isSelected = option.id === visibleSelectedId && !isUniversalSelected
-                // Extract phone number from meta (last segment)
+                // Secondary line: gender · age · everything-after-gender-age from the meta.
+                // The first meta segment is the gender+age combo (e.g. "M, 60y"); we
+                // skip it because option.gender + option.age are already explicit fields.
+                // Remaining segments (mobile, patient ID, visit type, etc.) each render
+                // as their own |-separated chunk so all of them show — not just the
+                // last one. Surfaces e.g. "M | 60y | +91 98333 83625 | 843373981236".
                 const metaParts = option.meta.split("·").map((s) => s.trim())
-                const phoneNumber = metaParts.length >= 3 ? metaParts[metaParts.length - 1] : metaParts.length > 1 ? metaParts.slice(1).join(" · ") : ""
-                // Secondary line: gender / age / phone
-                const secondaryParts = [option.gender || "", option.age ? `${option.age}y` : "", phoneNumber].filter(Boolean)
+                const extraSegments = metaParts.slice(1)
+                const secondaryParts = [option.gender || "", option.age ? `${option.age}y` : "", ...extraSegments].filter(Boolean)
                 return (
                   <button key={option.id} type="button" onClick={() => handleRowClick(option.id)}
                     className={cn("flex w-full items-center gap-[10px] rounded-[8px] px-[10px] py-[8px] text-left transition-colors", isSelected ? "bg-tp-blue-50" : "hover:bg-tp-slate-100/80")}>

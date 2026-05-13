@@ -162,7 +162,7 @@ export function VeloraV0Section() {
             number="①"
             flagship
             icon={<Hospital className="h-5 w-5" strokeWidth={1.8} />}
-            title="MDT brief"
+            title="Cross-consultation brief"
             doctorQuestion="What does each specialty think — and where do they collide?"
             oneLine="Cross-team Assessment + Plan per specialty, plus a guideline-anchored synthesis where they meet."
             href="/dr-agent-design-system/velora-v0/mdt-brief"

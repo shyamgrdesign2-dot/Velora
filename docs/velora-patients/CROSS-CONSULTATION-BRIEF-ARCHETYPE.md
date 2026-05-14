@@ -12,6 +12,52 @@
 > The most important section in this document. Memorise this before
 > editing a single line of the card.
 
+### First — what *are* Stack 1 and Stack 2?
+
+Velora's Cross-consultation surface ships as **two cards stacked
+vertically inside one chat turn**. Each card has a distinct job, a
+distinct source of truth, and a distinct relationship to AI.
+
+**Stack 1 — the *Cross-consultation brief* card.**
+*Its job:* show the clinician, in one screen, exactly what every
+specialty team has already written in the EMR. Doctor's note,
+verbatim. Drug list, verbatim. Advice line, verbatim. **It is a
+mirror of the hospital's record, not an interpretation of it.**
+The clinician comes here to **recall** what their colleagues did, not
+to ask "what does Velora think?".
+
+   ➝ If a value isn't in the EMR, Stack 1 does not invent it. The
+     row reads *"No data from patient record"*, explicitly.
+   ➝ If a drug name comes back in shout-case from the pharmacy
+     module, Stack 1 renders it in shout-case. We don't normalise
+     a single character.
+   ➝ Every chip + every visit row carries an ⓘ tooltip naming the
+     OMOP consultations behind it.
+
+**Stack 2 — the *Clinical synthesis* card.**
+*Its job:* once the clinician has read the verbatim picture in
+Stack 1, help them **connect dots across specialties** — drug
+interactions, surveillance lapses, regimens that span three teams
+who weren't talking to each other. **It is an interpretation layer,
+but the interpretations come from published clinical guidelines, not
+from the LLM.**
+The clinician comes here to ask "what should I notice that no single
+specialty card showed me?".
+
+   ➝ Every flag cites a published rule body (NCCN · NICE · ESC ·
+     ADA · KDIGO · Beers · WHO HEARTS · AASM) signed off by the
+     hospital.
+   ➝ AI's job is to *pick which panels apply* to this patient and
+     *rank the fires by severity*. The clinical content of each
+     panel is verbatim from the cited guideline.
+   ➝ Stack 2 never authors a recommendation that isn't backed by a
+     cited rule.
+
+**Mnemonic.**
+*Stack 1 answers "what did my colleagues do?". Stack 2 answers
+"what should I notice across what they did?". Stack 1 is recall;
+Stack 2 is connection. Neither is the LLM's opinion.*
+
 ```
    ╔══════════════════════════════╗   ╔══════════════════════════════╗
    ║                              ║   ║                              ║
@@ -20,6 +66,8 @@
    ║    Verbatim from OMOP        ║   ║   AI = librarian, not author ║
    ║    "Cross-consultation       ║   ║   "Clinical synthesis"       ║
    ║     brief" CardShell         ║   ║    CardShell                 ║
+   ║                              ║   ║                              ║
+   ║    Job: RECALL               ║   ║   Job: CONNECTION            ║
    ║                              ║   ║                              ║
    ╚══════════════════════════════╝   ╚══════════════════════════════╝
 ```

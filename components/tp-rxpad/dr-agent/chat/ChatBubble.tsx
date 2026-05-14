@@ -806,10 +806,9 @@ export function ChatBubble({
                 style={{
                   // Quiet grey bubble — clearly differentiates the user
                   // turn from the white/elevated assistant cards below it.
-                  // Slate-100-with-tint over a slight blur keeps it
-                  // readable against the rotating background wash.
+                  // No outer stroke; the slate-100 tint over the
+                  // background wash carries the shape on its own.
                   background: "rgba(241, 245, 249, 0.92)",
-                  border: "1px solid rgba(15, 23, 42, 0.06)",
                   backdropFilter: "blur(14px) saturate(1.4)",
                   WebkitBackdropFilter: "blur(14px) saturate(1.4)",
                 }}

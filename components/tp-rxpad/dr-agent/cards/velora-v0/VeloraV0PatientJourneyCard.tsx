@@ -5,6 +5,7 @@ import { Clock, ArrowDown2 } from "iconsax-reactjs"
 import { Stethoscope, Hospital as HospitalIcon } from "lucide-react"
 import { CardShell } from "../CardShell"
 import { HighlightLine } from "./highlight"
+import { VisitBody } from "./visit-sections"
 import type { VeloraV0EventTone, VeloraV0JourneyEvent, VeloraV0PatientJourneyData } from "../../types"
 
 /**
@@ -152,35 +153,31 @@ function SourceBadge({ id, type }: { id: string; type?: VeloraV0JourneyEvent["so
   )
 }
 
-// ── Structured expand view (5 pointers, mirrors MDT brief Stack 1) ───────
-
-const POINTER_LABELS: Array<{ key: keyof NonNullable<VeloraV0JourneyEvent["rxPointers"]>; label: string }> = [
-  { key: "findings",    label: "Findings" },
-  { key: "keyLabs",     label: "Key labs" },
-  { key: "medication",  label: "Medication" },
-  { key: "advices",     label: "Advices" },
-  { key: "plan",        label: "Plan" },
-]
+// ── Structured expand view (mirrors VisitCard in the cross-brief) ────────
+//
+// One unified UI pattern for "Rx content" across the whole agent surface.
+// Each rxPointers field maps to the matching VisitSection (Diagnosis,
+// Medications, Advice, Follow Up / Plan, Labs) so a doctor reading the
+// patient-journey timeline sees the same shape they read in the
+// cross-consultation brief.
 
 function StructuredDetail({ rx }: { rx: NonNullable<VeloraV0JourneyEvent["rxPointers"]> }) {
-  const rows = POINTER_LABELS.filter((p) => rx[p.key])
   return (
-    <div className="flex flex-col gap-[8px]">
+    <div className="flex flex-col">
       {rx.author && (
-        <p className="text-[11.5px] font-medium text-tp-slate-500">{rx.author}</p>
+        <p className="px-[12px] pb-[4px] text-[11.5px] font-medium text-tp-slate-500">
+          {rx.author}
+        </p>
       )}
-      <ul className="flex flex-col gap-[4px] pl-[4px] text-[13px] leading-[1.55] text-tp-slate-700">
-        {rows.map(({ key, label }) => (
-          <li key={key} className="flex gap-[6px]">
-            <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-            <span>
-              <span className="font-medium text-tp-slate-500">{label}</span>
-              <span className="mr-[6px] text-tp-slate-300">:</span>
-              <HighlightLine text={rx[key]!} />
-            </span>
-          </li>
-        ))}
-      </ul>
+      <VisitBody
+        fields={{
+          diagnosis: rx.findings,
+          labs: rx.keyLabs,
+          medications: rx.medication,
+          advice: rx.advices,
+          followUp: rx.plan,
+        }}
+      />
     </div>
   )
 }
@@ -261,23 +258,32 @@ function TimelineRow({
           )}
         </div>
 
-        {/* HEADLINE — own row below the top bar */}
-        <p className="mt-[5px] text-[14px] leading-[1.5] text-tp-slate-800">
-          <HighlightLine text={event.headline} />
-        </p>
+        {/* HEADLINE — only shown when the row is COLLAPSED, as a quick
+            preview. Once expanded, the sectioned body (Diagnosis /
+            Medications / Advice / Follow Up / Labs) takes over and the
+            inline summary disappears so the doctor reads one canonical
+            content shape — the same shape used inside the cross-
+            consultation brief's VisitCard. */}
+        {!open && (
+          <p className="mt-[5px] text-[13.5px] leading-[1.5] text-tp-slate-700">
+            <HighlightLine text={event.headline} plain />
+          </p>
+        )}
 
-        {/* EXPANDED BODY — structured (5 pointers) or plain text */}
+        {/* EXPANDED BODY — sectioned VisitBody (same components as the
+            cross-brief) when rxPointers is present; plain detail block
+            otherwise (lab reports, scheduled items, open loops). */}
         {open && (event.detail || event.rxPointers) && (
-          <div className="mt-[8px] rounded-[8px] border border-tp-slate-100 bg-white px-[10px] py-[8px]">
+          <div className="mt-[8px] overflow-hidden rounded-[8px] border border-tp-slate-100 bg-white">
             {event.rxPointers ? (
               <StructuredDetail rx={event.rxPointers} />
             ) : (
-              <p className="text-[12.5px] leading-[1.6] text-tp-slate-600">
+              <p className="px-[12px] py-[10px] text-[12.5px] leading-[1.6] text-tp-slate-600">
                 <HighlightLine text={event.detail!} />
               </p>
             )}
             {event.sourceId && (
-              <div className="mt-[8px] flex items-center">
+              <div className="flex items-center px-[12px] pb-[10px]">
                 <SourceBadge id={event.sourceId} type={event.sourceType} />
               </div>
             )}

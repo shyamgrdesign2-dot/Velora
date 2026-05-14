@@ -10,6 +10,7 @@ import { GuidelineChip } from "./VeloraStack"
 import { FloatingTooltip, HighlightLine, InfoTip, SourceInfoTip, shortDate } from "./highlight"
 import { useVeloraViewMode } from "../../shell/VeloraViewModeContext"
 import { TPMedicalIcon } from "@/components/tp-ui"
+import { VisitSection } from "./visit-sections"
 import type {
   VeloraV0MdtBriefData,
   VeloraV0Attribution,
@@ -814,110 +815,11 @@ function SynthesisBullet({ row }: { row: VeloraV0Synthesis["rows"][number] }) {
  *  Each visit block is separated by a hairline divider so the eye reads
  *  the specialty as a chronological list of consultations.
  */
-/** Inline section bar inside a visit card — matches the PastVisitsContent
- *  pattern from VoiceRx-L: 30px-tall slate-100/70 bar with a TPMedicalIcon
- *  on the left and the label in slate-500 semibold. Used as the heading
- *  for each Symptoms / Examination / Diagnosis / Medications / Advice /
- *  Follow Up / Additional Notes block inside the consultation expansion. */
-function VisitSectionBar({
-  iconName,
-  iconNode,
-  label,
-}: {
-  iconName?: string
-  iconNode?: React.ReactNode
-  label: string
-}) {
-  return (
-    <div className="mb-[4px] flex h-[28px] w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/70 px-2 py-[3px]">
-      {iconNode ?? (iconName ? (
-        <TPMedicalIcon name={iconName} variant="bulk" size={16} color="var(--tp-slate-500, #64748B)" className="shrink-0" />
-      ) : null)}
-      <span className="flex min-h-0 min-w-0 flex-1 items-center text-left text-[13px] font-semibold leading-none text-tp-slate-500">
-        {label}
-      </span>
-    </div>
-  )
-}
-
-/** Render a verbatim OMOP string as bullet items. The data is naturally
- *  pipe-separated (` | `) and sometimes also slash-separated, so we split
- *  on the pipe and emit one bullet per fragment. Single-fragment content
- *  renders as one bullet too, keeping the row format consistent. */
-function VisitBulletList({ text }: { text: string }) {
-  const fragments = text
-    .split(/\s+\|\s+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-  if (fragments.length === 0) return null
-  return (
-    <ul className="space-y-[3px] pl-[6px]">
-      {fragments.map((f, i) => (
-        <li key={i} className="flex items-start gap-[6px] text-[13.5px] leading-[20px] text-tp-slate-700">
-          <span className="mt-[8px] h-[4px] w-[4px] shrink-0 rounded-full bg-tp-slate-400" />
-          <span className="min-w-0">
-            <HighlightLine text={f} plain />
-          </span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-/** Inline pipe-separated renderer for list-style content (Medications,
- *  Vaccinations, Active medications). Keeps the row compact — drugs flow
- *  across the width with quiet slate-300 dividers between them — instead
- *  of stacking one bullet per item, which used to eat large amounts of
- *  vertical space when the patient was on 8–15 medications. */
-function VisitInlineList({ text }: { text: string }) {
-  const fragments = text
-    .split(/\s+\|\s+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-  if (fragments.length === 0) return null
-  return (
-    <p className="pl-[6px] text-[13.5px] leading-[1.6] text-tp-slate-700">
-      {fragments.map((f, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="mx-[7px] text-tp-slate-300">|</span>}
-          <HighlightLine text={f} plain />
-        </React.Fragment>
-      ))}
-    </p>
-  )
-}
-
-/** One per-section block inside a visit's expanded body: icon + label
- *  bar + items. `layout="inline"` renders pipe-separated items in a single
- *  flowing paragraph (for Medications-like lists); the default `"bullets"`
- *  keeps the sentence-per-line bullet rhythm (Symptoms, Examination,
- *  Diagnosis, Advice, …). Drops out entirely when the doctor wrote
- *  nothing for that section. */
-function VisitSection({
-  iconName,
-  iconNode,
-  label,
-  content,
-  layout = "bullets",
-}: {
-  iconName?: string
-  iconNode?: React.ReactNode
-  label: string
-  content?: string
-  layout?: "bullets" | "inline"
-}) {
-  if (!content) return null
-  return (
-    <div className="px-[12px] py-[6px]">
-      <VisitSectionBar iconName={iconName} iconNode={iconNode} label={label} />
-      {layout === "inline" ? (
-        <VisitInlineList text={content} />
-      ) : (
-        <VisitBulletList text={content} />
-      )}
-    </div>
-  )
-}
+// `VisitSection` (and the related VisitBulletList / VisitInlineList /
+// VisitSectionBar helpers) now live in ./visit-sections.tsx so the
+// patient-journey card can reuse the exact same shape for any Rx body
+// it surfaces. Doctors see one unified pattern for "what the doctor
+// wrote inside" regardless of which card the visit appears on.
 
 /** One per-visit card. Header strip shows doctor + specialty pill on the
  *  left and a date pill on the right; the body — full set of VisitSection

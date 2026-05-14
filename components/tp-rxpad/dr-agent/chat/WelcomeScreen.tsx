@@ -50,9 +50,15 @@ const CONTEXT_ACTIONS: Record<PageContext, QuickAction[]> = {
     },
     {
       icon: <Activity size={ICON_SIZE} variant="Bulk" />,
-      title: "Recent trends",
-      subtitle: "Vital + lab trends Velora can pull for this patient · BP · HbA1c · eGFR · Lipid · Hb · …",
-      message: "Show recent trends",
+      title: "Recent vital trends",
+      subtitle: "Bedside vitals Velora can pull for this patient — BP · weight · SpO₂",
+      message: "Show recent vital trends",
+    },
+    {
+      icon: <Health size={ICON_SIZE} variant="Bulk" />,
+      title: "Recent lab trends",
+      subtitle: "Lab parameters Velora can pull for this patient — HbA1c · eGFR · Lipid · Hb · …",
+      message: "Show recent lab trends",
     },
   ],
   // RxPad actions are built dynamically — see buildRxPadActions()

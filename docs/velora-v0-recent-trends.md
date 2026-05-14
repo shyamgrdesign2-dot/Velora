@@ -5,6 +5,27 @@ Maintainer: surface design owner.
 Audience: clinical lead / product reviewer auditing why a particular
 trend chip exists for a particular patient.
 
+## Welcome-card split — vital vs lab
+
+The V0 welcome screen exposes two trend entry points, not one:
+
+  • **Recent vital trends** — bedside measurements (BP, weight, SpO₂).
+  • **Recent lab trends** — anything drawn / cultured / processed
+    downstream (HbA1c, eGFR, lipid, Hb, calcium, vitamin D, troponin,
+    fasting glucose, wound culture, …).
+
+Each `TrendDef` in `lib/velora/v0-trends.ts` carries a `category:
+"vital" | "lab"` field. The reply handler reads the doctor's message
+through `detectTrendCategory(message)` and filters the per-patient
+trend list to just that category before rendering the menu chips. A
+specific trend question ("Show HbA1c trend") matches its own
+canonical TrendDef regardless of which menu the doctor came from —
+but the *pivot* suggestions under the reply stay in the matched
+trend's category so the menu stays coherent.
+
+When in doubt, a trend is classified as `lab` — that's how doctors
+naturally search for downstream parameters.
+
 ---
 
 ## Why this doc exists

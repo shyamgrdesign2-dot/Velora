@@ -41,9 +41,21 @@ export type TrendId =
   | "spo2"
   | "wound_culture"
 
+/** Coarse category — drives the two split welcome-card entry points:
+ *   "Recent vital trends" (vitals subset) vs
+ *   "Recent lab trends" (labs subset).
+ *
+ * Vitals are bedside measurements (BP, weight, SpO₂). Labs are anything
+ * drawn / cultured / processed downstream (HbA1c, eGFR, troponin,
+ * wound culture, …). When in doubt the trend is classified as "lab" —
+ * that's how the doctor will naturally search for it. */
+export type TrendCategory = "vital" | "lab"
+
 /** Public-facing label + the question Velora wires to each canned chip. */
 export interface TrendDef {
   id: TrendId
+  /** Which welcome card surfaces this trend (vital vs lab). */
+  category: TrendCategory
   quickLabel: string
   question: string
   /** Why this trend is offered to this patient. Surfaced in the design
@@ -78,6 +90,7 @@ export interface PatientTrendProfile {
 
 const trendBP = (note: string): TrendDef => ({
   id: "bp",
+  category: "vital",
   quickLabel: "Blood pressure",
   question: "Show blood pressure trend",
   rationale:
@@ -88,6 +101,7 @@ const trendBP = (note: string): TrendDef => ({
 
 const trendWeight = (note: string): TrendDef => ({
   id: "weight",
+  category: "vital",
   quickLabel: "Weight",
   question: "Show weight trend",
   rationale:
@@ -98,6 +112,7 @@ const trendWeight = (note: string): TrendDef => ({
 
 const trendHbA1c = (note: string): TrendDef => ({
   id: "hba1c",
+  category: "lab",
   quickLabel: "HbA1c",
   question: "Show HbA1c trend",
   rationale:
@@ -108,6 +123,7 @@ const trendHbA1c = (note: string): TrendDef => ({
 
 const trendLipid = (note: string): TrendDef => ({
   id: "lipid",
+  category: "lab",
   quickLabel: "Lipid panel",
   question: "Show lipid panel trend",
   rationale:
@@ -118,6 +134,7 @@ const trendLipid = (note: string): TrendDef => ({
 
 const trendEgfr = (note: string): TrendDef => ({
   id: "egfr",
+  category: "lab",
   quickLabel: "eGFR",
   question: "Show eGFR trend",
   rationale:
@@ -128,6 +145,7 @@ const trendEgfr = (note: string): TrendDef => ({
 
 const trendHb = (note: string): TrendDef => ({
   id: "hemoglobin",
+  category: "lab",
   quickLabel: "Hemoglobin",
   question: "Show hemoglobin trend",
   rationale:
@@ -138,6 +156,7 @@ const trendHb = (note: string): TrendDef => ({
 
 const trendFastingGlucose = (note: string): TrendDef => ({
   id: "fasting_glucose",
+  category: "lab",
   quickLabel: "Fasting glucose",
   question: "Show fasting glucose trend",
   rationale:
@@ -148,6 +167,7 @@ const trendFastingGlucose = (note: string): TrendDef => ({
 
 const trendCa = (note: string): TrendDef => ({
   id: "calcium",
+  category: "lab",
   quickLabel: "Calcium",
   question: "Show serum calcium trend",
   rationale:
@@ -158,6 +178,7 @@ const trendCa = (note: string): TrendDef => ({
 
 const trendVitD = (note: string): TrendDef => ({
   id: "vitamin_d",
+  category: "lab",
   quickLabel: "Vitamin D",
   question: "Show vitamin D trend",
   rationale:
@@ -168,6 +189,7 @@ const trendVitD = (note: string): TrendDef => ({
 
 const trendWoundCulture = (note: string): TrendDef => ({
   id: "wound_culture",
+  category: "lab",
   quickLabel: "Wound culture",
   question: "Show wound culture trend",
   rationale:
@@ -178,6 +200,7 @@ const trendWoundCulture = (note: string): TrendDef => ({
 
 const trendSpO2 = (note: string): TrendDef => ({
   id: "spo2",
+  category: "vital",
   quickLabel: "SpO₂",
   question: "Show oxygen saturation trend",
   rationale:
@@ -188,6 +211,7 @@ const trendSpO2 = (note: string): TrendDef => ({
 
 const trendTroponin = (note: string): TrendDef => ({
   id: "troponin",
+  category: "lab",
   quickLabel: "Troponin",
   question: "Show troponin trend",
   rationale:
@@ -352,6 +376,27 @@ export function findTrendByQuestion(
   return patient.trends.find(
     (t) => t.question.toLowerCase() === q || q.includes(t.quickLabel.toLowerCase()),
   )
+}
+
+/** Filter a patient's trend list to just one category. Used by the
+ *  split "Recent vital trends" / "Recent lab trends" welcome cards so
+ *  the menu reply shows only the chips relevant to the doctor's
+ *  click. */
+export function filterTrendsByCategory(
+  profile: PatientTrendProfile,
+  category: TrendCategory,
+): TrendDef[] {
+  return profile.trends.filter((t) => t.category === category)
+}
+
+/** Detect which trend category the doctor is asking about from the raw
+ *  free-text question. Returns null when the question is ambiguous /
+ *  combined — caller falls back to the full list. */
+export function detectTrendCategory(message: string): TrendCategory | null {
+  const m = message.toLowerCase()
+  if (m.includes("vital trend") || m.includes("recent vital")) return "vital"
+  if (m.includes("lab trend") || m.includes("lab result trend") || m.includes("recent lab")) return "lab"
+  return null
 }
 
 /** All registered patients — useful for tests + the design doc audit. */

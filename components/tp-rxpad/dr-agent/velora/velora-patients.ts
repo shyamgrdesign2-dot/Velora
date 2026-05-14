@@ -1,5 +1,5 @@
 import React from "react"
-import { Flash, Clock, Stickynote, InfoCircle, Diagram, Activity, Chart, Hospital, ClipboardText } from "iconsax-reactjs"
+import { Flash, Clock, Stickynote, InfoCircle, Diagram, Activity, Chart, Hospital, ClipboardText, Health } from "iconsax-reactjs"
 import type { RxAgentChatMessage } from "../types"
 import { VELORA_BRIEF_OUTPUT } from "./velora-scenarios"
 import { SURESH_PATEL_BRIEF_MOCK } from "@/lib/velora/v0-replies"
@@ -190,9 +190,15 @@ const VELORA_V0_INTENT_ACTIONS = [
   },
   {
     icon: icon(Activity),
-    title: "Recent trends",
-    subtitle: "Vital + lab trends Velora can pull for this patient — BP · HbA1c · eGFR · Lipid · Hb",
-    message: "Show recent trends",
+    title: "Recent vital trends",
+    subtitle: "Bedside vitals Velora can pull for this patient — BP · weight · SpO₂",
+    message: "Show recent vital trends",
+  },
+  {
+    icon: icon(Health),
+    title: "Recent lab trends",
+    subtitle: "Lab parameters Velora can pull for this patient — HbA1c · eGFR · Lipid · Hb",
+    message: "Show recent lab trends",
   },
 ]
 

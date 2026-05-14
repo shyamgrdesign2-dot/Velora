@@ -23,7 +23,7 @@ import type {
   VeloraV0Attribution,
 } from "@/components/tp-rxpad/dr-agent/types"
 import { findVeloraFollowUp, getVeloraFollowUps, type VeloraParentIntent } from "./v0-followups"
-import { resolvePatientTrends, findTrendByQuestion } from "./v0-trends"
+import { resolvePatientTrends, findTrendByQuestion, filterTrendsByCategory, detectTrendCategory } from "./v0-trends"
 
 /** Top-N sub-intent suggestions for a parent intent — rendered as inline
  *  canned pills directly under the card the doctor is reading. */
@@ -4113,62 +4113,88 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     }
   }
 
-  // Intent ③ — Recent trends
+  // Intent ③ — Recent trends (split into "Recent vital trends" and
+  // "Recent lab trends" on the welcome surface).
   //
-  // Two-stage flow:
-  //   (a) bare "show recent trends" → the menu: "Which trend would you
-  //       like to view?" with the per-patient available-trend chips as
-  //       suggestions (BP / HbA1c / eGFR / …).
-  //   (b) specific trend question ("Show blood pressure trend", "Show
-  //       HbA1c trend", …) → the canned reply for that trend.
+  // Flow:
+  //   (a) bare "show recent vital trends" / "show recent lab trends" →
+  //       menu reply listing the per-patient chips for THAT category
+  //       only. Bare "show recent trends" still works as a combined
+  //       menu (every available chip).
+  //   (b) specific trend question ("Show HbA1c trend", "Show BP trend",
+  //       …) → the canned reply for that trend. The pivot suggestions
+  //       under the reply are scoped to the *same* category so a doctor
+  //       reading the lab menu keeps seeing lab chips.
   //
   // A trend that isn't in the patient's available set triggers the
-  // guardrail: a polite "this trend isn't on file" with the available
-  // list re-surfaced as canned chips so the doctor never lands in a
-  // dead end.
+  // guardrail: a polite "this trend isn't on file" with the category-
+  // scoped list re-surfaced as canned chips so the doctor never lands
+  // in a dead end.
   if (
     m.includes("recent trends") ||
+    m.includes("vital trend") ||
+    m.includes("lab trend") ||
+    m.includes("lab result trend") ||
     m === "show recent trends" ||
     m.includes("show trends") ||
     m.startsWith("show trend") ||
-    /\bvital trend|\blab(?: result)? trend|\bhba1c trend|\bblood pressure trend|\begfr trend|\blipid|\bweight trend|\btroponin trend|\bhemoglobin trend|\bcalcium trend|\bvitamin d trend|\bspo2 trend|\bwound culture/.test(m)
+    /\bhba1c trend|\bblood pressure trend|\begfr trend|\blipid|\bweight trend|\btroponin trend|\bhemoglobin trend|\bcalcium trend|\bvitamin d trend|\bspo2 trend|\bwound culture/.test(m)
   ) {
     const profile = resolvePatientTrends(rawMessage)
+    const category = detectTrendCategory(rawMessage)
+    const scopedTrends = category ? filterTrendsByCategory(profile, category) : profile.trends
+    const suggestionList = scopedTrends.map((t) => ({
+      label: t.quickLabel,
+      message: t.question,
+    }))
+    const categoryLabel = category === "vital" ? "vital" : category === "lab" ? "lab" : null
+    const isMenu =
+      m === "show recent trends" ||
+      m === "show recent vital trends" ||
+      m === "show recent lab trends" ||
+      m.includes("which trend")
     // (b) Specific trend question — answer it or guardrail.
-    if (m !== "show recent trends" && !m.includes("which trend") && !m.startsWith("show recent trends")) {
+    if (!isMenu) {
       const match = findTrendByQuestion(profile, rawMessage)
       if (match) {
+        // Pivot suggestions stay in the same category as the matched
+        // trend, so the doctor keeps reading a coherent menu.
+        const pivotCategory = match.category
+        const pivots = filterTrendsByCategory(profile, pivotCategory).map((t) => ({
+          label: t.quickLabel,
+          message: t.question,
+        }))
         return {
           text: match.replyText,
           loadingHint: `Pulling ${match.quickLabel.toLowerCase()} for ${profile.patientName}…`,
           loadingDelayMs: 900,
-          suggestions: profile.trends.map((t) => ({
-            label: t.quickLabel,
-            message: t.question,
-          })),
+          suggestions: pivots,
         }
       }
       // Guardrail — trend isn't on the patient's available list.
-      const availableList = profile.trends.map((t) => t.quickLabel).join(" · ")
+      const scopeWord = categoryLabel ? `${categoryLabel} trend` : "trend"
+      const availableList =
+        scopedTrends.length > 0
+          ? scopedTrends.map((t) => t.quickLabel).join(" · ")
+          : "(none on file for this category)"
       return {
-        text: `Sorry — that trend isn't on file for **${profile.patientName}**. Trends Velora can pull for this patient:\n\n  ${availableList}\n\nTap a chip below to view one.`,
+        text: `Sorry — that ${scopeWord} isn't on file for **${profile.patientName}**. ${categoryLabel ? `${categoryLabel === "vital" ? "Vital" : "Lab"} trends` : "Trends"} Velora can pull for this patient:\n\n  ${availableList}\n\nTap a chip below to view one.`,
         loadingHint: "Checking the trend availability index…",
         loadingDelayMs: 800,
-        suggestions: profile.trends.map((t) => ({
-          label: t.quickLabel,
-          message: t.question,
-        })),
+        suggestions: suggestionList,
       }
     }
-    // (a) Menu — list available trends as canned chips.
+    // (a) Menu — list available trends (category-scoped when applicable).
+    const headline = categoryLabel
+      ? `Here are the **${categoryLabel === "vital" ? "vital" : "lab"} trends** Velora can pull for **${profile.patientName}** — ${profile.scopeReason}`
+      : `Here are the trends Velora can pull for **${profile.patientName}** — ${profile.scopeReason}`
     return {
-      text: `Here are the trends Velora can pull for **${profile.patientName}** — ${profile.scopeReason}\n\nTap a trend below to view it.`,
-      loadingHint: `Loading available trends for ${profile.patientName}…`,
+      text: scopedTrends.length > 0
+        ? `${headline}\n\nTap a trend below to view it.`
+        : `Sorry — no ${categoryLabel ?? ""} trends are on file for **${profile.patientName}** right now. Try the other category, or open the cross-consultation brief for the full picture.`,
+      loadingHint: `Loading ${categoryLabel ? `${categoryLabel} ` : ""}trends for ${profile.patientName}…`,
       loadingDelayMs: 900,
-      suggestions: profile.trends.map((t) => ({
-        label: t.quickLabel,
-        message: t.question,
-      })),
+      suggestions: suggestionList,
     }
   }
 

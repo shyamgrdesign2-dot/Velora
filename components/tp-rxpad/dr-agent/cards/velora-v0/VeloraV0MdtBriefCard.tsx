@@ -919,20 +919,37 @@ function VisitCard({
     !!c.followUp || !!c.investigations || !!c.advice || !!c.surgery ||
     !!c.vaccinations || !!c.additionalNotes
   return (
-    <div className="rounded-[10px] border border-tp-violet-100 bg-white shadow-[0_1px_0_rgba(124,58,237,0.06)]">
+    <div
+      // No outer stroke; the soft top-down violet gradient + the
+      // shadow underneath carry the card outline on their own. Reads
+      // as a quiet "raised note" rather than a fenced rectangle.
+      className="rounded-[12px] shadow-[0_2px_6px_rgba(124,58,237,0.08)]"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(237, 233, 254, 0.55) 0%, rgba(245, 243, 255, 0.30) 28%, #FFFFFF 70%, #FFFFFF 100%)",
+      }}
+    >
       {/* Header strip — informational only (no toggle). Doctor (semibold,
-          violet to flag clinical attribution) · specialty pill · IPD chip
-          on the left, date pill on the right. Sticky so it hovers under
+          violet to flag clinical attribution) on the left, a highlighted
+          violet date pill next to the name. Sticky so it hovers under
           the specialty heading while the user scrolls through this visit's
           body.
           NOTE: the outer wrapper is NOT `overflow-hidden` — sticky
           positioning silently breaks when an ancestor clips overflow, so
           the header would scroll away with the rest of the card. The
-          `rounded-t-[10px]` here keeps the sticky bar visually aligned
-          with the parent's rounded outline. */}
-      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[10px] border-b border-tp-violet-100 bg-tp-violet-50/60 px-[10px] py-[8px]">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[2px]">
+          solid violet-50 sticky background ensures content scrolling
+          behind it is cleanly masked. */}
+      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[12px] bg-tp-violet-50 px-[12px] py-[8px]">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[3px]">
           <span className="text-[13.5px] font-semibold text-tp-violet-700">{c.doctor}</span>
+          {/* Date pill — highlighted violet chip placed right next to the
+              doctor's name (instead of floating at the far right). Same-
+              tone family as the doctor's name + the card's body gradient,
+              just dialled up enough to pop as a clear "visit date" anchor. */}
+          <span className="inline-flex shrink-0 items-center gap-[4px] rounded-[6px] bg-tp-violet-100 px-[8px] py-[2px] text-[11px] font-semibold text-tp-violet-700">
+            <Calendar2 size={11} variant="Bulk" className="opacity-80" />
+            {c.date}
+          </span>
           {/* Specialty pill removed — the parent specialty heading
               already names the team, so repeating it on every visit
               row read as visual noise. */}
@@ -942,12 +959,6 @@ function VisitCard({
             </span>
           )}
         </div>
-        {/* Date pill — quiet white chip with a 4px radius (no outer
-            stroke, default Inter font family). Sits on the violet header
-            without competing for attention. */}
-        <span className="shrink-0 rounded-[4px] bg-white/80 px-[8px] py-[2px] text-[11px] font-semibold text-tp-slate-600">
-          {c.date}
-        </span>
       </div>
       <div className="flex flex-col gap-[2px] py-[4px]">
         <VisitSection iconName="Virus" label="Symptoms" content={c.symptoms} />
@@ -1500,6 +1511,21 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 />
                 <div className="flex flex-col gap-[12px] px-[10px] py-[6px]">
                   {filteredHistory.map((group, gi) => {
+                    // Drug-name casing policy (Active medications +
+                    // every other group):
+                    //
+                    // The strings rendered here come VERBATIM from the
+                    // OMOP `drug_source_value` / `condition_source_value`
+                    // fields the EMR stored. We do NOT manually uppercase
+                    // anything — the hospital's pharmacy module is what
+                    // writes "ONCOLET 2.5MG TABLET" in shout-case. Same
+                    // policy as the per-visit `medications` row inside
+                    // each VisitCard. To title-case for readability we
+                    // would need an explicit normalisation layer (drug-
+                    // catalogue lookup), which V0 deliberately avoids so
+                    // every shown character is auditable back to a
+                    // specific OMOP row.
+                    //
                     // Active medications: filter to the subset whose
                     // prescribedAt + daysSupply window covers today.
                     // Items that didn't carry those fields (legacy mock

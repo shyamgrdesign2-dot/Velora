@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import { Eye, EyeSlash } from "iconsax-reactjs"
+import { Setting2 } from "iconsax-reactjs"
 import { cn } from "@/lib/utils"
 import type { DoctorViewType, DrAgentVariant, SpecialtyTabId } from "../types"
-import { useVeloraViewMode } from "./VeloraViewModeContext"
+import { GuidelineSettingsSidebar } from "./GuidelineSettingsSidebar"
 
 // -----------------------------------------------------------------
 // Specialty → Auto-switch patient mapping
@@ -88,9 +88,12 @@ export function AgentHeader({
   brandTitle,
 }: AgentHeaderProps) {
   const isV0 = variant === "v0"
-  const { viewMode, toggleViewMode } = useVeloraViewMode()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  // Admin → Guideline Settings sidebar. Triggered by the gear icon next
+  // to the minimize button. V0: the trigger is always rendered (the
+  // demo audience IS the admin). Future: gate behind a role check.
+  const [guidelineSettingsOpen, setGuidelineSettingsOpen] = useState(false)
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -131,7 +134,7 @@ export function AgentHeader({
       >
         {/* Left: Dr. Agent brand tag — floating liquid-glass card with 10px radius */}
         <div className="pointer-events-auto relative z-10 flex items-center gap-[6px]">
-          <span className="da-agent-brand-tag relative flex items-center gap-[7px] rounded-[10px] py-[5px] pl-[6px] pr-[11px]">
+          <span className="da-agent-brand-tag relative flex items-center gap-[7px] rounded-[10px] py-[5px] pl-[6px] pr-[8px]">
             <span
               className="relative inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-hidden"
               aria-hidden
@@ -159,28 +162,23 @@ export function AgentHeader({
             >
               {brandTitle ?? "Velora"}
             </span>
+            {/* Beta tag — orange gradient pill sitting INSIDE the
+                brand tag, immediately after the name. Signals to the
+                clinician that this surface is a pilot release; the
+                gradient keeps it warm without competing with the
+                violet brand tone on the rest of the agent UI. */}
+            <span
+              className="inline-flex shrink-0 items-center rounded-[5px] px-[6px] py-[2px] text-[9.5px] font-bold uppercase leading-none text-white"
+              style={{
+                background: "linear-gradient(135deg, #FB923C 0%, #F97316 50%, #EA580C 100%)",
+                letterSpacing: "0.08em",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.45), 0 1px 2px rgba(234,88,12,0.20)",
+              }}
+              aria-label="Beta release"
+            >
+              Beta
+            </span>
           </span>
-
-          {/* Detailed ↔ Concise view-mode toggle — icon only, no label.
-              Eye = Detailed (every visit verbatim); EyeSlash = Concise
-              (summary). Drives every brief card on this surface via
-              VeloraViewModeContext. */}
-          <button
-            type="button"
-            onClick={toggleViewMode}
-            className={cn(
-              "inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] transition-colors",
-              "text-tp-slate-500 hover:bg-tp-slate-100 hover:text-tp-slate-800",
-            )}
-            aria-label={viewMode === "detailed" ? "Switch to concise view" : "Switch to detailed view"}
-            title={viewMode === "detailed" ? "Detailed view (click for concise)" : "Concise view (click for detailed)"}
-          >
-            {viewMode === "detailed" ? (
-              <Eye size={16} variant="Linear" />
-            ) : (
-              <EyeSlash size={16} variant="Linear" />
-            )}
-          </button>
 
           {/* Unified Dropdown — Specialty + Doctor Type + Intake (removed — demo only) */}
           {false && <div className="relative" ref={dropdownRef}>
@@ -327,20 +325,44 @@ export function AgentHeader({
           </div>}
         </div>
 
-        {/* Right: collapse — matching floating glass tag (10px radius) */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="da-agent-collapse-tag pointer-events-auto relative z-10 flex h-[32px] w-[32px] items-center justify-center rounded-[10px] text-tp-slate-600 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
-          aria-label="Minimize agent"
-        >
-          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" aria-hidden>
-            <rect x="3" y="3" width="18" height="18" rx="3.5" stroke="currentColor" strokeWidth="1.7" />
-            <path d="M9 3v18" stroke="currentColor" strokeWidth="1.7" />
-            <path d="M13 9l3 3-3 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+        {/* Right: admin · guideline settings + collapse — two floating
+            glass tags sitting together so the doctor-facing collapse
+            stays the rightmost affordance and the admin-only gear is
+            one tap to the left. */}
+        <div className="pointer-events-auto relative z-10 flex items-center gap-[6px]">
+          {/* Admin · Guideline Settings trigger. V0: always visible
+              (the demo audience is the admin). Future: gate behind a
+              `role === "hospital_admin"` check. */}
+          <button
+            type="button"
+            onClick={() => setGuidelineSettingsOpen(true)}
+            className="da-agent-collapse-tag pointer-events-auto relative z-10 flex h-[32px] w-[32px] items-center justify-center rounded-[10px] text-tp-slate-600 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
+            aria-label="Open guideline settings (admin)"
+            title="Guideline Settings"
+          >
+            <Setting2 size={16} variant="Linear" />
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="da-agent-collapse-tag pointer-events-auto relative z-10 flex h-[32px] w-[32px] items-center justify-center rounded-[10px] text-tp-slate-600 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
+            aria-label="Minimize agent"
+          >
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" aria-hidden>
+              <rect x="3" y="3" width="18" height="18" rx="3.5" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M9 3v18" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M13 9l3 3-3 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* Admin sidebar — slide-in panel. Renders into document.body via
+          its own portal, so it sits above every chat surface. */}
+      <GuidelineSettingsSidebar
+        open={guidelineSettingsOpen}
+        onClose={() => setGuidelineSettingsOpen(false)}
+      />
 
       <style>{`
         /* Dr. Agent brand tag — iOS liquid-glass with subtle AI gradient tint.

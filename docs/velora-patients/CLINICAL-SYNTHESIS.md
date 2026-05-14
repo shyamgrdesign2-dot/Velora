@@ -438,6 +438,114 @@ Stack-2 fires:
     the inpatient `visit_occurrence` row.
 ```
 
+### Example C · Asha Krishnan (P3) — narrow-footprint counter-example
+
+Stack-2 deliberately fires very little:
+
+```
+  ── Where they collide ──
+  ⚠ Coordination gap   Allergy verification not on file
+                       12 months of care across 4 providers; no
+                       explicit allergy review documented.
+                       Citation: Hospital safety policy (signed)
+
+  ── Guideline-anchored panels ──
+  📈 WHO HTN target check        WHO HEARTS 2023
+     Latest BP : 132/82  (in target)
+     Trend     : downward over 12 months  ok
+
+  ── Pending MDT items ──
+  • Internal Medicine to capture an explicit allergy + adverse-event
+    review at the next visit (template available).
+```
+
+A useful negative — the design holds when there's almost nothing to
+say. The card's job is *honest* synthesis; an empty Stack 2 reads as
+"this patient is well-coordinated", which is a positive signal.
+
+### Example D · Meera Joshi (P4) — CAD + CVA + dense metabolic stack
+
+```
+  ── Where they collide ──
+  ⚠ DDI flag           DAPT in place for > 12 months
+                       Aspirin + Clopidogrel both active beyond the
+                       6-12 month post-event window; bleed-vs-MACE
+                       balance has shifted.
+                       Citation: ACC / AHA 2023 secondary-prevention
+
+  ⚠ DDI flag           Glimepiride double-dose
+                       Endo + Internal Medicine each carry an active
+                       glimepiride Rx with overlapping date windows.
+                       Citation: NICE NG28
+
+  ⚠ DDI flag           T3 + T4 cross-specialty combo
+                       Two specialties prescribing thyroid replacement
+                       streams that have not been reconciled.
+                       Citation: ATA 2014 (current)
+
+  ── Guideline-anchored panels ──
+  📈 Secondary-prevention CV regimen            ACC / AHA 2023
+     Statin intensity : Atorvastatin 40 mg N  ok
+     BP target        : 134/86                ok
+     LDL target       : 1.9 mmol/L            warn  (target < 1.4)
+
+  ── Pending MDT items ──
+  • Cardiology to assess DAPT step-down to monotherapy at next
+    review; cite bleed-risk score.
+  • Endo + Internal Medicine to reconcile glimepiride streams
+    (which prescriber is the owner?).
+  • Endo to consolidate thyroid replacement under a single owner.
+```
+
+### Example E · Anita Desai (P5) — hyperTG + recurrent pancreatitis
+
+```
+  ── Where they collide ──
+  ⚠ Coordination gap   Fibrate-gap on TG 2898
+                       Triglycerides 2898 mg/dL recorded in
+                       Gastro narrative with NO fibrate started;
+                       recurrent pancreatitis is the consequence.
+                       Citation: NICE NG181 / endocrinology bundle
+
+  ── Guideline-anchored panels ──
+  📈 Metabolic-syndrome optimisation             NICE NG28
+     HbA1c   : 7.6 %    warn  (target < 7.0)
+     LDL     : 2.8 mmol/L  warn
+     TG      : 2898 mg/dL  alert  (severe hyperTG)
+     BP      : 138/84   warn
+
+  ── Pending MDT items ──
+  • Endo to start fibrate (fenofibrate first-line) before next
+    pancreatitis recurrence.
+  • Gastro + Endo to agree on a TG-driven pancreatitis follow-up
+    cadence.
+```
+
+### Example F · Arjun Verma (P6) — IPD case
+
+The IPD admission shows a full discharge-summary rendering in Stack 1
+(not the OPD per-section blocks). Stack 2 stays light because the
+patient is post-discharge clinically stable:
+
+```
+  ── Where they collide ──
+  (none currently signed — patient is on chelation + hepato-
+   protective regimen, recovering)
+
+  ── Guideline-anchored panels ──
+  📈 LFT trajectory · post-acute HAV            AASLD 2024
+     Bilirubin Total : 1.4 mg/dL   ok    (peak 8.2 on admission)
+     SGPT            : 38 U/L      ok    (peak 1240 on admission)
+     INR             : 1.1         ok
+     Trend           : continuing improvement across 5 OPD f/u
+
+  ── Pending MDT items ──
+  • Gastroenterology to repeat LFT + INR at 4-week interval until
+    SGPT < 30.
+  • Family counselling on low-copper diet + paracetamol ceiling
+    documented in the discharge advice.
+```
+
 ---
 
 ## 10 · Failure modes and how the design prevents them

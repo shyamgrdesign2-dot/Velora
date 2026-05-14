@@ -351,13 +351,14 @@ The brief adapts. Five real OMOP-backed patients in the live demo illustrate the
 
 | # | Patient | Profile | What the brief surfaces |
 |---|---|---|---|
-| P1 | Lakshmi Iyer (F · 76) | Breast Ca stage IA + cardiac + OSA + CKD · 17-day pre-op burst | 5 specialty cards racing toward surgery; cardiac + airway + renal clearance chains incomplete |
+| P1 | Lakshmi Iyer (F · 76) | Breast Ca stage IA + cardiac + OSA + CKD · 17-day pre-op burst | 5 specialty cards racing toward surgery; cardiac + airway + renal clearance chains incomplete; cumulative CNS-depressant stack across 3 teams (ingredient-level Gabapentin + Tramadol + Nortriptyline overlap) |
 | P2 | Suresh Patel (M · 60) | Colon Ca T3N2b + lung mets + 12-specialty polypharmacy | Surveillance overdue + 3 DDI / coordination flags + Pain Specialist closure |
 | P3 | Asha Krishnan (F · 57) | HTN + post-Achilles + recurrent viral fevers · narrow footprint | A **deliberately sparse** card — one chronic anchor, allergy gap dominates |
 | P4 | Meera Joshi (F · 58) | CAD + prior CVA + DM stack · DAPT for 12+ months | Secondary-prevention regimen flagged for de-escalation; glimepiride double-dose; T3+T4 cross-specialty combo |
 | P5 | Anita Desai (F · 64) | Severe hyperTG + recurrent pancreatitis + 15 specialties | The headline lab value (TG 2898) lives in narrative not measurement; fibrate-gap is the highest-priority intervention |
+| P6 | Arjun Verma (M · 14) | Wilson's disease + acute Hepatitis A · 3-day IPD admission + 5 OPD f/u | First IPD case in the catalogue. The IPD visit pivots to a full discharge summary (admission line · final dx · hospital course · advice · warning signs · functional). 315 lab rows drive structured trends. |
 
-**The same card shape handles all five.** The mock data is per-patient; the rendering logic is not. That's the test of whether the design is right.
+**The same card shape handles all six.** The mock data is per-patient; the rendering logic is not. That's the test of whether the design is right.
 
 ---
 

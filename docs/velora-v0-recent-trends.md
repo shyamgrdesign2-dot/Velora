@@ -7,10 +7,11 @@ trend chip exists for a particular patient.
 
 ## Where this sits in the Stack 1 / Stack 2 architecture
 
-Recent Trends is **Stack-1 content** — the chart it renders (or the
-canned text reply, in V0) shows the patient's vitals / labs verbatim
-from OMOP `measurement` and `observation`. No AI authors a single
-data point. The line is the line; the number is the number.
+Recent Trends is **Stack-1 content** — the structured `TrendDetailCard`
+(or the canned text reply, for trends not yet migrated to the
+structured form) shows the patient's vitals / labs verbatim from OMOP
+`measurement` and `observation`. No AI authors a single data point.
+The line is the line; the number is the number.
 
 The AI scope here is identical to the cross-consultation brief:
 
@@ -175,26 +176,63 @@ weight.
 
 ## Reply shape
 
-For each canned chip the reply is text-only in V0. Future
-revisions will plug a chart card behind each chip:
+Two cards drive every Recent-trends reply:
+
+### 1. The trend-menu card (`velora_v0_trend_menu`)
+
+Surfaced when the doctor opens *Recent vital trends* / *Recent lab
+trends* from the welcome screen, or when the guardrail fires because
+they asked for an unavailable trend. Layout:
+
+- **Header**: "Recent trends · {Patient}".
+- **Optional guardrail banner** (`guardrail.askedFor`) — amber tile
+  naming what was asked and reminding the doctor that every chip
+  below is real.
+- **Scope reason** caption (verbatim from the per-patient profile
+  in `lib/velora/v0-trends.ts`).
+- **Chip groups**: "Bedside vitals" (violet) + "Lab parameters"
+  (emerald). Each chip is a tap target firing the canonical trend
+  question.
+
+### 2. The trend-detail card (`velora_v0_trend_detail`)
+
+Surfaced when the doctor taps a specific trend chip (or types
+"Show HbA1c trend" / similar). Layout:
 
 ```
-Trend: <name>
-Series: <timestamp → value> × N rows
-Annotation: <threshold / target line from the signed guideline>
-Citation footer: <Source + guideline body + year>
+[icon] {Trend name} trend · {Patient}
+─────────────────────────────────────
+[VITAL / LAB pill]  [unit chip]  {whyOffered note}
+
+Series table:
+  Date         Value          Flag
+  ─────────    ─────────      ──────────────
+  12 May '26   28             insufficient
+  29 Apr '26   24             insufficient
+  15 Feb '26   18             deficient    ← red dot
+
+Reference · {target / interpretation thresholds}
+
+Source · {body} · {year} · {section}
 ```
 
-The pre-canned reply text lives next to the chip definition in
-`v0-trends.ts` so the chat-time path is a single registry lookup —
-no LLM call, no synthesised numbers.
+The series, target line, and citation come straight from
+`TrendDef.series[]` / `targetLine` / `citation` in
+`lib/velora/v0-trends.ts`. **No LLM authoring**; AI picks the chip,
+the registry renders the card.
+
+For trends not yet restructured (P2–P6 in the catalogue at
+time-of-writing), the reply falls back to the legacy text
+`replyText` string in `TrendDef`. Same source-of-truth registry;
+upgrading is a per-trend job, not a global refactor.
 
 ---
 
 ## Guardrail
 
 If a doctor types a trend question that doesn't match any of the
-patient's visible chips, the reply is:
+patient's visible chips, the guardrail surfaces the **trend-menu
+card** with the `guardrail.askedFor` banner populated:
 
 > Sorry — that trend isn't on file for **{Patient}**. Trends Velora
 > can pull for this patient:

@@ -34,6 +34,29 @@ function subSuggestionsFor(parent: VeloraParentIntent, n: number = 2) {
 }
 
 /**
+ * briefTrendSuggestions — chips shown under the Cross-consultation brief
+ * reply. Returns the top-N per-patient trend questions from the trends
+ * registry, e.g. "HbA1c trend", "BP trend", "eGFR trend" — chosen
+ * because they are clinically actionable for *this* patient's problem
+ * list (see `v0-trends.ts` and `docs/velora-v0-recent-trends.md` for
+ * the rule-table that drives the selection).
+ *
+ * Each chip when tapped fires the canonical trend question, which the
+ * reply pipeline matches against the patient's trends registry and
+ * either renders the canned reply or trips the guardrail.
+ */
+function briefTrendSuggestions(
+  data: VeloraV0MdtBriefData,
+  n: number = 4,
+): Array<{ label: string; message: string }> {
+  const profile = resolvePatientTrends(data.patientName)
+  return profile.trends.slice(0, n).map((t) => ({
+    label: `${t.quickLabel} trend`,
+    message: t.question,
+  }))
+}
+
+/**
  * buildBriefPreamble — rule-based, fully data-driven sentence that
  * introduces the Cross-consultation brief card in the chat.
  *
@@ -3946,7 +3969,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(ASHA_KRISHNAN_BRIEF_MOCK),
       loadingHint: "Reading the record…",
       loadingDelayMs: 1000,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(ASHA_KRISHNAN_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: ASHA_KRISHNAN_BRIEF_MOCK },
     }
   }
@@ -3955,7 +3978,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(MEERA_JOSHI_BRIEF_MOCK),
       loadingHint: "Reading 11 specialty streams…",
       loadingDelayMs: 1400,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(MEERA_JOSHI_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: MEERA_JOSHI_BRIEF_MOCK },
     }
   }
@@ -3964,7 +3987,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(ANITA_DESAI_BRIEF_MOCK),
       loadingHint: "Reading 15 specialty streams…",
       loadingDelayMs: 1400,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(ANITA_DESAI_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: ANITA_DESAI_BRIEF_MOCK },
     }
   }
@@ -3973,7 +3996,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(SURESH_PATEL_BRIEF_MOCK),
       loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1400,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(SURESH_PATEL_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: SURESH_PATEL_BRIEF_MOCK },
     }
   }
@@ -3982,7 +4005,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(ARJUN_VERMA_BRIEF_MOCK),
       loadingHint: "Reading IPD admission + 5 OPD follow-ups…",
       loadingDelayMs: 1400,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(ARJUN_VERMA_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: ARJUN_VERMA_BRIEF_MOCK },
     }
   }
@@ -3994,7 +4017,7 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       text: buildBriefPreamble(LAKSHMI_IYER_BRIEF_MOCK),
       loadingHint: "Reading 12 specialty streams…",
       loadingDelayMs: 1200,
-      suggestions: subSuggestionsFor("mdt_brief"),
+      suggestions: briefTrendSuggestions(LAKSHMI_IYER_BRIEF_MOCK),
       rxOutput: { kind: "velora_v0_mdt_brief", data: LAKSHMI_IYER_BRIEF_MOCK },
     }
   }

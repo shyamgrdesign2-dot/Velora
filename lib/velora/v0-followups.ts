@@ -70,21 +70,9 @@ export interface VeloraFollowUp {
 // ─────────────────────────────────────────────────────────────────────────
 
 const MDT_FOLLOWUPS: VeloraFollowUp[] = [
-  {
-    id: "mdt-expand",
-    parent: "mdt_brief",
-    quickLabel: "Full notes",
-    question: "Expand each specialty's last note",
-    category: "expand",
-    rationale:
-      "The brief shows only headers. A doctor with 30 seconds wants the body — full Cardiology / Endocrinology / Nephrology assessment text. Same source, longer attribution window.",
-    reply: {
-      text:
-        "Expanded notes (verbatim, paginated):\n\n① Cardiology — Dr Sharma, 24 Apr 2026 (Note #NOT-3119)\n   AFib on apixaban 5 mg BID since 12 Mar. CHA₂DS₂-VASc 4. Echo 21 Apr: EF 38%, mild LV hypertrophy. Plan: continue anticoag; review 8 weeks.\n\n② Endocrinology — Dr Iyer, 18 Apr 2026 (Note #NOT-3104)\n   T2DM, HbA1c 8.4%. Metformin 1000 mg BID continued. Empagliflozin 10 mg OD added. Plan: HbA1c recheck 12 weeks; monitor eGFR.\n\n③ Nephrology — Dr Bose, 02 Apr 2026 (Note #NOT-3082)\n   eGFR 48 (G3a CKD). Apixaban dose held at 5 mg BID after cardio discussion. Plan: repeat eGFR + ACR in 8 weeks.",
-      footer: "Source: Note × 3 · ACC/AHA 2023 · ADA 2024 · KDIGO 2024 · Synced 12 min ago",
-    },
-    loadingHint: "Loading the full body of each specialty note…",
-  },
+  // "Full notes" sub-intent removed — the cross-brief card itself now
+  // renders the verbatim per-visit body inline, so the doctor never has
+  // to ask for an "expand each note" view.
   {
     id: "mdt-trends",
     parent: "mdt_brief",

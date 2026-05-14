@@ -494,6 +494,21 @@ function SpecialtySidebar({
  * Tooltip contents — sources list + reasoning sentence — render through a
  * FloatingTooltip portal so they escape any clipping ancestor.
  */
+/** Pick a TPMedicalIcon token for a medical-history group chip, based on
+ *  the group's title text. Returns null when no sensible icon maps — the
+ *  chip then renders without an icon, no failure. */
+function iconForHistoryGroup(title: string): string | null {
+  const t = title.toLowerCase()
+  if (t.includes("co-morbid") || t.includes("comorbid")) return "Diagnosis"
+  if (t.includes("primary")) return "Diagnosis"
+  if (t.includes("surgical")) return "medical-service"
+  if (t.includes("allerg")) return "health care"
+  if (t.includes("medication") || t.includes("active med")) return "Tablets"
+  if (t.includes("family") || t.includes("social")) return "medical-record"
+  if (t.includes("additional")) return "medical-report"
+  return null
+}
+
 function MedicalHistorySubheadingTag({
   group,
 }: {
@@ -509,11 +524,15 @@ function MedicalHistorySubheadingTag({
       : tone === "positive"
         ? "bg-tp-violet-50 text-tp-violet-700"
         : "bg-tp-slate-100 text-tp-slate-700"
+  const iconName = iconForHistoryGroup(group.title)
   return (
     <span
-      className={`mr-[6px] inline-flex shrink-0 items-center rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
+      className={`mr-[6px] inline-flex shrink-0 items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
     >
-      {group.title}
+      {iconName && (
+        <TPMedicalIcon name={iconName} variant="bulk" size={12} color="currentColor" className="shrink-0 opacity-80" />
+      )}
+      <span>{group.title}</span>
     </span>
   )
 }

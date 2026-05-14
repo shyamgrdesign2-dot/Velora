@@ -162,23 +162,20 @@ function SourceBadge({ id, type }: { id: string; type?: VeloraV0JourneyEvent["so
 // cross-consultation brief.
 
 function StructuredDetail({ rx }: { rx: NonNullable<VeloraV0JourneyEvent["rxPointers"]> }) {
+  // `rx.author` (Dr <name> · <specialty>) is intentionally NOT rendered
+  // here — the timeline row's own header strip above this body already
+  // names the doctor + specialty. Repeating it inside the body read as
+  // visual noise.
   return (
-    <div className="flex flex-col">
-      {rx.author && (
-        <p className="px-[12px] pb-[4px] text-[11.5px] font-medium text-tp-slate-500">
-          {rx.author}
-        </p>
-      )}
-      <VisitBody
-        fields={{
-          diagnosis: rx.findings,
-          labs: rx.keyLabs,
-          medications: rx.medication,
-          advice: rx.advices,
-          followUp: rx.plan,
-        }}
-      />
-    </div>
+    <VisitBody
+      fields={{
+        diagnosis: rx.findings,
+        labs: rx.keyLabs,
+        medications: rx.medication,
+        advice: rx.advices,
+        followUp: rx.plan,
+      }}
+    />
   )
 }
 

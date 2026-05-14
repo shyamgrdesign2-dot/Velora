@@ -155,50 +155,103 @@ She makes three decisions in 8 minutes:
 
 ---
 
-## 4 · What's on the card — the four movements
+## 4 · Two stacks — the AI line in the sand
 
-The card has two stacks of content (the spec calls them *Stack 1* and *Stack 2*), unfolding in four ordered movements:
+The card is two stacks of content, separated by a strict, non-negotiable rule about where AI is allowed to operate.
 
-### Movement ① · Who is this patient?  →  Medical history
+```
+  ┌────────────────────────────────────────────────────────────────┐
+  │  STACK 1 · Cross-consultation brief                            │
+  │     Verbatim from OMOP · NO AI authorship                      │
+  │                                                                │
+  │   ▸ Patient header                                             │
+  │   ▸ Medical history (Co-morbidities · Surgical history ·       │
+  │     Allergies & safety · Active medications · Family/Social)   │
+  │   ▸ Per-specialty visit cards                                  │
+  │       (Doctor's Diagnosis · Medications · Advice · Follow Up)  │
+  └────────────────────────────────────────────────────────────────┘
 
-A single block at the top of the card. Five tone-tinted tag chips, each one bullet of pipe-divided content:
+  ┌────────────────────────────────────────────────────────────────┐
+  │  STACK 2 · Clinical synthesis                                  │
+  │     AI applied — bounded, citable, never authorial             │
+  │                                                                │
+  │   ▸ Where they collide (DDI flags · Coordination gaps)         │
+  │   ▸ Guideline-anchored panels                                  │
+  │     (ESC · ADA · KDIGO · NICE · NCCN · Beers · WHO · AASM)     │
+  │   ▸ Pending MDT items                                          │
+  └────────────────────────────────────────────────────────────────┘
+```
 
-| Chip | Tone | What it carries |
+### Stack 1 — what the doctor wrote, verbatim. NO AI.
+
+Stack 1 is the entire Cross-consultation brief card itself.
+
+**The rule:** zero AI authorship. Every visible value, every chip, every visit summary, every drug name, every date is **row-attributable to a specific OMOP CDM v5.4 row** from the hospital's structured data. The clinician is reading their own colleagues' work — never an AI paraphrase of it.
+
+The only place AI shows up in Stack 1 is **intent routing**: when the doctor types *"Show cross-consultation brief for Lakshmi"*, the agent recognises the intent and pulls Lakshmi's brief. After that hand-off, the data layer takes over — no LLM call sits between OMOP and the card.
+
+What Stack 1 contains:
+
+| Block | OMOP source | What it shows |
 |---|---|---|
-| **Primary problem** | Red | The headline diagnosis driving everything else — active cancer, recurrence signal, primary cardiac event, etc. |
-| **Co-morbidities** | Slate | Chronic Active conditions recorded across visits |
-| **Surgical history** | Slate | Past procedures with their dates |
-| **Allergies & safety** | Green ✓ | Explicit verifications — "No known drug allergy, verified ×6". Absence is data. |
-| **Family / Social** | Green ✓ | Anything noted, or explicit "no significant" |
+| Patient header | `person` | name · gender · age |
+| Medical history → Co-morbidities | `condition_occurrence` (chronic conditions, `condition_status_source_value` populated) | active diagnoses with their (Active) / (Confirmed) status |
+| Medical history → Surgical history | `condition_occurrence` (surgical concepts) + `observation.surgical_history_text` | past procedures with dates |
+| Medical history → Allergies & safety | `condition_occurrence` (allergy concepts, including explicit-negative) | "No known drug allergy", verified across N visits |
+| Medical history → Active medications | `drug_exposure` filtered by `start_date + days_supply` window | only drugs still inside their prescribed period |
+| Medical history → Family / Social | `observation.family_history_text` + `observation.social_history_text` | as the doctor wrote it |
+| Per-specialty visit card | `visit_occurrence` + `condition_occurrence` + `drug_exposure` + `observation` joined on `visit_occurrence_id` | Diagnosis · Medications (inline pipe list) · Advice · Follow Up Notes — exactly as recorded in the visit |
 
-Each chip carries an ⓘ icon — hover reveals the OMOP consultations behind it + a one-sentence "why this matters".
+What Stack 1 does NOT contain:
 
-### Movement ② · Who has been involved? → Specialty consultations
+- No cross-specialty synthesis
+- No guideline interpretation
+- No DDI commentary
+- No "the AI thinks this means…"
 
-One card per active specialty team, in priority order. Each card has:
+If a field is empty in the EMR, the chip reads *"No data from patient record"* — explicitly, never silently.
 
-- A **rich header** showing the date range, visit count, doctors, and an ⓘ.
-- A **body** with three labelled rows:
-  - `Findings` — diagnosis + examination + symptoms, pipe-divided
-  - `Medications` — only **currently ongoing** Rx (the row disappears entirely if nothing is active)
-  - `Plan` — follow-up date, investigations advised, advice given
-- An optional **amber open-loops block** — what's captured upstream but not shown, what's missing entirely, what's overdue per cited guideline.
+### Stack 2 — the clinical synthesis. AI applied, but bounded.
 
-### Movement ③ · What demands attention? → Where they collide
+Stack 2 is the second card on the surface, titled **Clinical synthesis · Cross-team interpretation**.
 
-A separate card below — Velora's "Stack 2 · Clinical synthesis". Lists every detector fire as its own sub-card:
+**Stack 2's agenda:** the doctor has read the verbatim picture in Stack 1; now they need help connecting dots **across specialties** — drug interactions, surveillance lapses, guideline-anchored interpretations they wouldn't notice from a single-card read. Stack 2 is the only place Velora applies guidance, and **the guidance is always anchored to a hospital-signed published guideline**.
 
-- **DDI flags** — gabapentinoid double-dose, sedative + opioid stack, NSAID-on-DAPT, etc.
-- **Coordination gaps** — overdue surveillance, missed follow-ups, ordered-but-no-result investigations.
-- Each fire cites a real published rule (NCCN, Beers, NICE, ESC, ADA, KDIGO, BTS) with the specific section.
+**What AI is allowed to do in Stack 2:**
 
-### Movement ④ · How do I trust this? → Throughout
+1. **Pick which guideline panels apply.** Given the patient's conditions + drugs + age, AI selects from the hospital's signed panel library (NCCN · NICE · ESC · ADA · KDIGO · Beers · WHO HEARTS · AASM). AI does NOT author the panels; the panel content (rules, thresholds, target ranges) is verbatim from the cited guideline body.
+2. **Rank the detector fires.** When multiple rules fire (e.g. four DDI flags), AI orders them by clinical severity within the cited guideline's framework.
+3. **Compose the collision narrative.** A collision title like *"Aromatase inhibitor + multi-team Rx — bone-protective regimen needs cross-coverage"* is AI-composed; the rule it cites and the bullet content underneath stay verbatim from the source data.
 
-Three layers, present at every level of the card:
+**What AI is NOT allowed to do in Stack 2:**
 
-1. **Header attribution** — every specialty card states up-front *"based on N visits with Dr X and Dr Y between D1 and D2"*. The doctor sees the evidence strength before they read a word of the body.
-2. **Inline ⓘ tooltips** — every chip + every section header opens a tooltip with the OMOP source rows + the reasoning.
-3. **Open-loops blocks** — amber-tinted callouts that surface what *isn't* shown. Absence is never silent.
+- Author a new clinical recommendation (panels come from published bodies, not the LLM)
+- Decide what is "dangerous" outside a cited rule
+- Hallucinate patient values, lab numbers, or doses
+- Issue a diagnosis the EMR doesn't carry
+- Adjust drug doses
+
+**What Stack 2 contains:**
+
+| Block | Driver | Example |
+|---|---|---|
+| **Where they collide** | Rule-based detectors + AI severity ranking | DDI: Naproxen × Apixaban (Lexicomp class rule LX-0042). Coordination gap: Oncology surveillance overdue 6 months (NCCN Colon Ca v.2.2024 §SURV-2). |
+| **Guideline-anchored panels** | AI panel-selection + signed guideline content | "Hormonal therapy + bone-protective bundle" panel rendering Letrozole · Denosumab · Calcium + Vit D coverage with ASCO / NCCN target rows. |
+| **Pending MDT items** | Cross-stack analysis | "Cardiology to release Echo report before surgical date booking." |
+
+Every panel + every flag carries a **citation chip** naming the body + year of the signed rule. The doctor sees not just *"this is a flag"* but *"this is a flag because NCCN says…"*.
+
+### The product-team-ready summary
+
+If you have 60 seconds to explain it:
+
+> Velora's Cross-consultation brief is a **two-stack** experience.
+>
+> **Stack 1 — the brief card itself — is a verbatim mirror of what the doctor's colleagues actually wrote in the EMR.** Every drug, date, and diagnosis is row-attributable to OMOP CDM data; no AI authors a single value. AI's only role here is recognising the doctor's intent and pulling up the right patient.
+>
+> **Stack 2 — the clinical synthesis card — is where AI helps.** It picks which published guideline panels apply to this patient (from the hospital's signed library: NCCN, NICE, ESC, ADA, KDIGO, Beers, WHO HEARTS, AASM), ranks the rule fires by severity, and composes a one-line title over each. **The clinical content of each panel comes from the published guideline, not from the LLM.** AI is a librarian, not an author.
+>
+> This is what lets Velora promise the doctor: every line you read in Stack 1 is your colleagues' words; every recommendation in Stack 2 cites a signed rule. There is never a third category — "the AI's opinion" — anywhere on the surface.
 
 ---
 
@@ -206,7 +259,9 @@ Three layers, present at every level of the card:
 
 The single rule that governs every claim on the card:
 
-> Every visible statement is row-attributable to a specific OMOP consultation, and anything the brief chose **not** to surface is disclosed.
+> Every visible statement is row-attributable to a specific OMOP consultation (Stack 1) **or** to a cited published guideline (Stack 2), and anything the brief chose **not** to surface is disclosed.
+
+In other words: **Stack 1 traces to data; Stack 2 traces to rules. Nothing on the screen traces to "the AI's judgement".**
 
 In practice:
 

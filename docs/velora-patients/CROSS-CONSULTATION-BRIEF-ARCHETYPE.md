@@ -7,6 +7,46 @@
 
 ---
 
+## 0 · Stack 1 vs Stack 2 — the AI line in the code
+
+Before any spec table, the single architectural invariant a developer
+needs to honour while editing this card:
+
+- **Stack 1** is the `CardShell` whose `title="Cross-consultation brief"` — the
+  big card with the medical-history block + per-specialty visit stack.
+  **Zero AI authorship.** Every string in this card comes from the
+  `VeloraV0MdtBriefData` payload, which the data generator (see
+  `lib/velora/v0-replies.ts` + the OMOP generator scripts) computes
+  directly from OMOP CDM rows. No LLM call sits between OMOP and this
+  card's children. The intent-routing call (matching the doctor's
+  free-text question to the `velora_v0_mdt_brief` output kind) is the
+  ONLY AI step that touches Stack 1.
+
+- **Stack 2** is the `CardShell` whose `title="Clinical synthesis"` — rendered
+  immediately below Stack 1 by the same `VeloraV0MdtBriefCard`
+  component. AI is allowed to operate inside this card, but its scope
+  is bounded:
+  1. **Panel selection** — `data.syntheses[]` is the AI-selected list of
+     hospital-signed guideline panels relevant to the patient. Panel
+     content (`rows[]` with label / value / target) is verbatim from the
+     cited guideline.
+  2. **Collision ranking + titling** — `data.collisions[]` carries the
+     rule fires; their order + the human-readable `title` field are
+     AI-composed. The rule body, citation, and bullet content are not.
+  3. **Pending MDT items** — `data.pendingMdtItems[]` enumerates the
+     coordination gaps. Each item is a fully-cited next step, not an
+     LLM monologue.
+
+When you add a new field to `VeloraV0MdtBriefData`, ask: *"Does this
+value get authored by AI?"* If yes, it must live in Stack 2 and ship
+with a `VeloraV0Guideline` citation. If no, it lives in Stack 1 and
+must trace to OMOP.
+
+The plain-English version of this rule is in
+[`WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md) §4.
+
+---
+
 ## 1 · The whole card at a glance
 
 Every labeled element below is a link to its spec table further down.

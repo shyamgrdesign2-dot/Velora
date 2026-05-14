@@ -5,6 +5,36 @@ Maintainer: surface design owner.
 Audience: clinical lead / product reviewer auditing why a particular
 trend chip exists for a particular patient.
 
+## Where this sits in the Stack 1 / Stack 2 architecture
+
+Recent Trends is **Stack-1 content** — the chart it renders (or the
+canned text reply, in V0) shows the patient's vitals / labs verbatim
+from OMOP `measurement` and `observation`. No AI authors a single
+data point. The line is the line; the number is the number.
+
+The AI scope here is identical to the cross-consultation brief:
+
+- **Intent routing** — recognising *"Show recent vital trends"* /
+  *"Show HbA1c trend"* and dispatching to the trends handler.
+- **Per-patient chip filtering** — picking which of the canonical
+  trends are clinically actionable for *this* patient's problem list.
+  This is documented in `lib/velora/v0-trends.ts` as a static rule
+  table and audited in this doc. **The filter is rule-based, not
+  LLM-generated** — the same set of inputs (problem list + specialty
+  context + signed-guideline coverage) always yields the same set of
+  chips.
+
+The Stack-2 idea (AI-selected guideline panels) does not apply to
+Recent Trends in V0. A future revision might bundle the BP trend
+with the WHO HEARTS target as a "Stack-2 BP panel" — that's where
+the cited rule + AI panel-selection layer would live. Today the
+target line is rendered inline with each trend's canned reply,
+quoting the signed guideline directly.
+
+For the canonical Stack 1 / Stack 2 explanation, see
+[`velora-patients/WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./velora-patients/WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md)
+§4.
+
 ## Welcome-card split — vital vs lab
 
 The V0 welcome screen exposes two trend entry points, not one:

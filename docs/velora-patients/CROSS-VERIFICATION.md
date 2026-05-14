@@ -7,6 +7,16 @@
 > previous run. When the mocks need updating to keep pace, the relevant
 > commit hashes are referenced.
 
+> **Why this doc matters in the architecture.** The mocks this log
+> verifies drive **Stack 1** of the Cross-consultation surface — the
+> verbatim card body that renders OMOP data without any AI authorship.
+> Any drift in the source OMOP export is therefore a Stack-1 fidelity
+> issue, not a Stack-2 (clinical-synthesis) one. Keeping the mocks
+> exactly aligned with the source is what lets us promise the doctor
+> that every line in the brief is row-attributable. For the canonical
+> Stack 1 / Stack 2 explanation see
+> [`WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md) §4.
+
 ---
 
 ## Pass 2 · 13 May 2026 · all six patients re-exported

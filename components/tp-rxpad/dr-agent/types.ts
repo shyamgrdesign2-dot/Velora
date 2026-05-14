@@ -759,6 +759,7 @@ export type RxAgentOutput =
   | { kind: "velora_v0_active_meds"; data: VeloraV0ActiveMedsData }
   | { kind: "velora_v0_why_flagged"; data: VeloraV0WhyFlaggedData }
   | { kind: "velora_v0_trends"; data: VeloraV0TrendsData }
+  | { kind: "velora_v0_trend_menu"; data: VeloraV0TrendMenuData }
 
 // ═══════════════ VELORA V0 — STACK 1 / STACK 2 CARD DATA ═══════════════
 // Per Velora_V0_Intent_Spec: every answer separates verifiable hospital records
@@ -1310,6 +1311,47 @@ export interface VeloraV0TrendsData {
   trends: VeloraV0Trend[]
   /** One-line preamble explaining the selection rule. */
   selectionReason: string
+}
+
+// ═══════════════ VELORA V0 — TREND MENU (Recent trends entry card) ═══════════
+//
+// Card surfaced when the doctor asks "Show recent trends" / "Show recent
+// vital trends" / "Show recent lab trends" — OR when the guardrail fires
+// because they asked for a trend that's not on file for this patient.
+// In both cases we show the patient's AVAILABLE trends as clickable
+// chips, grouped vital vs lab, so the doctor lands on a real chart in
+// one tap. The text body above can carry the guardrail "sorry…" line
+// when applicable.
+
+export interface VeloraV0TrendMenuChip {
+  /** Stable id from `lib/velora/v0-trends.ts` (e.g. "bp", "hba1c"). */
+  id: string
+  /** Public-facing label rendered inside the chip. */
+  label: string
+  /** "vital" | "lab" — drives the chip's group + tint. */
+  category: "vital" | "lab"
+  /** Canonical question the chip fires when tapped (matches the
+   *  trends handler's per-trend reply lookup). */
+  question: string
+  /** Tooltip / rationale shown on hover — verbatim from the
+   *  registry's `rationale` field. */
+  rationale: string
+}
+
+export interface VeloraV0TrendMenuData {
+  patientName: string
+  patientMeta: string
+  /** Short one-line scope reason from the registry — e.g.
+   *  "Right breast cancer on Letrozole + Denosumab · IHD · HTN ·
+   *   CKD G3a · OSA — trends drawn from oncology, cardio, nephro
+   *   and pulm guidelines." */
+  scopeReason: string
+  /** Chips to render, in the registry order. */
+  chips: VeloraV0TrendMenuChip[]
+  /** When true, the card is the guardrail reply (the doctor asked
+   *  for an unavailable trend). The renderer surfaces a small
+   *  banner above the chips so the doctor knows what went wrong. */
+  guardrail?: { askedFor: string }
 }
 
 // ═══════════════ VELORA — CARE GAP WINDOW ═══════════════

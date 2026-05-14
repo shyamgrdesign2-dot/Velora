@@ -4194,11 +4194,19 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     const profile = resolvePatientTrends(rawMessage)
     const category = detectTrendCategory(rawMessage)
     const scopedTrends = category ? filterTrendsByCategory(profile, category) : profile.trends
-    const suggestionList = scopedTrends.map((t) => ({
-      label: t.quickLabel,
-      message: t.question,
-    }))
     const categoryLabel = category === "vital" ? "vital" : category === "lab" ? "lab" : null
+    // Build the chip payload that drives the TrendMenu card. This is
+    // the SINGLE source of truth for "what trends does this patient
+    // have" — the doctor cannot click a chip pointing to an unavailable
+    // trend, because every chip is sourced from the registry-filtered
+    // list above.
+    const trendChips = scopedTrends.map((t) => ({
+      id: t.id,
+      label: t.quickLabel,
+      category: t.category,
+      question: t.question,
+      rationale: t.rationale,
+    }))
     const isMenu =
       m === "show recent trends" ||
       m === "show recent vital trends" ||
@@ -4208,10 +4216,10 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     if (!isMenu) {
       const match = findTrendByQuestion(profile, rawMessage)
       if (match) {
-        // Pivot suggestions stay in the same category as the matched
-        // trend, so the doctor keeps reading a coherent menu.
-        const pivotCategory = match.category
-        const pivots = filterTrendsByCategory(profile, pivotCategory).map((t) => ({
+        // Specific trend matched — return the canned trend text reply.
+        // The chat surface follows it with the per-patient pivot
+        // suggestions kept inside the same category for coherence.
+        const pivots = filterTrendsByCategory(profile, match.category).map((t) => ({
           label: t.quickLabel,
           message: t.question,
         }))
@@ -4222,30 +4230,45 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
           suggestions: pivots,
         }
       }
-      // Guardrail — trend isn't on the patient's available list.
-      const scopeWord = categoryLabel ? `${categoryLabel} trend` : "trend"
-      const availableList =
-        scopedTrends.length > 0
-          ? scopedTrends.map((t) => t.quickLabel).join(" · ")
-          : "(none on file for this category)"
+      // Guardrail — the doctor asked for a trend not on file for this
+      // patient. Emit the TrendMenu card with a `guardrail` banner so
+      // the doctor lands on the actual available chips instead of a
+      // text dead-end.
       return {
-        text: `Sorry — that ${scopeWord} isn't on file for **${profile.patientName}**. ${categoryLabel ? `${categoryLabel === "vital" ? "Vital" : "Lab"} trends` : "Trends"} Velora can pull for this patient:\n\n  ${availableList}\n\nTap a chip below to view one.`,
+        text: `Sorry — that trend isn't on file for **${profile.patientName}**. Velora can only pull trends with a clinically actionable series for this patient's problem list.`,
         loadingHint: "Checking the trend availability index…",
         loadingDelayMs: 800,
-        suggestions: suggestionList,
+        rxOutput: {
+          kind: "velora_v0_trend_menu",
+          data: {
+            patientName: profile.patientName,
+            patientMeta: "",
+            scopeReason: profile.scopeReason,
+            chips: trendChips,
+            guardrail: { askedFor: rawMessage.trim() },
+          },
+        },
       }
     }
-    // (a) Menu — list available trends (category-scoped when applicable).
-    const headline = categoryLabel
-      ? `Here are the **${categoryLabel === "vital" ? "vital" : "lab"} trends** Velora can pull for **${profile.patientName}** — ${profile.scopeReason}`
-      : `Here are the trends Velora can pull for **${profile.patientName}** — ${profile.scopeReason}`
+    // (a) Menu — render the TrendMenu card with chips grouped by
+    // vital / lab. No text body in the bubble; the card carries the
+    // entire response.
+    const headlineWord = categoryLabel
+      ? `${categoryLabel === "vital" ? "vital" : "lab"} trends`
+      : "trends"
     return {
-      text: scopedTrends.length > 0
-        ? `${headline}\n\nTap a trend below to view it.`
-        : `Sorry — no ${categoryLabel ?? ""} trends are on file for **${profile.patientName}** right now. Try the other category, or open the cross-consultation brief for the full picture.`,
+      text: `Here are the **${headlineWord}** Velora can pull for **${profile.patientName}**. Tap any chip to view that trend.`,
       loadingHint: `Loading ${categoryLabel ? `${categoryLabel} ` : ""}trends for ${profile.patientName}…`,
       loadingDelayMs: 900,
-      suggestions: suggestionList,
+      rxOutput: {
+        kind: "velora_v0_trend_menu",
+        data: {
+          patientName: profile.patientName,
+          patientMeta: "",
+          scopeReason: profile.scopeReason,
+          chips: trendChips,
+        },
+      },
     }
   }
 

@@ -1119,7 +1119,29 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "coordination-gap",
-      title: "**Pre-op clearance chain incomplete** · Cardiology Echo + Anaesthesia airway plan + Nephro contrast protocol",
+      title: "Pre-op clearance chain incomplete",
+      clinicalConcern:
+        "Three pre-op clearances are due before any non-emergency surgery in a patient with known IHD + severe OSA + CKD. None are on file — surgical date booking is blocked until they close.",
+      pendingItems: [
+        {
+          specialty: "Cardiology",
+          action: "Echo + functional-capacity sign-off",
+          context:
+            "27 Apr · Cardiology saw the patient with DOE grade III × 4-5 months; no Echo result on file yet.",
+        },
+        {
+          specialty: "Anaesthesia",
+          action: "Difficult-airway plan",
+          context:
+            "1 May · Pulmonology PSG returned AHI 31.2 with CPAP titration advised; no airway plan recorded against the PSG.",
+        },
+        {
+          specialty: "Nephrology",
+          action: "Pre + post-contrast hydration protocol",
+          context:
+            "29 Apr · Nephrology saw with Creat 1.39; no scripted hydration protocol on the chart.",
+        },
+      ],
       points: [
         "Cardiology saw the patient on 27 Apr with **DOE grade III × 4-5 months**; no Echo result on file.",
         "Pulmonology PSG (1 May) returned **AHI 31.2** with CPAP titration advised, but no anaesthesia airway plan is recorded.",
@@ -1138,7 +1160,65 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     },
     {
       kind: "ddi",
-      title: "**Aromatase inhibitor + DMARD-style steroid + multi-team Rx** · cross-stream reconciliation",
+      title: "Cumulative CNS-depressant + serotonergic stack across 3 teams",
+      clinicalConcern:
+        "Three independent specialties are layering analgesics on a 76-year-old. The brand names hide the overlap — at the ingredient level, Gabapentin appears twice, Tramadol + Nortriptyline together raise serotonin-syndrome risk, and Baclofen adds further CNS depression. A cumulative-sedation review is indicated.",
+      specialtiesInvolved: [
+        {
+          specialty: "Oncology",
+          date: "12 May 2026",
+          drugs: [
+            "Letrozole (Oncolet) 2.5 mg OD",
+            "Denosumab 60 mg SC q6mo",
+            "Calcium + Vit D daily",
+          ],
+          note: "Long-term hormonal + bone-protective regimen — not contributing to the CNS stack but defines the cumulative therapy load.",
+        },
+        {
+          specialty: "Orthopaedics",
+          date: "28 Apr 2026",
+          drugs: [
+            "Ultracet (Acetaminophen + Tramadol)",
+            "Bacgab gel (Baclofen + Gabapentin + Lidocaine)",
+          ],
+          note: "For cervical disc + bilateral knee OA.",
+        },
+        {
+          specialty: "Neurology",
+          date: "29 Apr 2026",
+          drugs: ["Gabapin NT (Gabapentin + Nortriptyline)"],
+          note: "For left-sided cervical radiculopathy.",
+        },
+      ],
+      sharedIngredients: [
+        {
+          ingredient: "Gabapentin",
+          appearsIn: [
+            { brand: "Bacgab gel", specialty: "Orthopaedics" },
+            { brand: "Gabapin NT", specialty: "Neurology" },
+          ],
+          effect:
+            "Cumulative gabapentinoid exposure across topical + oral routes — sedation + dizziness risk compounds.",
+        },
+        {
+          ingredient: "Tramadol",
+          appearsIn: [{ brand: "Ultracet", specialty: "Orthopaedics" }],
+          effect:
+            "Serotonergic opioid on top of Nortriptyline (Gabapin NT) → serotonin-syndrome surveillance window.",
+        },
+        {
+          ingredient: "Nortriptyline",
+          appearsIn: [{ brand: "Gabapin NT", specialty: "Neurology" }],
+          effect:
+            "TCA in a 76-year-old — Beers 2023 lists low-dose TCAs as potentially inappropriate; anticholinergic + sedation load.",
+        },
+        {
+          ingredient: "Baclofen",
+          appearsIn: [{ brand: "Bacgab gel", specialty: "Orthopaedics" }],
+          effect:
+            "Additional CNS depressant on the stack — even topical absorption matters when stacked with oral sedating agents.",
+        },
+      ],
       points: [
         "Oncology (12 May) initiated **Letrozole 2.5 mg + Denosumab 60 mg SC + Calcium + Vit D** — long-term hormonal + bone-protective regimen.",
         "Orthopaedics (28 Apr) added **Ultracet (Acetaminophen + Tramadol)** + **Bacgab gel (Baclofen + Gabapentin + Lidocaine)** for cervical disc + bilateral knee OA.",

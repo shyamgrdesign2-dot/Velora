@@ -1362,6 +1362,192 @@ function MultiSelectFilter({
   )
 }
 
+/**
+ * CollideEntryCard — one row inside "Where they collide".
+ *
+ * Renders a header (kind badge + title + guideline citation), then a
+ * "clinical concern" plain-English sentence, then the structured
+ * detail blocks that apply to this entry:
+ *
+ *   • DDI flag                     • Coordination gap
+ *     ─ Specialties involved          ─ Pending items checklist
+ *     ─ Shared ingredients            (each item names the team
+ *       (ingredient + every brand      that owns the next step)
+ *       it appears in across teams,
+ *       + cumulative-effect line)
+ *
+ * Legacy entries that only carry `title` + `points[]` fall through
+ * to a simple bulleted list — no breaking change.
+ */
+function CollideEntryCard({ entry }: { entry: import("../../types").VeloraV0CollideEntry }) {
+  const hasRichDetail =
+    !!entry.clinicalConcern ||
+    !!(entry.specialtiesInvolved && entry.specialtiesInvolved.length > 0) ||
+    !!(entry.sharedIngredients && entry.sharedIngredients.length > 0) ||
+    !!(entry.pendingItems && entry.pendingItems.length > 0)
+
+  return (
+    <div className="rounded-[8px] border border-tp-warning-200/70 bg-white px-[12px] py-[10px]">
+      {/* Header strip — badge + title + guideline citation */}
+      <div className="mb-[6px] flex items-start justify-between gap-[8px]">
+        <div className="flex flex-1 flex-wrap items-center gap-[8px]">
+          <span
+            className={`shrink-0 rounded-[4px] px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-[0.06em] ${
+              entry.kind === "ddi"
+                ? "bg-tp-error-100 text-tp-error-700"
+                : "bg-tp-warning-100 text-tp-warning-800"
+            }`}
+          >
+            {entry.kind === "ddi" ? "DDI flag" : "Coordination gap"}
+          </span>
+          <span className="text-[14px] font-semibold leading-[1.4] text-tp-slate-900">
+            <HighlightLine text={entry.title} />
+          </span>
+        </div>
+        <GuidelineChip {...entry.rule} />
+      </div>
+
+      {/* Clinical concern — the one-line "why this matters" the doctor reads first. */}
+      {entry.clinicalConcern && (
+        <p className="mb-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
+          <HighlightLine text={entry.clinicalConcern} />
+        </p>
+      )}
+
+      {/* Specialties involved — DDI shows which teams are feeding the
+          stack; coordination-gap can also use it to show who triggered
+          the chain. */}
+      {entry.specialtiesInvolved && entry.specialtiesInvolved.length > 0 && (
+        <div className="mb-[8px] flex flex-col gap-[6px]">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
+            Specialties involved
+          </div>
+          <div className="flex flex-col gap-[5px]">
+            {entry.specialtiesInvolved.map((s, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-[8px] rounded-[6px] bg-tp-slate-50 px-[8px] py-[5px]"
+              >
+                <span className="shrink-0 rounded-[4px] bg-tp-violet-100 px-[6px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
+                  {s.specialty}
+                </span>
+                <div className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-tp-slate-700">
+                  {s.date && (
+                    <span className="mr-[6px] font-mono text-[11px] text-tp-slate-500">
+                      {s.date}
+                    </span>
+                  )}
+                  {s.drugs && s.drugs.length > 0 && (
+                    <span className="font-medium text-tp-slate-800">
+                      {s.drugs.join(" · ")}
+                    </span>
+                  )}
+                  {s.note && (
+                    <span className="ml-[4px] text-tp-slate-500">— {s.note}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Shared ingredients — DDI's signature value. Surfaces the
+          underlying ingredient overlap that brand names hide. */}
+      {entry.sharedIngredients && entry.sharedIngredients.length > 0 && (
+        <div className="mb-[8px] flex flex-col gap-[6px]">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
+            Active ingredients to watch
+          </div>
+          <ul className="flex flex-col gap-[5px]">
+            {entry.sharedIngredients.map((row, i) => (
+              <li
+                key={i}
+                className="rounded-[6px] border border-tp-error-100 bg-tp-error-50/40 px-[8px] py-[6px] text-[12.5px] leading-[1.5] text-tp-slate-700"
+              >
+                <div className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
+                  <span className="font-semibold text-tp-error-700">{row.ingredient}</span>
+                  <span className="text-[11.5px] text-tp-slate-500">
+                    appears in&nbsp;
+                    {row.appearsIn.map((a, j) => (
+                      <React.Fragment key={j}>
+                        {j > 0 && <span className="mx-[4px] text-tp-slate-300">·</span>}
+                        <span className="font-medium text-tp-slate-700">{a.brand}</span>
+                        <span className="ml-[3px] text-tp-slate-400">({a.specialty})</span>
+                      </React.Fragment>
+                    ))}
+                  </span>
+                </div>
+                <div className="mt-[2px] text-[12px] text-tp-slate-600">→ {row.effect}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Pending items — coordination-gap's signature value. A
+          checklist showing what needs to happen + which team owns it. */}
+      {entry.pendingItems && entry.pendingItems.length > 0 && (
+        <div className="mb-[8px] flex flex-col gap-[6px]">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
+            What's pending
+          </div>
+          <ul className="flex flex-col gap-[5px]">
+            {entry.pendingItems.map((p, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-[8px] rounded-[6px] border border-tp-warning-200/70 bg-tp-warning-50/30 px-[8px] py-[6px] text-[12.5px] leading-[1.5] text-tp-slate-700"
+              >
+                <span
+                  aria-hidden
+                  className="mt-[2px] flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border-[1.5px] border-tp-warning-500 text-tp-warning-700"
+                >
+                  <svg viewBox="0 0 12 12" width="9" height="9" aria-hidden="true">
+                    <path
+                      d="M3 3l6 6M9 3l-6 6"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline gap-x-[6px]">
+                    <span className="rounded-[4px] bg-tp-violet-100 px-[5px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
+                      {p.specialty}
+                    </span>
+                    <span className="font-semibold text-tp-slate-900">{p.action}</span>
+                  </div>
+                  {p.context && (
+                    <div className="mt-[2px] text-[11.5px] leading-[1.45] text-tp-slate-500">
+                      {p.context}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Legacy bullets — only render when the entry didn't carry
+          the rich structured fields above. Lets older mocks still
+          surface their content without duplicating it under the new
+          layout. */}
+      {!hasRichDetail && entry.points.length > 0 && (
+        <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
+          {entry.points.map((p, i) => (
+            <li key={i} className="flex gap-[6px]">
+              <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+              <span><HighlightLine text={p} /></span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   const patientLine = formatPatientStrip(data)
   const headlines = data.chronicConditions ?? []
@@ -1803,33 +1989,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   </span>
                 </div>
                 {entries.map((entry, idx) => (
-                  <div key={idx} className="rounded-[8px] border border-tp-warning-200/70 bg-white px-[10px] py-[8px]">
-                    <div className="mb-[4px] flex items-start justify-between gap-[6px]">
-                      <div className="flex flex-1 flex-wrap items-center gap-[6px]">
-                        <span
-                          className={`shrink-0 rounded-[4px] px-[6px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] ${
-                            entry.kind === "ddi"
-                              ? "bg-tp-error-100 text-tp-error-700"
-                              : "bg-tp-warning-100 text-tp-warning-800"
-                          }`}
-                        >
-                          {entry.kind === "ddi" ? "DDI flag" : "Coordination gap"}
-                        </span>
-                        <span className="text-[13.5px] font-medium leading-[1.4] text-tp-slate-800">
-                          <HighlightLine text={entry.title} />
-                        </span>
-                      </div>
-                      <GuidelineChip {...entry.rule} />
-                    </div>
-                    <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
-                      {entry.points.map((p, i) => (
-                        <li key={i} className="flex gap-[6px]">
-                          <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-                          <span><HighlightLine text={p} /></span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <CollideEntryCard key={idx} entry={entry} />
                 ))}
               </div>
             )

@@ -1115,15 +1115,73 @@ export interface VeloraV0MdtBriefData {
   freshness: string
 }
 
-/** One entry in the "Where they collide" warning panel. Multiple detectors
- *  can fire independently for a single patient — the card renders each as
- *  its own sub-section with a kind badge + drug-pair title + bullet points
- *  + cited guideline chip. */
+/** One entry in the "Where they collide" warning panel. Multiple
+ *  detectors can fire independently for a single patient — the card
+ *  renders each as its own sub-section with a kind badge + headline +
+ *  optional rich structure (clinical-concern · specialties involved ·
+ *  shared ingredients · pending checklist) + cited guideline chip.
+ *
+ *  The optional rich fields below were added so a first-time reader
+ *  can parse the collision without flipping back to the brief card.
+ *  Older mocks that only carry `title` + `points[]` still render
+ *  correctly — the renderer falls back to the bullet-only shape. */
 export interface VeloraV0CollideEntry {
   kind: "ddi" | "coordination-gap"
   /** Short drug-pair / signal-pair headline (HighlightLine supported). */
   title: string
-  /** Bullet-style points shown under the title (HighlightLine supported). */
+  /** One-sentence plain-English statement of WHY this matters. Read
+   *  first by a new clinician opening the patient cold — sits
+   *  immediately under the title, before any structured detail. */
+  clinicalConcern?: string
+  /** Per-specialty contribution chips. Surfaces which teams are
+   *  feeding into this collision and what each one prescribed /
+   *  ordered. Renders as a labelled list with one row per specialty. */
+  specialtiesInvolved?: Array<{
+    /** Specialty name as it appears on the patient's brief
+     *  (e.g. "Oncology", "Orthopaedics", "Neurology"). */
+    specialty: string
+    /** Date the contribution landed (e.g. "12 May 2026"). */
+    date?: string
+    /** Drugs / orders this specialty added. For combo drugs the
+     *  brand carries `(ingredients...)` inline so the doctor sees
+     *  what's actually being prescribed. */
+    drugs?: string[]
+    /** Free-text note about this specialty's piece of the collision
+     *  ("Long-term hormonal + bone-protective regimen",
+     *  "Post-op pain control"). */
+    note?: string
+  }>
+  /** DDI-only — active ingredients that appear in more than one
+   *  prescription across the specialties above. The doctor sees the
+   *  ingredient-level overlap that brand names hide (e.g. Gabapentin
+   *  inside both Bacgab + Gabapin NT, even though the brands differ). */
+  sharedIngredients?: Array<{
+    ingredient: string
+    /** Where this ingredient shows up — one row per occurrence. */
+    appearsIn: Array<{
+      brand: string
+      specialty: string
+    }>
+    /** What the cumulative effect is — one sentence, plain English. */
+    effect: string
+  }>
+  /** Coordination-gap only — the pending items that close the chain
+   *  (e.g. "Cardiology Echo", "Anaesthesia airway plan",
+   *  "Nephro contrast protocol"). */
+  pendingItems?: Array<{
+    /** Owning specialty / team — surfaces who needs to act. */
+    specialty: string
+    /** What's pending. */
+    action: string
+    /** Optional context: when the trigger fired, what value tripped
+     *  it (e.g. "27 Apr · Cardiology saw the patient with DOE grade
+     *  III × 4-5 months; no Echo result yet"). */
+    context?: string
+  }>
+  /** Bullet-style points shown under the title (HighlightLine supported).
+   *  Legacy shape — kept so older mocks that don't carry the rich
+   *  fields above still render. New collision entries should prefer
+   *  the structured fields. */
   points: string[]
   /** Cited guideline body governing the rule. */
   rule: VeloraV0Guideline

@@ -1099,6 +1099,7 @@ function BriefFilterBar({
       <MultiSelectFilter
         label="Specialty"
         allLabel="All specialties"
+        pluralLabel="specialties"
         options={specialties}
         selected={selectedSpecialties}
         onToggle={(v) => onSpecialtiesChange(toggle(selectedSpecialties, v))}
@@ -1107,6 +1108,7 @@ function BriefFilterBar({
       <MultiSelectFilter
         label="Doctor"
         allLabel="All doctors"
+        pluralLabel="doctors"
         options={doctors}
         selected={selectedDoctors}
         onToggle={(v) => onDoctorsChange(toggle(selectedDoctors, v))}
@@ -1134,6 +1136,7 @@ function BriefFilterBar({
 function MultiSelectFilter({
   label,
   allLabel,
+  pluralLabel,
   options,
   selected,
   onToggle,
@@ -1141,6 +1144,10 @@ function MultiSelectFilter({
 }: {
   label: string
   allLabel: string
+  /** Plural noun rendered in the summary chip when 2+ items selected
+   *  (e.g. "specialties", "doctors"). English plurals are irregular
+   *  enough that we just take it as a prop instead of deriving. */
+  pluralLabel: string
   options: string[]
   selected: Set<string>
   onToggle: (value: string) => void
@@ -1148,6 +1155,13 @@ function MultiSelectFilter({
 }) {
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState<{ top: number; right: number } | null>(null)
+  // Display order is snapshotted when the popover opens — selected
+  // items move to the top, unselected items keep their source order
+  // below. We deliberately DON'T resort while open so the doctor's
+  // checkboxes don't shuffle out from under their cursor; the next
+  // open re-snapshots fresh.
+  const [displayOrder, setDisplayOrder] = useState<string[]>(options)
+  // Outside-click / Escape close + position calc happen via refs.
   const triggerRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
   // Position the popover relative to the trigger via fixed coordinates.
@@ -1196,23 +1210,51 @@ function MultiSelectFilter({
       document.removeEventListener("keydown", handleKey)
     }
   }, [open])
+  // When the source `options` list changes (e.g. specialty filter
+  // narrowed the doctor list), keep displayOrder in sync only while
+  // the popover is closed. While it's open we keep the snapshot.
+  useEffect(() => {
+    if (!open) setDisplayOrder(options)
+  }, [options, open])
+  const handleTriggerClick = () => {
+    setOpen((wasOpen) => {
+      if (!wasOpen) {
+        // Just opening — snapshot the sort: selected on top (in source
+        // order), unselected below (in source order).
+        const sel = options.filter((o) => selected.has(o))
+        const rest = options.filter((o) => !selected.has(o))
+        setDisplayOrder([...sel, ...rest])
+      }
+      return !wasOpen
+    })
+  }
   const count = selected.size
+  // Summary chip text:
+  //   0     → allLabel  ("All specialties" / "All doctors")
+  //   1     → that one item's name
+  //   2+    → "N {pluralLabel}"  ("4 specialties" / "3 doctors")
   const valueLabel =
     count === 0
       ? allLabel
       : count === 1
         ? Array.from(selected)[0]
-        : `${Array.from(selected)[0]} +${count - 1}`
+        : `${count} ${pluralLabel}`
+  // Native browser tooltip when summarised — gives the doctor the
+  // full list on hover without needing a custom popover.
+  const titleAttr =
+    count > 1
+      ? `${label} · ${Array.from(selected).join(", ")}`
+      : label
   return (
     <>
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleTriggerClick}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Filter by ${label.toLowerCase()}`}
-        title={label}
+        title={titleAttr}
         className="inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[13px] text-tp-blue-700 transition-colors"
         style={{
           background:
@@ -1220,9 +1262,9 @@ function MultiSelectFilter({
         }}
       >
         {/* The "SPECIALTY" / "DOCTOR" pre-label is dropped — the value
-            ("All specialties", "All doctors", or the selected list)
-            already tells the doctor what this chip filters, and the
-            popover header repeats the label for accessibility. */}
+            ("All specialties", "All doctors", or the count summary)
+            already tells the doctor what this chip filters. Hovering
+            reveals the full list when summarised. */}
         <span className="max-w-[160px] truncate font-semibold text-tp-blue-700">
           {valueLabel}
         </span>
@@ -1260,41 +1302,51 @@ function MultiSelectFilter({
               </button>
             </div>
             <div className="max-h-[280px] overflow-y-auto py-[2px]">
-              {options.length === 0 ? (
+              {displayOrder.length === 0 ? (
                 <div className="px-[12px] py-[10px] text-[12px] italic text-tp-slate-400">
                   No options available
                 </div>
               ) : (
-                options.map((opt) => {
+                displayOrder.map((opt, idx) => {
                   const isOn = selected.has(opt)
+                  const prev = displayOrder[idx - 1]
+                  const prevOn = prev ? selected.has(prev) : false
+                  // Hairline divider between the "selected" block and
+                  // the "unselected" block once selected items have
+                  // been sorted to the top.
+                  const showDivider = idx > 0 && prevOn && !isOn
                   return (
-                    <button
-                      key={opt}
-                      type="button"
-                      role="option"
-                      aria-selected={isOn}
-                      onClick={() => onToggle(opt)}
-                      className="flex w-full items-center gap-[8px] px-[10px] py-[7px] text-left text-[12.5px] text-tp-slate-700 transition-colors hover:bg-tp-blue-50/60"
-                    >
-                      <span
-                        className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border ${isOn ? "border-tp-blue-500 bg-tp-blue-500" : "border-tp-slate-300 bg-white"}`}
-                        aria-hidden
+                    <React.Fragment key={opt}>
+                      {showDivider && (
+                        <div className="my-[2px] h-px bg-tp-slate-100" aria-hidden />
+                      )}
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={isOn}
+                        onClick={() => onToggle(opt)}
+                        className="flex w-full items-center gap-[8px] px-[10px] py-[7px] text-left text-[12.5px] text-tp-slate-700 transition-colors hover:bg-tp-blue-50/60"
                       >
-                        {isOn && (
-                          <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
-                            <path
-                              d="M3.5 8.5l3 3 6-7"
-                              fill="none"
-                              stroke="white"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        )}
-                      </span>
-                      <span className="truncate">{opt}</span>
-                    </button>
+                        <span
+                          className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border ${isOn ? "border-tp-blue-500 bg-tp-blue-500" : "border-tp-slate-300 bg-white"}`}
+                          aria-hidden
+                        >
+                          {isOn && (
+                            <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
+                              <path
+                                d="M3.5 8.5l3 3 6-7"
+                                fill="none"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                        <span className="truncate">{opt}</span>
+                      </button>
+                    </React.Fragment>
                   )
                 })
               )}

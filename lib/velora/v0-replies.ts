@@ -573,8 +573,8 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Oncology surveillance overdue",
-      clinicalConcern:
-        "12 oncology visits ended Mar '26. With metastatic disease + lung-mets on the condition row, NCCN expects CEA every 3-6 months and imaging every 6-12 months — neither order is on file since Mar.",
+      titleEvidence:
+        "Latest oncology visit_occurrence row is 19 Mar 2026 (Dr Pankaj Shah / Dr Mithun Shah). condition_occurrence carries 'Metastatic disease · Lung metastasis most likely' as Active. NCCN Colon Ca v.2.2024 §SURV-1/2 expects CEA every 3-6 months and imaging every 6-12 months post-resection × adjuvant chemo — both cadences are past due (6+ months since last contact).",
       pendingItems: [
         {
           specialty: "Oncology",
@@ -611,6 +611,8 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "ddi",
       title: "Cumulative gabapentinoid stack across 3 teams + serotonergic overlap",
+      titleEvidence:
+        "Detected by joining active drug_exposure rows on ingredient. Neurosurgery (Dr Kalpesh Shah / Dr Saija) carries Gabator NT on the 11 Jun + 18 Jul 2025 visits. Neurology (Dr Nikhil Dave) added Gabantin GRS 300 + Progaba 6 % gel on 20 Dec 2025. Pain Specialist (Dr Milan Mehta) added Morphine 10 mg PO on 5 May 2026. Gabapentin appears in all three Neuro / Ortho lines; Nortriptyline lives inside Gabator NT; Tramadol-equivalent serotonergic risk sits on top via the Pain Specialist Morphine.",
       clinicalConcern:
         "Three specialties are independently writing prescriptions that touch the same active ingredients. Gabapentin appears in three forms (oral + oral combo + topical) across Neurosurgery and Neurology; Nortriptyline (a TCA) layers serotonergic risk on top of the short-course Morphine added by Pain Specialist. Single-active-ingredient principle says one team should own this Rx.",
       specialtiesInvolved: [
@@ -1181,6 +1183,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Pre-op clearance chain incomplete",
+      titleEvidence:
+        "Surgery is pending — Onco-surgery (Dr Dhara Girish Pandya) recorded 'Pre Op Profile Major (Cancer) ordered' on 30 Apr + 4 May 2026 visits, then a 'Final pre-op review' on 11 May for bilateral breast + axilla 'AS DESCRIBED'. Surgical date is not yet booked on the chart. ASA / DAS pre-op standard requires Cardiology Echo + Anaesthesia airway plan + Nephro contrast protocol on file before booking; none are present.",
       clinicalConcern:
         "Three pre-op clearances are due before any non-emergency surgery in a patient with known IHD + severe OSA + CKD. None are on file — surgical date booking is blocked until they close.",
       pendingItems: [
@@ -1222,6 +1226,8 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "ddi",
       title: "Cumulative CNS-depressant + serotonergic stack across 3 teams",
+      titleEvidence:
+        "Detected by reading every active drug_exposure row's ingredients (drug_source_value + generic_name) and finding overlap across three prescribing specialties: Orthopaedics (Ultracet · Bacgab gel on 28 Apr) + Neurology (Gabapin NT on 29 Apr) + Oncology bone-protective regimen (12 May). Gabapentin appears in Bacgab + Gabapin NT; Tramadol + Nortriptyline live in Ultracet + Gabapin NT respectively; Baclofen adds further CNS depression.",
       clinicalConcern:
         "Three independent specialties are layering analgesics on a 76-year-old. The brand names hide the overlap — at the ingredient level, Gabapentin appears twice, Tramadol + Nortriptyline together raise serotonin-syndrome risk, and Baclofen adds further CNS depression. A cumulative-sedation review is indicated.",
       specialtiesInvolved: [
@@ -2068,6 +2074,8 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Allergy review absent across every prescription",
+      titleEvidence:
+        "Across 59 visits / 12-month window / 4 prescribing providers, zero allergy-class condition_occurrence rows exist (drug · food · contrast). Every drug_exposure event was written without a documented allergy verification preceding it. WHO HEARTS primary-care Rx-safety standard expects an explicit allergy row per prescription chain.",
       clinicalConcern:
         "Hypertension is the chronic anchor and recurrent viral pharyngitis episodes layer prescriptions on top. The record carries zero allergy-verification rows; every Rx is being written on an unverified safety premise. The fix is one structured allergy review at the next Internal Medicine visit.",
       pendingItems: [
@@ -2653,6 +2661,8 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "ddi",
       title: "Sulfonylurea double-dose across Diabetology + Cardiology",
+      titleEvidence:
+        "Two concurrent active drug_exposure rows containing Glimepiride: Diabetology (Dr Nimit Shah) carries Amaryl M 1 (Glimepiride 1 + Metformin 500) across 11 visits; Cardiology (Dr Bhavesh Roy) carries Amaryl 1 (Glimepiride 1) on the secondary-prevention bundle. Date windows overlap. NICE NG28 §Glycaemic + Beers 2023 §Sulfonylurea + β-blocker (Metoprolol is also active) flag this exact stacking pattern.",
       clinicalConcern:
         "Two teams are prescribing the same active ingredient (Glimepiride) through two different brand names. Hypoglycaemia risk amplifies because the patient is also on a β-blocker (Metoprolol) which masks the warning symptoms — one team must own the sulfonylurea Rx.",
       specialtiesInvolved: [
@@ -2698,6 +2708,8 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "DAPT duration review overdue post-CVA",
+      titleEvidence:
+        "Aspirin + Clopidogrel drug_exposure rows both `start_date` ≈ Jul 2025 (10 months ago) and are still active. condition_occurrence carries 'CAD (Active)' + post-CVA history. No Cardiology visit_occurrence carries a 'DAPT step-down review' note. ESC 2024 secondary-prevention guidance gates de-escalation at the 12-month mark.",
       clinicalConcern:
         "Aspirin + Clopidogrel have been running together for ~10 months after CVA in a chronic-coronary-syndrome patient. ESC says the bleed-vs-event balance shifts after 12 months — Cardiology should review for de-escalation to monotherapy at the 12-month mark.",
       pendingItems: [
@@ -3287,6 +3299,8 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Fibrate-gap on severe hypertriglyceridaemia",
+      titleEvidence:
+        "condition_occurrence carries 'Acute pancreatitis' as a recurrent active row; the Gastro narrative captures TG 2898 mg/dL inline (the measurement table isn't yet populated for this row). Active drug_exposure rows: Rozuvastatin + Ezetimibe (Rozavel EZ 20) — no fibrate / omega-3 row. AHA hypertriglyceridaemia statement: TG > 500 mg/dL warrants fibrate add-on.",
       clinicalConcern:
         "Recurrent acute pancreatitis with TG-driven aetiology is on the active problem list. Rozuvastatin + Ezetimibe are on board, but the fibrate or omega-3 add-on indicated above TG > 500 mg/dL has not been started. Each recurrence is preventable once TG falls below 500.",
       pendingItems: [
@@ -3320,6 +3334,8 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "ddi",
       title: "Two ARBs + two β-blockers stacked across Cardiology + Diabetology",
+      titleEvidence:
+        "Active drug_exposure rows on 13 Apr 2026: Cardiology (Dr Bhavesh Roy) carries Valsartan + Amlodipine + Propranolol; Diabetology (Dr Talati) added Losartan + Chlorthalidone + Metoprolol. Ingredient-level join: two ARB-class molecules (Valsartan + Losartan) + two β-blocker-class molecules (Propranolol + Metoprolol) active concurrently with overlapping date windows. ESC/ESH 2023 expects one agent per class.",
       clinicalConcern:
         "Cardiology and Diabetology are independently writing anti-HTN regimens. The patient now has TWO ARBs (Valsartan + Losartan) and TWO β-blockers (Propranolol + Metoprolol) active simultaneously — ESC/ESH says one agent per class. The fix is a single reconciliation visit, not a new prescription.",
       specialtiesInvolved: [
@@ -3580,6 +3596,8 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Wilson's chelation safety monitoring incomplete",
+      titleEvidence:
+        "Active drug_exposure rows: Cilamin 250 MG (Penicillamine) + Zinfate (Zinc sulfate) — chelation regimen confirmed. measurement / observation rows for the AASLD-mandated safety panel are absent: no 24-h urinary copper (weeks 1, 4, 12 post-initiation) and no monthly urine PCR for Penicillamine-induced nephrotic syndrome surveillance.",
       clinicalConcern:
         "Penicillamine + Zinc are actively prescribed but the AASLD-mandated safety labs (24-h urinary copper to confirm chelation, urine PCR to surveil Penicillamine-induced nephrotic syndrome) aren't on the chart. Each gap is a single Gastro order; together they form the chelation-safety bundle.",
       pendingItems: [
@@ -3618,6 +3636,8 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
     {
       kind: "coordination-gap",
       title: "Family screening for Wilson's not yet initiated",
+      titleEvidence:
+        "condition_occurrence confirms Wilson's disease as Active (proband identified). observation / condition rows for first-degree relatives — siblings + parents — carry no ATP7B, ceruloplasmin or 24-h urinary copper entries. AASLD 2023 family-screening cascade gates on the index proband; once the proband is confirmed the cascade is expected.",
       clinicalConcern:
         "Wilson's is autosomal recessive — first-degree relatives carry a 25 % risk. The proband is identified; the screening cascade (ATP7B + ceruloplasmin + 24-h copper) for siblings + parents hasn't been opened yet. Family counselling is the natural starting point.",
       pendingItems: [

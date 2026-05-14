@@ -1126,6 +1126,15 @@ export interface VeloraV0CollideEntry {
   kind: "ddi" | "coordination-gap"
   /** Short drug-pair / signal-pair headline (HighlightLine supported). */
   title: string
+  /** Evidence trail — answers "WHERE did this conclusion come from?".
+   *  Surfaced as a hover tooltip on the title so a sceptical doctor
+   *  can trace the headline back to the OMOP rows that triggered it
+   *  (e.g. "Pre-op signal comes from Onco-surgery 'Pre Op Profile
+   *  Major (Cancer)' orders on 30 Apr + 4 May + the final pre-op
+   *  review on 11 May 2026"). Different from `clinicalConcern`
+   *  (which states the matter) and `rule.whyPicked` (which explains
+   *  why the cited guideline applies). */
+  titleEvidence?: string
   /** One-sentence plain-English statement of WHY this matters. Read
    *  first by a new clinician opening the patient cold — sits
    *  immediately under the title, before any structured detail. */

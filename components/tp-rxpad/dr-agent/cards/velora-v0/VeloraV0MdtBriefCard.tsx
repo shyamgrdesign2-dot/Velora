@@ -1409,8 +1409,11 @@ function CollideEntryCard({ entry }: { entry: import("../../types").VeloraV0Coll
           >
             {isDDI ? "DDI flag" : "Coordination gap"}
           </span>
-          <span className="text-[14px] font-semibold leading-[1.4] text-tp-slate-900">
+          <span className="inline-flex items-center gap-[5px] text-[14px] font-semibold leading-[1.4] text-tp-slate-900">
             <HighlightLine text={entry.title} />
+            {entry.titleEvidence && (
+              <CollideTitleEvidenceTip evidence={entry.titleEvidence} />
+            )}
           </span>
         </div>
         <GuidelineChip {...entry.rule} />
@@ -1566,6 +1569,43 @@ function CollideEntryCard({ entry }: { entry: import("../../types").VeloraV0Coll
         )}
       </div>
     </div>
+  )
+}
+
+/** Hover tooltip rendered next to a collide-entry title. Answers
+ *  "where did this conclusion come from?" with the explicit OMOP-row
+ *  trail that triggered the title. The tooltip itself is portal-
+ *  rendered (escapes any clipping ancestor) using FloatingTooltip. */
+function CollideTitleEvidenceTip({ evidence }: { evidence: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  return (
+    <>
+      <span
+        ref={ref}
+        className="inline-flex shrink-0 cursor-help items-center text-tp-slate-400 hover:text-tp-slate-700"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        tabIndex={0}
+        aria-label="Where this conclusion comes from"
+      >
+        <Info size={13} strokeWidth={1.85} />
+      </span>
+      <FloatingTooltip
+        open={open}
+        triggerRef={ref}
+        placement="top-center"
+        width={300}
+        className="rounded-[8px] bg-tp-slate-800 px-[12px] py-[9px] text-left text-[11.5px] font-normal leading-[1.5] text-white shadow-xl"
+      >
+        <span className="block text-[10px] font-semibold uppercase tracking-[0.06em] text-tp-violet-300">
+          Where this comes from
+        </span>
+        <span className="mt-[4px] block">{evidence}</span>
+      </FloatingTooltip>
+    </>
   )
 }
 

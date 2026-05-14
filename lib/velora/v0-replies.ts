@@ -1324,7 +1324,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         { label: "Calcium + Vit D cover", value: "Effectol + Shelcal daily", ref: "Per Tahiliani Rx.", tone: "ok" },
         { label: "Follow-up cadence", value: "1 year", ref: "Per followup_advice from Tahiliani — long-interval review appropriate to the hormonal regimen.", tone: "ok" },
       ],
-      note: "All four guideline-mandated components are on board. The regimen is well-aligned with ASCO/NCCN guidance for ER+ disease.",
+      note: "Dr Tahiliani's 12 May Oncology Rx lists Letrozole (aromatase inhibitor) + Denosumab (anti-resorptive) — that drug pair on a 76-year-old with ER+ breast cancer is the exact trigger for the ASCO/NCCN bone-protective bundle. All four mandated components are on board.",
     },
     {
       panelTitle: "Severe OSA · CPAP titration window",
@@ -1343,7 +1343,7 @@ export const LAKSHMI_IYER_BRIEF_MOCK: VeloraV0MdtBriefData = {
         { label: "CPAP titration scheduled", value: "Advised, not yet booked", ref: "Per followup_advice on 1 May.", tone: "warn" },
         { label: "Pre-op airway plan", value: "Pending", ref: "Anaesthesia has not documented in the record.", tone: "warn" },
       ],
-      note: "Severe-range AHI plus pending CPAP titration is the chief peri-op-airway risk for this patient.",
+      note: "Pulmonology PSG on 1 May returned AHI 31.2 — that single value crosses AASM's severe-OSA threshold (AHI ≥ 30), which auto-triggers the CPAP titration window. With surgery pending, this is now the chief peri-op airway risk.",
     },
   ],
   freshness: "OMOP-synced · verbatim from drug_exposure + observation rows · last refresh just now",

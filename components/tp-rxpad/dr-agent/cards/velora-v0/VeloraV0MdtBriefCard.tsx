@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { Hospital, Flag, Diagram, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, ArrowDown2 } from "iconsax-reactjs"
-import { Info } from "lucide-react"
+import { Hospital, Flag, Diagram, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, ArrowDown2, Clock } from "iconsax-reactjs"
+import { Info, AlertTriangle, Users, FlaskConical, Sparkles } from "lucide-react"
 import { FlagArrow } from "../../shared/FlagArrow"
 import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
@@ -1390,20 +1390,24 @@ function CollideEntryCard({ entry }: { entry: import("../../types").VeloraV0Coll
     !!(entry.specialtiesInvolved && entry.specialtiesInvolved.length > 0) ||
     !!(entry.sharedIngredients && entry.sharedIngredients.length > 0) ||
     !!(entry.pendingItems && entry.pendingItems.length > 0)
+  const isDDI = entry.kind === "ddi"
 
   return (
-    <div className="rounded-[8px] border border-tp-warning-200/70 bg-white px-[12px] py-[10px]">
-      {/* Header strip — badge + title + guideline citation */}
-      <div className="mb-[6px] flex items-start justify-between gap-[8px]">
+    <div className="overflow-hidden rounded-[10px] border border-tp-warning-200/70 bg-white">
+      {/* Header strip — kind pill + title + guideline citation.
+          Slate-50 bar separates this block visually from the alert
+          body below, so the kind / title read as a header, not part
+          of the prose. */}
+      <div className="flex items-start justify-between gap-[8px] border-b border-tp-warning-100/80 bg-tp-warning-50/40 px-[12px] py-[8px]">
         <div className="flex flex-1 flex-wrap items-center gap-[8px]">
           <span
             className={`shrink-0 rounded-[4px] px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-[0.06em] ${
-              entry.kind === "ddi"
+              isDDI
                 ? "bg-tp-error-100 text-tp-error-700"
                 : "bg-tp-warning-100 text-tp-warning-800"
             }`}
           >
-            {entry.kind === "ddi" ? "DDI flag" : "Coordination gap"}
+            {isDDI ? "DDI flag" : "Coordination gap"}
           </span>
           <span className="text-[14px] font-semibold leading-[1.4] text-tp-slate-900">
             <HighlightLine text={entry.title} />
@@ -1412,143 +1416,173 @@ function CollideEntryCard({ entry }: { entry: import("../../types").VeloraV0Coll
         <GuidelineChip {...entry.rule} />
       </div>
 
-      {/* Clinical concern — the one-line "why this matters" the doctor reads first. */}
-      {entry.clinicalConcern && (
-        <p className="mb-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
-          <HighlightLine text={entry.clinicalConcern} />
-        </p>
-      )}
+      <div className="px-[12px] py-[10px]">
+        {/* Clinical concern — the one-line "why this matters" the
+            doctor reads first. Tinted callout with a warning glyph
+            so it reads as the headline, not body prose. */}
+        {entry.clinicalConcern && (
+          <div
+            className={`mb-[10px] flex items-start gap-[8px] rounded-[8px] px-[10px] py-[8px] ${
+              isDDI
+                ? "border border-tp-error-100 bg-tp-error-50/50"
+                : "border border-tp-warning-200/60 bg-tp-warning-50/40"
+            }`}
+          >
+            <AlertTriangle
+              size={15}
+              strokeWidth={2}
+              className={`mt-[1px] shrink-0 ${isDDI ? "text-tp-error-600" : "text-tp-warning-700"}`}
+              aria-hidden
+            />
+            <p className="text-[13px] leading-[1.5] text-tp-slate-800">
+              <HighlightLine text={entry.clinicalConcern} />
+            </p>
+          </div>
+        )}
 
-      {/* Specialties involved — DDI shows which teams are feeding the
-          stack; coordination-gap can also use it to show who triggered
-          the chain. */}
-      {entry.specialtiesInvolved && entry.specialtiesInvolved.length > 0 && (
-        <div className="mb-[8px] flex flex-col gap-[6px]">
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-            Specialties involved
-          </div>
-          <div className="flex flex-col gap-[5px]">
-            {entry.specialtiesInvolved.map((s, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-[8px] rounded-[6px] bg-tp-slate-50 px-[8px] py-[5px]"
-              >
-                <span className="shrink-0 rounded-[4px] bg-tp-violet-100 px-[6px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
-                  {s.specialty}
-                </span>
-                <div className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-tp-slate-700">
-                  {s.date && (
-                    <span className="mr-[6px] font-mono text-[11px] text-tp-slate-500">
-                      {s.date}
-                    </span>
-                  )}
-                  {s.drugs && s.drugs.length > 0 && (
-                    <span className="font-medium text-tp-slate-800">
-                      {s.drugs.join(" · ")}
-                    </span>
-                  )}
-                  {s.note && (
-                    <span className="ml-[4px] text-tp-slate-500">— {s.note}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Shared ingredients — DDI's signature value. Surfaces the
-          underlying ingredient overlap that brand names hide. */}
-      {entry.sharedIngredients && entry.sharedIngredients.length > 0 && (
-        <div className="mb-[8px] flex flex-col gap-[6px]">
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-            Active ingredients to watch
-          </div>
-          <ul className="flex flex-col gap-[5px]">
-            {entry.sharedIngredients.map((row, i) => (
-              <li
-                key={i}
-                className="rounded-[6px] border border-tp-error-100 bg-tp-error-50/40 px-[8px] py-[6px] text-[12.5px] leading-[1.5] text-tp-slate-700"
-              >
-                <div className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
-                  <span className="font-semibold text-tp-error-700">{row.ingredient}</span>
-                  <span className="text-[11.5px] text-tp-slate-500">
-                    appears in&nbsp;
-                    {row.appearsIn.map((a, j) => (
-                      <React.Fragment key={j}>
-                        {j > 0 && <span className="mx-[4px] text-tp-slate-300">·</span>}
-                        <span className="font-medium text-tp-slate-700">{a.brand}</span>
-                        <span className="ml-[3px] text-tp-slate-400">({a.specialty})</span>
-                      </React.Fragment>
-                    ))}
-                  </span>
-                </div>
-                <div className="mt-[2px] text-[12px] text-tp-slate-600">→ {row.effect}</div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Pending items — coordination-gap's signature value. A
-          checklist showing what needs to happen + which team owns it. */}
-      {entry.pendingItems && entry.pendingItems.length > 0 && (
-        <div className="mb-[8px] flex flex-col gap-[6px]">
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-            What's pending
-          </div>
-          <ul className="flex flex-col gap-[5px]">
-            {entry.pendingItems.map((p, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-[8px] rounded-[6px] border border-tp-warning-200/70 bg-tp-warning-50/30 px-[8px] py-[6px] text-[12.5px] leading-[1.5] text-tp-slate-700"
-              >
-                <span
-                  aria-hidden
-                  className="mt-[2px] flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border-[1.5px] border-tp-warning-500 text-tp-warning-700"
+        {/* Specialties involved — labelled section with a team icon. */}
+        {entry.specialtiesInvolved && entry.specialtiesInvolved.length > 0 && (
+          <div className="mb-[10px] flex flex-col gap-[6px]">
+            <SectionHeading icon={<Users size={12} strokeWidth={2} />}>
+              Teams involved
+            </SectionHeading>
+            <div className="flex flex-col gap-[5px]">
+              {entry.specialtiesInvolved.map((s, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-[8px] rounded-[6px] bg-tp-slate-50 px-[8px] py-[5px]"
                 >
-                  <svg viewBox="0 0 12 12" width="9" height="9" aria-hidden="true">
-                    <path
-                      d="M3 3l6 6M9 3l-6 6"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-baseline gap-x-[6px]">
-                    <span className="rounded-[4px] bg-tp-violet-100 px-[5px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
-                      {p.specialty}
-                    </span>
-                    <span className="font-semibold text-tp-slate-900">{p.action}</span>
+                  <span className="shrink-0 rounded-[4px] bg-tp-violet-100 px-[6px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
+                    {s.specialty}
+                  </span>
+                  <div className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-tp-slate-700">
+                    {s.date && (
+                      <span className="mr-[6px] font-mono text-[11px] text-tp-slate-500">
+                        {s.date}
+                      </span>
+                    )}
+                    {s.drugs && s.drugs.length > 0 && (
+                      <span className="font-medium text-tp-slate-800">
+                        {s.drugs.join(" · ")}
+                      </span>
+                    )}
+                    {s.note && (
+                      <span className="ml-[4px] text-tp-slate-500">— {s.note}</span>
+                    )}
                   </div>
-                  {p.context && (
-                    <div className="mt-[2px] text-[11.5px] leading-[1.45] text-tp-slate-500">
-                      {p.context}
-                    </div>
-                  )}
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Shared ingredients — DDI's signature value. Surfaces the
+            underlying ingredient overlap that brand names hide. */}
+        {entry.sharedIngredients && entry.sharedIngredients.length > 0 && (
+          <div className="mb-[10px] flex flex-col gap-[6px]">
+            <SectionHeading icon={<FlaskConical size={12} strokeWidth={2} />}>
+              Active ingredients to watch
+            </SectionHeading>
+            <ul className="flex flex-col gap-[5px]">
+              {entry.sharedIngredients.map((row, i) => (
+                <li
+                  key={i}
+                  className="rounded-[6px] border border-tp-error-100 bg-tp-error-50/40 px-[8px] py-[6px] text-[12.5px] leading-[1.5] text-tp-slate-700"
+                >
+                  <div className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
+                    <span className="rounded-[4px] bg-tp-error-100 px-[6px] py-[1px] text-[11px] font-bold text-tp-error-700">
+                      {row.ingredient}
+                    </span>
+                    <span className="text-[11.5px] text-tp-slate-500">
+                      appears in&nbsp;
+                      {row.appearsIn.map((a, j) => (
+                        <React.Fragment key={j}>
+                          {j > 0 && <span className="mx-[4px] text-tp-slate-300">·</span>}
+                          <span className="font-medium text-tp-slate-700">{a.brand}</span>
+                          <span className="ml-[3px] text-tp-slate-400">({a.specialty})</span>
+                        </React.Fragment>
+                      ))}
+                    </span>
+                  </div>
+                  <div className="mt-[2px] text-[12px] text-tp-slate-600">→ {row.effect}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Pending items — coordination-gap's signature value. Each row
+            uses a Clock icon (pending semantics) instead of an X, so
+            the row doesn't read as a clickable dismiss. */}
+        {entry.pendingItems && entry.pendingItems.length > 0 && (
+          <div className="mb-[2px] flex flex-col gap-[6px]">
+            <SectionHeading icon={<Clock size={12} variant="Bulk" />}>
+              Pending — needs action from these teams
+            </SectionHeading>
+            <ul className="flex flex-col gap-[5px]">
+              {entry.pendingItems.map((p, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-[10px] rounded-[6px] border border-tp-warning-200/70 bg-tp-warning-50/30 px-[10px] py-[7px] text-[12.5px] leading-[1.5] text-tp-slate-700"
+                >
+                  <span
+                    aria-hidden
+                    className="mt-[2px] flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-full bg-tp-warning-100 text-tp-warning-700"
+                  >
+                    <Clock size={12} variant="Bulk" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-x-[6px]">
+                      <span className="rounded-[4px] bg-tp-violet-100 px-[5px] py-[1px] text-[10px] font-bold uppercase tracking-[0.05em] text-tp-violet-700">
+                        {p.specialty}
+                      </span>
+                      <span className="font-semibold text-tp-slate-900">{p.action}</span>
+                    </div>
+                    {p.context && (
+                      <div className="mt-[2px] text-[11.5px] leading-[1.45] text-tp-slate-500">
+                        {p.context}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Legacy bullets — only render when the entry didn't carry
+            the rich structured fields above. Lets older mocks still
+            surface their content without duplicating it under the new
+            layout. */}
+        {!hasRichDetail && entry.points.length > 0 && (
+          <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
+            {entry.points.map((p, i) => (
+              <li key={i} className="flex gap-[6px]">
+                <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+                <span><HighlightLine text={p} /></span>
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        )}
+      </div>
+    </div>
+  )
+}
 
-      {/* Legacy bullets — only render when the entry didn't carry
-          the rich structured fields above. Lets older mocks still
-          surface their content without duplicating it under the new
-          layout. */}
-      {!hasRichDetail && entry.points.length > 0 && (
-        <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[13px] leading-[1.5] text-tp-slate-700">
-          {entry.points.map((p, i) => (
-            <li key={i} className="flex gap-[6px]">
-              <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-              <span><HighlightLine text={p} /></span>
-            </li>
-          ))}
-        </ul>
-      )}
+/** Tiny uppercase-tracking section heading used inside a
+ *  `CollideEntryCard` body to label each block (Teams involved,
+ *  Active ingredients to watch, Pending — needs action). */
+function SectionHeading({
+  icon,
+  children,
+}: {
+  icon?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center gap-[5px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
+      {icon && <span className="shrink-0 text-tp-slate-400">{icon}</span>}
+      <span>{children}</span>
     </div>
   )
 }
@@ -2047,22 +2081,53 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             const hiddenCount = (data.syntheses?.length ?? 0) - visibleSyntheses.length
             return (
               <>
-                {visibleSyntheses.map((s, idx) => (
-                  <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "synthesis" : undefined}>
-                    <SectionSummaryBar
-                      label={s.panelTitle}
-                      icon="medical-report"
-                      trailing={<GuidelineChip {...s.guideline} />}
-                    />
-                    <ul className="flex flex-col gap-[3px] pl-[8px]">
-                              {s.rows.map((row, i) => (
+                {visibleSyntheses.map((s, idx) => {
+                  // Pick the panel-level "why" caption. Prefer the
+                  // panel's `note` (panel-specific reasoning); fall
+                  // back to the guideline's `whyPicked` (rule-level
+                  // reasoning) so even older mocks without a `note`
+                  // surface a usable explanation inline.
+                  const whyApplies = s.note ?? s.guideline.whyPicked
+                  return (
+                    <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "synthesis" : undefined}>
+                      <SectionSummaryBar
+                        label={s.panelTitle}
+                        icon="medical-report"
+                        trailing={<GuidelineChip {...s.guideline} />}
+                      />
+                      {/* Why this panel applies — surfaces the panel's
+                          patient-specific reasoning IN the card body so
+                          the doctor doesn't have to hover the ⓘ to
+                          learn why Velora picked it. Reads as a small
+                          violet-tinted caption beneath the title, with
+                          a sparkle glyph so it's visually clear it's
+                          the AI-reasoning line (the only AI-authored
+                          piece on this card, per the Stack 1 / Stack 2
+                          doctrine). */}
+                      {whyApplies && (
+                        <div className="ml-[2px] mt-[2px] flex items-start gap-[6px] rounded-[6px] bg-tp-violet-50/50 px-[10px] py-[6px] text-[12px] leading-[1.5] text-tp-slate-600">
+                          <Sparkles
+                            size={12}
+                            strokeWidth={2}
+                            className="mt-[2px] shrink-0 text-tp-violet-500"
+                            aria-hidden
+                          />
+                          <span>
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-600">
+                              Why this panel applies&nbsp;·&nbsp;
+                            </span>
+                            {whyApplies}
+                          </span>
+                        </div>
+                      )}
+                      <ul className="flex flex-col gap-[3px] pl-[8px]">
+                        {s.rows.map((row, i) => (
                           <SynthesisBullet key={i} row={row} />
                         ))}
-                    </ul>
-                    {/* `s.note` (Why this panel) is intentionally NOT rendered in the live card —
-                        the deep-dive doc surfaces per-panel reasoning. Keeps the chat surface clean. */}
-                  </div>
-                ))}
+                      </ul>
+                    </div>
+                  )
+                })}
                 {hiddenCount > 0 && (
                   <p className="px-[2px] text-[11px] italic text-tp-slate-500">
                     + {hiddenCount} panel{hiddenCount === 1 ? "" : "s"} hidden — cited body not in this hospital's signed library.

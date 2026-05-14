@@ -752,13 +752,9 @@ export type RxAgentOutput =
   | { kind: "clinical_correlation_chain"; data: ClinicalCorrelationChainCardData }
   // Velora — flexible custom card for drill-down replies (checklist / evidence / comparison / trend …)
   | { kind: "velora_scenario_card"; data: VeloraScenarioCardData }
-  // ── Velora v0 — four canonical intent cards (Stack 1 / Stack 2 anatomy per spec) ──
+  // ── Velora v0 — three live intent cards (Stack 1 brief · Patient journey · Recent trends)
   | { kind: "velora_v0_mdt_brief"; data: VeloraV0MdtBriefData }
-  | { kind: "velora_v0_open_loops"; data: VeloraV0OpenLoopsData }
   | { kind: "velora_v0_patient_journey"; data: VeloraV0PatientJourneyData }
-  | { kind: "velora_v0_active_meds"; data: VeloraV0ActiveMedsData }
-  | { kind: "velora_v0_why_flagged"; data: VeloraV0WhyFlaggedData }
-  | { kind: "velora_v0_trends"; data: VeloraV0TrendsData }
   | { kind: "velora_v0_trend_menu"; data: VeloraV0TrendMenuData }
   | { kind: "velora_v0_trend_detail"; data: VeloraV0TrendDetailData }
 
@@ -1188,77 +1184,11 @@ export interface VeloraV0CollideEntry {
   rule: VeloraV0Guideline
 }
 
-// ── Intent ② · Open loops ───────────────────────────────────────────────
-export interface VeloraV0OpenLoop {
-  ageDays: number
-  severity: "red" | "amber"
-  title: string
-  sourceId: string
-  source: VeloraV0Source
-  detector: string
-  disclosure?: string
-}
-
-export interface VeloraV0OpenLoopsData {
-  patientName: string
-  patientMeta: string
-  loops: VeloraV0OpenLoop[]
-  /** Stack 2 — thresholds from signed config (operational, not clinical). */
-  thresholdConfig: {
-    signedBy: string
-    rules: Array<{ category: string; window: string }>
-  }
-  freshness: string
-}
-
-// ── Intent ③ · Active meds & safety ─────────────────────────────────────
-export interface VeloraV0ActiveMed {
-  drug: string
-  dose: string
-  specialty: string
-  prescriber: string
-  since: string
-}
-
-export interface VeloraV0DDIFlag {
-  drugs: [string, string]
-  severity: "alert" | "warn"
-  rationale: string
-  rule: VeloraV0Guideline
-}
-
-export interface VeloraV0ActiveMedsData {
-  patientName: string
-  patientMeta: string
-  meds: VeloraV0ActiveMed[]
-  allergiesOnFile: string[]
-  recentLabs: Array<{ label: string; value: string; refRange: string; tone?: "ok" | "warn" | "alert" }>
-  /** Stack 2 — DDI flags + threshold panels. */
-  ddi: VeloraV0DDIFlag[]
-  thresholdPanels: VeloraV0Synthesis[]
-  freshness: string
-}
-
-// ── Intent ④ · Why flagged today ────────────────────────────────────────
-export interface VeloraV0Flag {
-  severity: "critical" | "warning" | "info"
-  title: string
-  detail: string
-  source: VeloraV0Source
-  /** Threshold/guideline that classified this severity (Stack 2 trace). */
-  guideline?: VeloraV0Guideline
-  /** Short threshold description shown next to the cited body. */
-  thresholdNote?: string
-}
-
-export interface VeloraV0WhyFlaggedData {
-  patientName: string
-  patientMeta: string
-  flags: VeloraV0Flag[]
-  /** When no triggers fire, render the honest empty state. */
-  noTriggers?: boolean
-  freshness: string
-}
+// Retired intent payloads (Open loops · Active meds & safety · Why
+// flagged today) — these cards were superseded by the three-intent
+// surface (Cross-consultation brief · Patient journey · Recent
+// trends). The data interfaces are removed; their card components and
+// any code paths emitting them have also been pruned.
 
 // ═══════════════ VELORA V0 — PATIENT JOURNEY (timeline) ═══════════════
 //
@@ -1339,38 +1269,10 @@ export interface VeloraV0PatientJourneyData {
 // Selection is data-driven: pick the metrics that already appear in the MDT brief
 // Stack 1 as abnormal flagged values (HbA1c flagged in Endo, eGFR in Nephro, etc.).
 
-export interface VeloraV0Trend {
-  /** Display label, e.g. "HbA1c" or "eGFR". */
-  label: string
-  /** Unit, e.g. "%" or "mL/min/1.73 m²". */
-  unit: string
-  /** Latest reading, formatted (e.g. "8.4"). */
-  currentValue: string
-  /** Time-ordered values for the sparkline (oldest → newest). */
-  values: number[]
-  /** Short date labels paired 1:1 with `values`. */
-  dates: string[]
-  /** Target / threshold line, drawn dashed. */
-  threshold?: number
-  /** Short description of the threshold, e.g. "target <7%" or "G3a <60". */
-  thresholdLabel?: string
-  /** Visual tone — red / amber / green based on signed reference range. */
-  tone: "alert" | "warn" | "ok"
-  /** Direction summary line, e.g. "declining ~3.5 / quarter" or "gradual improvement". */
-  trajectory?: string
-  /** Cited guideline body that owns the target. */
-  guideline: VeloraV0Guideline
-  /** Why Velora picked this metric out of all the patient's labs / vitals. */
-  whyPicked: string
-}
-
-export interface VeloraV0TrendsData {
-  patientName: string
-  patientMeta: string
-  trends: VeloraV0Trend[]
-  /** One-line preamble explaining the selection rule. */
-  selectionReason: string
-}
+// `VeloraV0Trend` + `VeloraV0TrendsData` (legacy sparkline trend card)
+// were retired in favour of the per-trend `VeloraV0TrendDetailData` +
+// the menu card `VeloraV0TrendMenuData`. Both new types are defined
+// further up alongside the rxOutput union.
 
 // ═══════════════ VELORA V0 — TREND MENU (Recent trends entry card) ═══════════
 //

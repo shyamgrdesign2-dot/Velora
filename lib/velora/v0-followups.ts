@@ -73,92 +73,9 @@ const MDT_FOLLOWUPS: VeloraFollowUp[] = [
   // "Full notes" sub-intent removed — the cross-brief card itself now
   // renders the verbatim per-visit body inline, so the doctor never has
   // to ask for an "expand each note" view.
-  {
-    id: "mdt-trends",
-    parent: "mdt_brief",
-    quickLabel: "Trends",
-    /** Generic question — Velora picks the top-N metrics itself based on
-     *  Stack 1 flags + cross-team relevance. */
-    question: "Show top trends across visits",
-    category: "trend",
-    rationale:
-      "Whichever metrics were flagged abnormal in Stack 1 are the ones the doctor wants to see a direction-of-travel for. Velora picks the top 3 cross-team-relevant labs and charts them with the cited target line. Same selector, different patient → different charts.",
-    reply: {
-      text:
-        "Top 3 cross-team trends for Ravi Shankar — HbA1c (Endo), eGFR (Nephro), ABPM Daytime mean (Cardio/HTN). Each chart cites its target body.",
-      footer: "Source: Measurement × 11 · ADA 2024 · KDIGO 2024 · ESC/ESH 2023 · Synced 12 min ago",
-      rxOutput: {
-        kind: "velora_v0_trends",
-        data: {
-          patientName: "Ravi Shankar",
-          patientMeta: "M, 64y · MRN-78214",
-          selectionReason:
-            "Velora picked these three because they each appeared as a flagged value in the MDT brief and each is touched by a different specialty — making a direction-of-travel view useful before any cross-team plan change.",
-          trends: [
-            {
-              label: "HbA1c",
-              unit: "%",
-              currentValue: "8.4",
-              values: [9.1, 8.7, 8.6, 8.4],
-              dates: ["Aug '25", "Nov '25", "Feb '26", "Apr '26"],
-              threshold: 7.0,
-              thresholdLabel: "target <7.0 % per ADA 2024 §6.1",
-              tone: "alert",
-              trajectory: "Gradual improvement · still above target",
-              guideline: {
-                body: "ADA",
-                year: "2024",
-                section: "§6.1",
-                description: "American Diabetes Association — Standards of Care thresholds for HbA1c.",
-                fetches: "HbA1c target + recheck cadence.",
-              },
-              whyPicked:
-                "Flagged in the Endo section of the MDT brief (8.4%, target <7%). Cross-team relevance: SGLT2 dose depends on eGFR.",
-            },
-            {
-              label: "eGFR",
-              unit: "mL/min/1.73 m²",
-              currentValue: "48",
-              values: [62, 55, 51, 48],
-              dates: ["Aug '25", "Nov '25", "Feb '26", "Apr '26"],
-              threshold: 60,
-              thresholdLabel: "G3a threshold ≥60 per KDIGO 2024",
-              tone: "alert",
-              trajectory: "Declining ~3.5 / quarter · Nephro referred 02 Apr",
-              guideline: {
-                body: "KDIGO",
-                year: "2024",
-                description: "Kidney Disease Improving Global Outcomes — staging and drug-dose adjustment in CKD.",
-                fetches: "eGFR staging cut-offs and renal-adjusted drug dosing.",
-              },
-              whyPicked:
-                "Flagged in the Nephro section (48, G3a). Touches Cardio (apixaban dose) AND Endo (SGLT2 eligibility) — highest cross-specialty leverage.",
-            },
-            {
-              label: "ABPM Daytime mean",
-              unit: "mmHg",
-              currentValue: "152/95",
-              values: [148, 150, 151, 152],
-              dates: ["Aug '25", "Nov '25", "Feb '26", "Apr '26"],
-              threshold: 135,
-              thresholdLabel: "target ≥135/85 per ESC/ESH 2023",
-              tone: "warn",
-              trajectory: "Steadily creeping up · 3 antihypertensives active",
-              guideline: {
-                body: "ESC/ESH",
-                year: "2023",
-                description: "European Society of Cardiology + Hypertension joint guideline.",
-                fetches: "Ambulatory BP target for resistant-HTN classification.",
-              },
-              whyPicked:
-                "Flagged in the Resistant HTN synthesis panel. Cross-team relevance: an antihypertensive escalation interacts with Nephro's drug-dose window.",
-            },
-          ],
-        },
-      },
-    },
-    loadingHint: "Picking the top 3 cross-team trends from flagged Stack 1 values…",
-  },
+  // "Trends" sub-intent was removed — the Recent-trends intent now has
+  // its own welcome card, its own menu card, and per-trend detail cards.
+  // The cross-brief shouldn't carry a redundant trends pivot.
   {
     id: "mdt-missing",
     parent: "mdt_brief",
@@ -465,10 +382,10 @@ export function parentIntentForCardKind(kind: string | undefined): VeloraParentI
   switch (kind) {
     case "velora_v0_mdt_brief":
       return "mdt_brief"
-    case "velora_v0_open_loops":
     case "velora_v0_patient_journey":
       return "patient_journey"
-    case "velora_v0_recent_trends":
+    case "velora_v0_trend_menu":
+    case "velora_v0_trend_detail":
       return "recent_trends"
     default:
       return null

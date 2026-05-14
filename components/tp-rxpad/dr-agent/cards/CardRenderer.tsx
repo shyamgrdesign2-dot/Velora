@@ -98,10 +98,6 @@ import { PatientSearchCard } from "./homepage/PatientSearchCard"
 
 // Velora v0 — Stack 1 / Stack 2 intent cards
 import { VeloraV0MdtBriefCard } from "./velora-v0/VeloraV0MdtBriefCard"
-import { VeloraV0OpenLoopsCard } from "./velora-v0/VeloraV0OpenLoopsCard"
-import { VeloraV0ActiveMedsCard } from "./velora-v0/VeloraV0ActiveMedsCard"
-import { VeloraV0WhyFlaggedCard } from "./velora-v0/VeloraV0WhyFlaggedCard"
-import { VeloraV0TrendsCard } from "./velora-v0/VeloraV0TrendsCard"
 import { VeloraV0TrendMenuCard } from "./velora-v0/VeloraV0TrendMenuCard"
 import { VeloraV0TrendDetailCard } from "./velora-v0/VeloraV0TrendDetailCard"
 import { VeloraV0PatientJourneyCard } from "./velora-v0/VeloraV0PatientJourneyCard"
@@ -330,19 +326,11 @@ function renderCard(
     case "velora_scenario_card":
       return <VeloraScenarioCard data={output.data} onPillTap={onPillTap} />
 
-    // -- Velora v0 — Stack 1 / Stack 2 intent cards ---------------------------
+    // -- Velora v0 — three live intents --------------------------------------
     case "velora_v0_mdt_brief":
       return <VeloraV0MdtBriefCard data={output.data} />
-    case "velora_v0_open_loops":
-      return <VeloraV0OpenLoopsCard data={output.data} />
     case "velora_v0_patient_journey":
       return <VeloraV0PatientJourneyCard data={output.data} />
-    case "velora_v0_active_meds":
-      return <VeloraV0ActiveMedsCard data={output.data} />
-    case "velora_v0_why_flagged":
-      return <VeloraV0WhyFlaggedCard data={output.data} />
-    case "velora_v0_trends":
-      return <VeloraV0TrendsCard data={output.data} />
     case "velora_v0_trend_menu":
       return <VeloraV0TrendMenuCard data={output.data} onPillTap={onPillTap} />
     case "velora_v0_trend_detail":

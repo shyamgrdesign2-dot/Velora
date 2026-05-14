@@ -33,15 +33,13 @@ export function isSituationAtGlanceAssistantMessage(message: RxAgentChatMessage)
     return true
   }
 
-  // Velora v0 — the four canonical Stack 1 / Stack 2 intent cards + Trends.
+  // Velora v0 — the three live intents + the trend-detail card.
   // Inline follow-up pills surface directly under each card.
   if (
     message.rxOutput?.kind === "velora_v0_mdt_brief" ||
-    message.rxOutput?.kind === "velora_v0_open_loops" ||
     message.rxOutput?.kind === "velora_v0_patient_journey" ||
-    message.rxOutput?.kind === "velora_v0_active_meds" ||
-    message.rxOutput?.kind === "velora_v0_why_flagged" ||
-    message.rxOutput?.kind === "velora_v0_trends"
+    message.rxOutput?.kind === "velora_v0_trend_menu" ||
+    message.rxOutput?.kind === "velora_v0_trend_detail"
   ) {
     return true
   }

@@ -1,12 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────
 // Velora v0 — replyOverride for the standalone landing.
 //
-// Routes the four V0 intent prompts to spec-faithful mock replies that
-// render through the new Stack 1 / Stack 2 card components:
-//   ① MDT brief        → velora_v0_mdt_brief
-//   ② Open loops       → velora_v0_open_loops
-//   ③ Active meds      → velora_v0_active_meds
-//   ④ Why flagged today → velora_v0_why_flagged
+// Routes the three V0 intent prompts to spec-faithful mock replies
+// that render through the Stack 1 / Stack 2 card components:
+//   ① Cross-consultation brief → velora_v0_mdt_brief
+//   ② Patient journey          → velora_v0_patient_journey
+//   ③ Recent trends            → velora_v0_trend_menu / _trend_detail
 //
 // Each reply also carries a `loadingHint` so the typing indicator can
 // communicate trust ("Reading 3 specialty notes…") while the card prepares.
@@ -4181,65 +4180,6 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       rxOutput: {
         kind: "velora_v0_patient_journey",
         data: journey,
-      },
-    }
-  }
-
-  // Legacy ② — Open loops (kept for any old triggers; replaced by Patient journey).
-  if (false) {
-    return {
-      text: "(legacy)",
-      rxOutput: {
-        kind: "velora_v0_open_loops",
-        data: {
-          patientName: "Lakshmi Pandey",
-          patientMeta: "F, 58y · MRN-44103",
-          loops: [
-            {
-              ageDays: 41,
-              severity: "red",
-              title: "**Cardiology** referral · no destination visit",
-              sourceId: "Referral #REF-3119",
-              source: { specialty: "GenMed → Cardio", author: "Dr Bose", date: "30 Mar 2026" },
-              detector: "internal referral >30d · no Cardio Visit created",
-            },
-            {
-              ageDays: 12,
-              severity: "red",
-              title: "**TSH** ordered · no result on file",
-              sourceId: "Order #LAB-22841",
-              source: { specialty: "GenMed", author: "Dr Bose", date: "28 Apr 2026" },
-              detector: "lab order >7d · no result_id",
-            },
-            {
-              ageDays: 73,
-              severity: "amber",
-              title: "**Telmisartan** refill · no in-hospital fill",
-              sourceId: "Rx #RX-1840",
-              source: { specialty: "GenMed", author: "Dr Bose", date: "26 Feb 2026" },
-              detector: "active Rx without fill in 90d",
-              disclosure: "Pharmacy data is in-hospital only · the patient may be filling outside.",
-            },
-            {
-              ageDays: 18,
-              severity: "amber",
-              title: "**Follow-up** booked · **no-show**",
-              sourceId: "Appointment #APT-7740",
-              source: { specialty: "GenMed", author: "Front desk", date: "22 Apr 2026" },
-              detector: "Appointment.status == 'no-show' · last 30d",
-            },
-          ],
-          thresholdConfig: {
-            signedBy: "GenMed lead · Zydus",
-            rules: [
-              { category: "Lab order without result", window: ">7 days = open" },
-              { category: "Internal referral without destination visit", window: ">30 days = open" },
-              { category: "Chronic Rx without in-hospital fill", window: ">90 days = signal (not adherence truth)" },
-              { category: "Booked follow-up no-show", window: "last 30 days" },
-            ],
-          },
-          freshness: "Synced 8 min ago",
-        },
       },
     }
   }

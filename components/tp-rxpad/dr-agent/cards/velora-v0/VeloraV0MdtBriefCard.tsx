@@ -570,13 +570,13 @@ function MedicalHistorySubheadingTag({
   const tone = group.tone ?? "neutral"
   // Inner section chips (Co-morbidities, Surgical history, Allergies,
   // Active medications, Family / Social, Additional history) sit on
-  // a neutral slate palette. Only the chief-diagnosis chip (`primary`
-  // tone) keeps its red accent; everything else stays quiet so the
-  // chips read as section labels rather than colour-coded callouts.
+  // a soft violet palette so they read as the inner-content accent
+  // (parent Medical-history bar stays neutral slate). Only the
+  // chief-diagnosis chip (`primary` tone) keeps its red accent.
   const toneClass =
     tone === "primary"
       ? "bg-tp-error-50 text-tp-error-700"
-      : "bg-tp-slate-100 text-tp-slate-700"
+      : "bg-tp-violet-50 text-tp-violet-700"
   const iconName = iconForHistoryGroup(group.title)
   return (
     <span

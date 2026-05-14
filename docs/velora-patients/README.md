@@ -82,6 +82,7 @@ The Velora chat surface currently routes the six demo patients (P1-P6) by name m
 ## Related docs
 
 - [`WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md) — full plain-English explainer with the Stack 1 / Stack 2 architecture, scenarios, and product-team summary
+- [`CLINICAL-SYNTHESIS.md`](./CLINICAL-SYNTHESIS.md) — the dedicated Stack-2 spec: every block (Where they collide · Guideline panels · Pending MDT items), the AI's authoring scope, prompt-template instructions, clinical-significance hierarchy, and worked examples per patient
 - [`CROSS-CONSULTATION-BRIEF-ARCHETYPE.md`](./CROSS-CONSULTATION-BRIEF-ARCHETYPE.md) — developer-facing schema + ASCII wireframes
 - [`CROSS-VERIFICATION.md`](./CROSS-VERIFICATION.md) — OMOP export drift audit
 - [`../velora-v0-recent-trends.md`](../velora-v0-recent-trends.md) — Recent-trends intent (intent ③), how the per-patient trend chips are selected

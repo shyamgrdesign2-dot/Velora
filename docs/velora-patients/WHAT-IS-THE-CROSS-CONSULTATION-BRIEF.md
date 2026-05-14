@@ -380,6 +380,7 @@ These are not show-stoppers. They are explicit. The brief is designed to be *hon
 ## 10 · Related documents
 
 - [README.md](./README.md) — index of all 5 patient docs + cross-cutting data-quality flags
+- [CLINICAL-SYNTHESIS.md](./CLINICAL-SYNTHESIS.md) — the dedicated Stack-2 spec: every block, the AI's authoring scope, prompt-template instructions, clinical-significance hierarchy, and worked examples
 - [CROSS-CONSULTATION-BRIEF-ARCHETYPE.md](./CROSS-CONSULTATION-BRIEF-ARCHETYPE.md) — developer-facing schema + ASCII wireframes + how-to-add-a-patient
 - [P1-lakshmi-iyer-1093717054960.md](./P1-lakshmi-iyer-1093717054960.md) — F · 76 · breast Ca pre-op
 - [P2-suresh-patel-843373981236.md](./P2-suresh-patel-843373981236.md) — M · 60 · colon Ca + lung mets (LIVE demo)

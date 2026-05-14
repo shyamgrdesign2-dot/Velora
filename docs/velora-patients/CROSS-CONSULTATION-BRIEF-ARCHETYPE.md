@@ -142,6 +142,10 @@ citation cannot land on the surface.
 The plain-English version of this rule is in
 [`WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md) §4.
 
+For the full Stack-2 spec (every block · AI scope · prompt-template
+instructions · clinical-significance hierarchy · worked examples)
+see [`CLINICAL-SYNTHESIS.md`](./CLINICAL-SYNTHESIS.md).
+
 ---
 
 ## 1 · The whole card at a glance

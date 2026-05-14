@@ -847,12 +847,17 @@ function VisitCard({
     !!c.followUp || !!c.investigations || !!c.advice || !!c.surgery ||
     !!c.vaccinations || !!c.additionalNotes
   return (
-    <div className="overflow-hidden rounded-[10px] border border-tp-slate-100 bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+    <div className="rounded-[10px] border border-tp-slate-100 bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
       {/* Header strip — informational only (no toggle). Doctor (semibold)
           · specialty pill · IPD chip on the left, date pill on the right.
           Sticky so it hovers under the specialty heading while the user
-          scrolls through this visit's body. */}
-      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] border-b border-tp-slate-100/80 bg-tp-slate-50 px-[10px] py-[8px]">
+          scrolls through this visit's body.
+          NOTE: the outer wrapper is NOT `overflow-hidden` — sticky
+          positioning silently breaks when an ancestor clips overflow, so
+          the header would scroll away with the rest of the card. The
+          `rounded-t-[10px]` here keeps the sticky bar visually aligned
+          with the parent's rounded outline. */}
+      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[10px] border-b border-tp-slate-100/80 bg-tp-slate-50 px-[10px] py-[8px]">
         <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[2px]">
           <span className="text-[13.5px] font-semibold text-tp-slate-800">{c.doctor}</span>
           <span className="inline-flex items-center rounded-[4px] bg-tp-violet-50 px-[6px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-700">
@@ -864,7 +869,11 @@ function VisitCard({
             </span>
           )}
         </div>
-        <span className="shrink-0 rounded-full bg-white px-[10px] py-[3px] font-mono text-[11px] font-semibold text-tp-slate-700 ring-1 ring-tp-slate-200">
+        {/* Date pill — soft slate-50 chip with a 4px radius (no outer
+            stroke, default Inter font family). The minimalist chrome
+            keeps the date legible without competing with the specialty
+            pill on the left. */}
+        <span className="shrink-0 rounded-[4px] bg-tp-slate-50 px-[8px] py-[2px] text-[11px] font-semibold text-tp-slate-600">
           {c.date}
         </span>
       </div>
@@ -884,7 +893,7 @@ function VisitCard({
         <VisitSection iconName="medical-record" label="Vaccinations" content={c.vaccinations} layout="inline" />
         <VisitSection
           iconNode={<Note1 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
-          label="Additional Notes"
+          label="Follow Up Notes"
           content={c.additionalNotes}
         />
         {/* Empty visit — surface a polite placeholder + sidebar link.

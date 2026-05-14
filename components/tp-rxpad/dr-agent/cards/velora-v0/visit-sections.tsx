@@ -180,7 +180,7 @@ export function VisitBody({ fields }: { fields: VisitBodyFields }) {
       <VisitSection iconName="medical-report" label="Plan" content={f.plan} />
       <VisitSection
         iconNode={<Note1 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
-        label="Additional Notes"
+        label="Follow Up Notes"
         content={f.additionalNotes}
       />
       {!hasAny && (

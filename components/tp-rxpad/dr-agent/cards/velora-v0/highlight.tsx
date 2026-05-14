@@ -68,7 +68,11 @@ function PipeDivider() {
 }
 
 function PlainRun({ text }: { text: string }) {
-  const segs = text.split(" · ")
+  // Treat both " · " (middle dot) and " | " (pipe) as inline dividers so
+  // medical-history rows joined with " | " (Active medications,
+  // Co-morbidities, Surgical history, …) render the divider as a
+  // light slate-300 mark instead of a strong literal-text pipe.
+  const segs = text.split(/\s+[·|]\s+/)
   return (
     <>
       {segs.map((s, i) => (

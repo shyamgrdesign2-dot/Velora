@@ -1,21 +1,29 @@
 // ─────────────────────────────────────────────────────────────────────────
 // Velora v0 — Follow-up intent registry
 //
-// For each parent intent (MDT brief / Open loops / Active meds / Why flagged)
-// we expose six follow-up *sub-intents*. These are not random canned messages
-// — they are deliberately chosen to model what a clinician would most likely
-// reach for next, derived from:
+// V0 narrows the parent intents to THREE:
+//   ① Cross-consultation brief   (mdt_brief)
+//   ② Patient journey            (patient_journey)
+//   ③ Recent trends              (recent_trends)
+//
+// The retired "Active meds & safety" and "Why flagged today" intents
+// have been removed from the live surface — their card components remain
+// in the codebase for type compatibility but no UI path lands on them.
+//
+// For each parent intent we expose follow-up *sub-intents*. These are
+// not random canned messages — they are deliberately chosen to model
+// what a clinician would most likely reach for next, derived from:
 //
 //   1. The doctor's original message (which parent intent fired).
-//   2. The patient's condition + data available (active meds, recent labs,
-//      missed orders, specialty touch points).
+//   2. The patient's condition + data available (active meds, recent
+//      labs, missed orders, specialty touch points).
 //   3. The doctor's specialty (GenMed for V0 pilot).
 //   4. The guideline bodies the hospital has signed
 //      (ADA 2024 · WHO HEARTS 2023 · NICE NG56 · KDIGO 2024 · ESC 2024 etc.).
 //
 // Each entry below carries a `rationale` field so the Velora v0 docs can
-// surface the reasoning verbatim — there is no "where did this question come
-// from?" mystery for the clinical lead reviewing the surface.
+// surface the reasoning verbatim — there is no "where did this question
+// come from?" mystery for the clinical lead reviewing the surface.
 // ─────────────────────────────────────────────────────────────────────────
 
 export type VeloraFollowUpCategory =
@@ -31,8 +39,7 @@ export type VeloraFollowUpCategory =
 export type VeloraParentIntent =
   | "mdt_brief"
   | "patient_journey"
-  | "active_meds"
-  | "why_flagged"
+  | "recent_trends"
 
 export interface VeloraFollowUp {
   id: string
@@ -324,198 +331,50 @@ const OPEN_LOOPS_FOLLOWUPS: VeloraFollowUp[] = [
 ]
 
 // ─────────────────────────────────────────────────────────────────────────
-// ③ Active meds & safety — sub-intents
+// ③ Recent trends — sub-intents
+//
+// The doctor lands here after clicking "Recent trends" from the welcome
+// screen, or via a pivot chip under another intent's card. The sub-intent
+// chips listed below are the *parent-level* follow-ups; the *per-patient*
+// trend chips (BP, HbA1c, eGFR, …) come from
+// lib/velora/v0-trends.ts and are wired into the reply pipeline directly.
 // ─────────────────────────────────────────────────────────────────────────
 
-const ACTIVE_MEDS_FOLLOWUPS: VeloraFollowUp[] = [
+const RECENT_TRENDS_FOLLOWUPS: VeloraFollowUp[] = [
   {
-    id: "meds-alternative",
-    parent: "active_meds",
-    quickLabel: "Alternative",
-    question: "Suggest a safer alternative for Naproxen",
-    category: "drill",
-    rationale:
-      "The DDI flag (Naproxen × Apixaban) is the headline. The doctor's next move is replacing the offending drug — Velora surfaces alternatives from the Zydus formulary that don't trigger the class rule.",
-    reply: {
-      text:
-        "Alternatives that do not trigger the NSAID + DOAC class rule:\n\n  • Paracetamol 500 mg–1 g QDS PRN (first-line per Zydus formulary)\n  • Topical diclofenac gel (local analgesia, minimal systemic absorption)\n  • Tramadol 50 mg PRN (caution: serotonergic interactions, review SSRIs)\n\nNot recommended: any oral NSAID while apixaban is active.",
-      footer: "Source: Zydus formulary · Lexicomp · Synced 3 min ago",
-    },
-    loadingHint: "Querying the Zydus formulary for non-NSAID analgesics…",
-  },
-  {
-    id: "meds-history",
-    parent: "active_meds",
-    quickLabel: "Med history",
-    question: "Show full medication history (including stopped)",
-    category: "history",
-    rationale:
-      "Stopped meds often explain why the current list looks the way it does. A timeline of starts + stops (with reasons when available) is a frequent doctor request when reviewing active meds.",
-    reply: {
-      text:
-        "Medication timeline (last 12 months):\n\n  12 Mar 2026  + Apixaban 5 mg BID         · Cardio\n  12 Mar 2026  + Bisoprolol 5 mg OD         · Cardio\n  12 Mar 2026  + Atorvastatin 40 mg N       · Cardio\n  04 Feb 2026  + Metformin 1000 mg BD       · GenMed\n  04 Feb 2026  + Pantoprazole 40 mg M       · GenMed\n  22 Apr 2026  + Naproxen 500 mg PRN        · GenMed\n  08 Oct 2025  – Aspirin 75 mg OD           · Cardio (stopped: switched to DOAC)\n  15 Nov 2025  – Glimepiride 2 mg OD        · Endo  (stopped: hypoglycaemia)",
-      footer: "Source: Drug Exposure (active + stopped) · Synced 3 min ago",
-    },
-    loadingHint: "Loading the 12-month medication timeline…",
-  },
-  {
-    id: "meds-polypharmacy-checklist",
-    parent: "active_meds",
-    quickLabel: "Polypharmacy review",
-    question: "Run the NICE NG56 polypharmacy review checklist",
+    id: "trends-which",
+    parent: "recent_trends",
+    quickLabel: "Which trends?",
+    question: "Which trends are available for this patient?",
     category: "expand",
     rationale:
-      "The polypharmacy threshold has fired (6 chronic meds, 61 days). NICE NG56 prescribes a specific medication-review checklist. Surfacing it lets the doctor work through it without leaving the chat.",
+      "After landing on Recent trends, the most common follow-up is 'show me the menu'. We re-render the per-patient trend list so the doctor can pick a specific vital / lab.",
     reply: {
-      text:
-        "NICE NG56 medication-review checklist · 6 active chronic meds:\n\n  ☐ Confirm indication for each drug is still active.\n  ☐ Confirm dose appropriate for current eGFR / weight / age.\n  ☐ Check for any drug that has lost its primary indication.\n  ☐ Cross-check anticholinergic burden score (none on this list).\n  ☐ Confirm adherence (pharmacy data is in-hospital only — verify verbally).\n  ☐ Document the review and the next review date.\n\nReady to mark this review as performed?",
-      footer: "Source: NICE NG56 medication review · Synced 3 min ago",
+      text: "Tap a chip below to view the trend for the selected patient.",
+      footer: "Source: Velora trends registry · v0-trends.ts",
     },
-    loadingHint: "Loading the NICE NG56 review checklist…",
+    loadingHint: "Loading the per-patient trends menu…",
   },
   {
-    id: "meds-compare-rules",
-    parent: "active_meds",
-    quickLabel: "Compare rules",
-    question: "Compare Lexicomp vs Zydus formulary on this DDI",
-    category: "compare",
-    rationale:
-      "Hospitals can pick which DDI rule base wins via the signed config. The doctor may want to confirm both bodies agree before changing the regimen.",
-    reply: {
-      text:
-        "Naproxen × Apixaban\n\n  Lexicomp (class rule LX-0042)        · severity: major     · recommend avoid co-prescription\n  Zydus formulary §3.2                · severity: major     · recommend avoid co-prescription; if needed, time-limit + add PPI\n\nBoth bodies agree. No disagreement to resolve.",
-      footer: "Source: Lexicomp · Zydus Formulary §3.2 · Synced 3 min ago",
-    },
-    loadingHint: "Diffing the two DDI rule bases for this pair…",
-  },
-  {
-    id: "meds-order-monitoring",
-    parent: "active_meds",
-    quickLabel: "Monitor labs",
-    question: "Order monitoring labs before next change",
-    category: "act",
-    rationale:
-      "On a 6-drug regimen with one DDI flag, the prudent next move is a labs order (renal, hepatic, INR if relevant). Velora prepares the order set the doctor can review.",
-    reply: {
-      text:
-        "Suggested order set (Velora does not auto-order):\n\n  ☐ Renal panel — Cr, eGFR, K+ (relevant: apixaban + bisoprolol)\n  ☐ LFT — last 18 Mar, due 18 Jun (relevant: atorvastatin)\n  ☐ Hb + platelet count (relevant: anticoag + NSAID bleed risk)\n  ☐ Faecal occult blood if symptomatic (relevant: NSAID + DOAC)\n\nReview and dispatch from the orders tab.",
-      footer: "Source: Drug Exposure × monitoring guideline mapping · Synced 3 min ago",
-    },
-    loadingHint: "Composing the monitoring order set for this regimen…",
-  },
-  {
-    id: "meds-whatif-new-rx",
-    parent: "active_meds",
-    quickLabel: "Pre-write check",
-    question: "Check interactions with a new Rx I'm about to add",
-    category: "act",
-    rationale:
-      "Lets the doctor type a drug name and see DDI flags before prescribing. Highest-leverage moment per the spec — before the order is placed.",
-    reply: {
-      text:
-        "Type the new drug name in the input below to run a pre-write DDI check.\n\nExample queries Velora is ready to answer:\n  · 'Will ibuprofen interact with the current list?'\n  · 'Is sertraline safe with apixaban?'\n  · 'Run pre-write check on amiodarone 200 mg.'",
-      footer: "Source: DDI rule-base + active meds (live) · Synced 3 min ago",
-    },
-    loadingHint: "Loading the pre-write DDI check…",
-  },
-]
-
-// ─────────────────────────────────────────────────────────────────────────
-// ④ Why flagged today — sub-intents
-// ─────────────────────────────────────────────────────────────────────────
-
-const WHY_FLAGGED_FOLLOWUPS: VeloraFollowUp[] = [
-  {
-    id: "flag-discharge",
-    parent: "why_flagged",
-    quickLabel: "Discharge summary",
-    question: "Show the discharge summary from the recent admission",
-    category: "drill",
-    rationale:
-      "Recent admission is the loudest critical signal. The doctor will want the discharge summary header in chat, not a separate tab.",
-    reply: {
-      text:
-        "Visit #VIS-91204 · Nephrology · 02–06 May 2026\n\nReason: Acute Kidney Injury (Stage 2, KDIGO 2024).\nDay 1 Cr 2.4 (baseline 1.3); Day 4 Cr 1.5; discharge Cr 1.4 stable.\nPlan on discharge:\n  • Hold furosemide 48 h, restart at 20 mg OD.\n  • Repeat U&E at 7 days (overdue: drawn 09 May, see Lab unreviewed).\n  • Outpatient Nephro review in 4 weeks.",
-      footer: "Source: Visit #VIS-91204 discharge summary · Synced 26 min ago",
-    },
-    loadingHint: "Loading the discharge summary header…",
-  },
-  {
-    id: "flag-acknowledge",
-    parent: "why_flagged",
-    quickLabel: "Acknowledge",
-    question: "Acknowledge and clear the K⁺ critical flag",
-    category: "act",
-    rationale:
-      "Critical lab is unreviewed only because no visit-tied note has touched it. A single click should let the doctor mark it reviewed (with a stub note) and remove the flag.",
-    reply: {
-      text:
-        "Lab unreviewed · Measurement #LAB-91440 · K⁺ 5.8 mmol/L · drawn 09 May 2026.\n\nMark reviewed? Velora will record:\n  • acknowledged_by = current doctor\n  • acknowledged_at = now\n  • short note required (≥1 char) for audit\n\nReady to acknowledge?",
-      footer: "Source: Measurement × audit log · Synced 26 min ago",
-    },
-    loadingHint: "Preparing the acknowledgement payload…",
-  },
-  {
-    id: "flag-reassess",
-    parent: "why_flagged",
-    quickLabel: "Reassessment",
-    question: "Schedule a 48-hour reassessment slot",
-    category: "act",
-    rationale:
-      "Post-AKI + K⁺ 5.8 calls for a near-term reassessment. Velora prepares the slot picker scoped to the doctor's clinic.",
-    reply: {
-      text:
-        "Reassessment slots in next 48 h · GenMed · Dr Bose:\n  • Wed 14 May 09:30\n  • Wed 14 May 16:00\n  • Thu 15 May 11:00\n  • Thu 15 May 17:00\n\nPatient SMS draft: \"Mr Kumar, please attend a short GenMed reassessment — Wed/Thu slots above. Reply 1, 2, 3 or 4.\"",
-      footer: "Source: GenMed slot config · Synced 26 min ago",
-    },
-    loadingHint: "Loading next-48h slots from your clinic config…",
-  },
-  {
-    id: "flag-vitals-trend",
-    parent: "why_flagged",
-    quickLabel: "Vitals trend",
-    question: "Show vitals trend since admission",
-    category: "trend",
-    rationale:
-      "Trajectory tells the story that point values can't. BP, HR, and weight since admission help the doctor judge whether to escalate.",
-    reply: {
-      text:
-        "Vitals since admission (02 May → today, 12 May):\n\n  BP (mmHg, WHO HEARTS target <140/90)\n    02 May 158/96   06 May 142/88   09 May 138/82   12 May 138/82\n\n  HR (bpm)\n    02 May 102      06 May 88       09 May 78       12 May 76\n\n  Weight (kg)\n    02 May 81.4    06 May 79.6 ▼   09 May 79.2     12 May 79.0\n\nTrajectory: improving on all three. Within WHO target post-discharge.",
-      footer: "Source: Vital × 12 readings · WHO HEARTS 2023 · Synced 26 min ago",
-    },
-    loadingHint: "Pulling vitals trend since admission…",
-  },
-  {
-    id: "flag-similar-patients",
-    parent: "why_flagged",
-    quickLabel: "Today's panel",
-    question: "Which other panel patients are flagged today?",
-    category: "cohort",
-    rationale:
-      "The morning radar is most useful when the doctor sees their whole panel of flagged patients in one pass. Cohort surface borrows the Panel audit V0.5 logic, scoped to today.",
-    reply: {
-      text:
-        "Today's flagged patients · Dr Bose's GenMed panel (138 active):\n\n  🔴 3 critical flags fired\n     · Ramesh Kumar  (this patient)  · K⁺ unreviewed + recent AKI admission\n     · Mohan Tewari                  · Hb 7.4 g/dL unreviewed\n     · Sita Ghosh                   · 30-day readmission (Cardio)\n\n  🟡 4 warning flags fired\n     · Anita Mehta · HbA1c 10.8 % (above ADA threshold)\n     · Vinod K · BP 158/96 mean (WHO HEARTS)\n     · Geeta Das · 6 chronic meds × 95 d (NICE NG56)\n     · Suresh Iyer · DDI Naproxen + apixaban active",
-      footer: "Source: Cohort registry zydus-genmed-2026-04 · Synced 26 min ago",
-    },
-    loadingHint: "Running the today-only cohort scan over your panel…",
-  },
-  {
-    id: "flag-polypharmacy",
-    parent: "why_flagged",
-    quickLabel: "Polypharmacy",
-    question: "Open the polypharmacy review for this patient",
+    id: "trends-rationale",
+    parent: "recent_trends",
+    quickLabel: "Why these trends?",
+    question: "Why these trends and not others?",
     category: "expand",
     rationale:
-      "The warning flag is polypharmacy (7 chronic meds, ≥90 d) cited to NICE NG56. The corresponding sub-intent in Active meds is the right place to land.",
+      "Trust gate. The doctor wants to know the trends list isn't arbitrary — surface the per-patient `scopeReason` so the selection logic is auditable.",
     reply: {
       text:
-        "Switching context to Active meds & safety for the polypharmacy review.\n\nActive list (7 chronic, ≥90 d):\n  Furosemide · Telmisartan · Metformin · Atorvastatin · Pantoprazole · Aspirin · Vit D weekly.\n\nNICE NG56 checklist available under Active meds → \"Run NICE NG56 polypharmacy review\".",
-      footer: "Source: Drug Exposure count × NICE NG56 · Synced 26 min ago",
+        "Trends are filtered to those that are clinically actionable for this patient's problem list, scoped to the hospital's signed guideline panels (ADA · WHO HEARTS · NICE · KDIGO · ESC). Trends that have no series for this patient are hidden — Velora will not invent a chart from a single reading.",
+      footer: "Source: lib/velora/v0-trends.ts (rationale per trend)",
     },
-    loadingHint: "Loading the polypharmacy review handoff…",
+    loadingHint: "Pulling the trend-selection rationale…",
   },
 ]
+// Re-exported below as the canonical sub-intent list for the Recent
+// Trends parent. We KEEP the old V0 prototype sub-intents commented out
+// (do not delete the rationale notes) so a future revisit can lift any
+// of them back into the active set without re-inventing the wheel.
 
 // ─────────────────────────────────────────────────────────────────────────
 // Lookup helpers
@@ -524,8 +383,7 @@ const WHY_FLAGGED_FOLLOWUPS: VeloraFollowUp[] = [
 const FOLLOWUP_INDEX: Record<VeloraParentIntent, VeloraFollowUp[]> = {
   mdt_brief: MDT_FOLLOWUPS,
   patient_journey: OPEN_LOOPS_FOLLOWUPS,
-  active_meds: ACTIVE_MEDS_FOLLOWUPS,
-  why_flagged: WHY_FLAGGED_FOLLOWUPS,
+  recent_trends: RECENT_TRENDS_FOLLOWUPS,
 }
 
 export function getVeloraFollowUps(parent: VeloraParentIntent): VeloraFollowUp[] {
@@ -536,27 +394,24 @@ export function getVeloraFollowUps(parent: VeloraParentIntent): VeloraFollowUp[]
 export const VELORA_PARENT_INTENTS: VeloraParentIntent[] = [
   "mdt_brief",
   "patient_journey",
-  "active_meds",
-  "why_flagged",
+  "recent_trends",
 ]
 
 /** Doctor-facing short label for each parent intent. */
 export function veloraParentLabel(parent: VeloraParentIntent): string {
   switch (parent) {
-    case "mdt_brief":   return "Cross-consultation brief"
-    case "patient_journey":  return "Patient journey"
-    case "active_meds": return "Active meds & safety"
-    case "why_flagged": return "Why flagged today"
+    case "mdt_brief":      return "Cross-consultation brief"
+    case "patient_journey":return "Patient journey"
+    case "recent_trends":  return "Recent trends"
   }
 }
 
 /** The message that triggers each parent intent through the reply override. */
 export function veloraParentMessage(parent: VeloraParentIntent): string {
   switch (parent) {
-    case "mdt_brief":   return "Show cross-consultation brief"
-    case "patient_journey":  return "Show patient journey"
-    case "active_meds": return "Show active meds and safety"
-    case "why_flagged": return "Why is this patient flagged today"
+    case "mdt_brief":      return "Show cross-consultation brief"
+    case "patient_journey":return "Show patient journey"
+    case "recent_trends":  return "Show recent trends"
   }
 }
 
@@ -625,10 +480,8 @@ export function parentIntentForCardKind(kind: string | undefined): VeloraParentI
     case "velora_v0_open_loops":
     case "velora_v0_patient_journey":
       return "patient_journey"
-    case "velora_v0_active_meds":
-      return "active_meds"
-    case "velora_v0_why_flagged":
-      return "why_flagged"
+    case "velora_v0_recent_trends":
+      return "recent_trends"
     default:
       return null
   }

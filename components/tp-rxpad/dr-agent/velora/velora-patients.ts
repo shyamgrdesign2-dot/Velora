@@ -1,5 +1,5 @@
 import React from "react"
-import { Flash, Clock, Stickynote, InfoCircle, Diagram, Activity, Chart, Hospital, ClipboardText, ShieldTick, SearchStatus } from "iconsax-reactjs"
+import { Flash, Clock, Stickynote, InfoCircle, Diagram, Activity, Chart, Hospital, ClipboardText } from "iconsax-reactjs"
 import type { RxAgentChatMessage } from "../types"
 import { VELORA_BRIEF_OUTPUT } from "./velora-scenarios"
 import { SURESH_PATEL_BRIEF_MOCK } from "@/lib/velora/v0-replies"
@@ -105,9 +105,8 @@ const VELORA_BRIEF_SUGGESTIONS: Record<VeloraPatientId, RxAgentChatMessage["sugg
   ],
   "velora-suresh": [
     { label: "Show patient journey", message: "Show patient journey" },
-    { label: "Active meds & safety", message: "Show active meds and safety" },
-    { label: "Why flagged today", message: "Why is this patient flagged today" },
-    { label: "Show trends", message: "Show trends" },
+    { label: "Recent trends", message: "Show recent trends" },
+    { label: "Cross-consultation brief", message: "Show cross-consultation brief" },
   ],
 }
 
@@ -172,9 +171,10 @@ const ICON_SIZE = 18
 const icon = (Cmp: React.ComponentType<{ size?: number; variant?: "Bulk" }>) =>
   React.createElement(Cmp, { size: ICON_SIZE, variant: "Bulk" })
 
-// ── Velora v0 — four canonical V0 intents shown on the welcome screen ──
+// ── Velora v0 — three canonical V0 intents shown on the welcome screen ──
 // Same set is used whether a patient is selected or not (Hospital Overview).
-// Panel audit (intent ⑤) is V0.5+ and lives in the docs, not the chat surface.
+// The previous "Active meds & safety" and "Why flagged today" intents
+// were retired in favour of a narrower "Recent trends" entry point.
 const VELORA_V0_INTENT_ACTIONS = [
   {
     icon: icon(Hospital),
@@ -189,16 +189,10 @@ const VELORA_V0_INTENT_ACTIONS = [
     message: "Show patient journey",
   },
   {
-    icon: icon(ShieldTick),
-    title: "Active meds & safety",
-    subtitle: "Active medications with cited DDI, allergy & duplicate-order checks",
-    message: "Show active meds and safety",
-  },
-  {
-    icon: icon(SearchStatus),
-    title: "Why flagged today",
-    subtitle: "Concrete events that fired since this patient's last contact",
-    message: "Why is this patient flagged today",
+    icon: icon(Activity),
+    title: "Recent trends",
+    subtitle: "Vital + lab trends Velora can pull for this patient — BP · HbA1c · eGFR · Lipid · Hb",
+    message: "Show recent trends",
   },
 ]
 

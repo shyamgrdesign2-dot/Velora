@@ -23,6 +23,7 @@ import type {
   VeloraV0Attribution,
 } from "@/components/tp-rxpad/dr-agent/types"
 import { findVeloraFollowUp, getVeloraFollowUps, type VeloraParentIntent } from "./v0-followups"
+import { resolvePatientTrends, findTrendByQuestion } from "./v0-trends"
 
 /** Top-N sub-intent suggestions for a parent intent — rendered as inline
  *  canned pills directly under the card the doctor is reading. */
@@ -4112,113 +4113,62 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     }
   }
 
-  // Intent ③ — Active meds & safety
+  // Intent ③ — Recent trends
+  //
+  // Two-stage flow:
+  //   (a) bare "show recent trends" → the menu: "Which trend would you
+  //       like to view?" with the per-patient available-trend chips as
+  //       suggestions (BP / HbA1c / eGFR / …).
+  //   (b) specific trend question ("Show blood pressure trend", "Show
+  //       HbA1c trend", …) → the canned reply for that trend.
+  //
+  // A trend that isn't in the patient's available set triggers the
+  // guardrail: a polite "this trend isn't on file" with the available
+  // list re-surfaced as canned chips so the doctor never lands in a
+  // dead end.
   if (
-    m === "show active meds and safety" ||
-    m.includes("active meds") ||
-    m.includes("active medications") ||
-    (m.includes("ddi") && (m.includes("show") || m.includes("check"))) ||
-    m.includes("drug interaction")
+    m.includes("recent trends") ||
+    m === "show recent trends" ||
+    m.includes("show trends") ||
+    m.startsWith("show trend") ||
+    /\bvital trend|\blab(?: result)? trend|\bhba1c trend|\bblood pressure trend|\begfr trend|\blipid|\bweight trend|\btroponin trend|\bhemoglobin trend|\bcalcium trend|\bvitamin d trend|\bspo2 trend|\bwound culture/.test(m)
   ) {
-    return {
-      text:
-        "Suresh Iyer is on 6 active medications across 2 specialties. One DDI is flagged: Naproxen × Apixaban (NSAID on a DOAC).",
-      loadingHint: "Checking DDI rules · class-level Lexicomp + Zydus formulary…",
-      loadingDelayMs: 1300,
-      suggestions: subSuggestionsFor("active_meds"),
-      rxOutput: {
-        kind: "velora_v0_active_meds",
-        data: {
-          patientName: "Suresh Iyer",
-          patientMeta: "M, 71y · MRN-29117",
-          meds: [
-            { drug: "Apixaban", dose: "5 mg BID", specialty: "Cardio", prescriber: "Dr Sharma", since: "12 Mar 2026" },
-            { drug: "Bisoprolol", dose: "5 mg OD", specialty: "Cardio", prescriber: "Dr Sharma", since: "12 Mar 2026" },
-            { drug: "Atorvastatin", dose: "40 mg N", specialty: "Cardio", prescriber: "Dr Sharma", since: "12 Mar 2026" },
-            { drug: "Metformin", dose: "1000 mg BD", specialty: "GenMed", prescriber: "Dr Bose", since: "04 Feb 2026" },
-            { drug: "Pantoprazole", dose: "40 mg M", specialty: "GenMed", prescriber: "Dr Bose", since: "04 Feb 2026" },
-            { drug: "Naproxen", dose: "500 mg PRN", specialty: "GenMed", prescriber: "Dr Bose", since: "22 Apr 2026" },
-          ],
-          allergiesOnFile: [],
-          recentLabs: [
-            { label: "Hb (g/dL)", value: "13.2", refRange: "13.0–17.0", tone: "ok" },
-            { label: "Creatinine (mg/dL)", value: "1.1", refRange: "0.7–1.3", tone: "ok" },
-            { label: "K+ (mmol/L)", value: "4.4", refRange: "3.5–5.1", tone: "ok" },
-          ],
-          ddi: [
-            {
-              drugs: ["Apixaban", "Naproxen"],
-              severity: "alert",
-              rationale:
-                "**NSAID on a DOAC** raises **bleed risk**. Class rule fires · avoid co-prescription where possible; if needed, time-limit · add PPI · review at next visit.",
-              rule: { body: "Lexicomp", section: "Class rule LX-0042" },
-            },
-          ],
-          thresholdPanels: [
-            {
-              panelTitle: "Polypharmacy review trigger",
-              guideline: { body: "NICE", year: "NG56" },
-              rows: [
-                { label: "Active chronic medications", value: "6", ref: "trigger ≥5 for 90d", tone: "warn" },
-                { label: "Days on ≥5 chronic meds", value: "61", ref: "<90d → watch", tone: "warn" },
-              ],
-              note: "Polypharmacy panel surfaces as soon as the count crosses the signed threshold.",
-            },
-          ],
-          freshness: "Synced 3 min ago",
-        },
-      },
+    const profile = resolvePatientTrends(rawMessage)
+    // (b) Specific trend question — answer it or guardrail.
+    if (m !== "show recent trends" && !m.includes("which trend") && !m.startsWith("show recent trends")) {
+      const match = findTrendByQuestion(profile, rawMessage)
+      if (match) {
+        return {
+          text: match.replyText,
+          loadingHint: `Pulling ${match.quickLabel.toLowerCase()} for ${profile.patientName}…`,
+          loadingDelayMs: 900,
+          suggestions: profile.trends.map((t) => ({
+            label: t.quickLabel,
+            message: t.question,
+          })),
+        }
+      }
+      // Guardrail — trend isn't on the patient's available list.
+      const availableList = profile.trends.map((t) => t.quickLabel).join(" · ")
+      return {
+        text: `Sorry — that trend isn't on file for **${profile.patientName}**. Trends Velora can pull for this patient:\n\n  ${availableList}\n\nTap a chip below to view one.`,
+        loadingHint: "Checking the trend availability index…",
+        loadingDelayMs: 800,
+        suggestions: profile.trends.map((t) => ({
+          label: t.quickLabel,
+          message: t.question,
+        })),
+      }
     }
-  }
-
-  // Intent ④ — Why flagged today
-  if (
-    m === "why is this patient flagged today" ||
-    m.includes("flagged today") ||
-    m.includes("why flagged") ||
-    (m.includes("flag") && m.includes("today"))
-  ) {
+    // (a) Menu — list available trends as canned chips.
     return {
-      text:
-        "Ramesh Kumar surfaced on the morning radar for 3 reasons (2 critical, 1 warning). Severity is from signed thresholds, not LLM judgment.",
-      loadingHint: "Reviewing morning triggers · admissions, criticals, polypharmacy…",
-      loadingDelayMs: 1300,
-      suggestions: subSuggestionsFor("why_flagged"),
-      rxOutput: {
-        kind: "velora_v0_why_flagged",
-        data: {
-          patientName: "Ramesh Kumar",
-          patientMeta: "M, 76y · MRN-90342",
-          flags: [
-            {
-              severity: "critical",
-              title: "Recent admission",
-              detail:
-                "Discharged **06 May** from Nephrology after a **4-day AKI episode**. Discharge summary on file.",
-              source: { specialty: "Nephrology", author: "Dr Bose", date: "06 May 2026" },
-            },
-            {
-              severity: "critical",
-              title: "Critical lab unreviewed",
-              detail:
-                "**K⁺**: __↑5.8 mmol/L__ drawn 09 May · status **unreviewed** · no subsequent visit-tied note.",
-              source: { specialty: "Lab", author: "Auto-flag", date: "09 May 2026" },
-              guideline: { body: "Zydus lab ref" },
-              thresholdNote: "K⁺ critical cut-off",
-            },
-            {
-              severity: "warning",
-              title: "Polypharmacy",
-              detail:
-                "**7 chronic medications** active for **≥90 days**. Medication review indicated.",
-              source: { specialty: "GenMed", author: "Drug Exposure count", date: "12 May 2026" },
-              guideline: { body: "NICE", year: "NG56" },
-              thresholdNote: "≥5 chronic meds for 90d",
-            },
-          ],
-          freshness: "Synced 26 min ago",
-        },
-      },
+      text: `Here are the trends Velora can pull for **${profile.patientName}** — ${profile.scopeReason}\n\nTap a trend below to view it.`,
+      loadingHint: `Loading available trends for ${profile.patientName}…`,
+      loadingDelayMs: 900,
+      suggestions: profile.trends.map((t) => ({
+        label: t.quickLabel,
+        message: t.question,
+      })),
     }
   }
 

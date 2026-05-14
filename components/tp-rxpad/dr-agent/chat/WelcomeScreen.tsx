@@ -34,7 +34,7 @@ interface QuickAction {
 const ICON_SIZE = 18
 
 const CONTEXT_ACTIONS: Record<PageContext, QuickAction[]> = {
-  // ── Velora v0 — five canonical intents (per Velora_V0_Intent_Spec) ──
+  // ── Velora v0 — three canonical intents (per Velora_V0_Intent_Spec rev 2) ──
   homepage: [
     {
       icon: <Hospital size={ICON_SIZE} variant="Bulk" />,
@@ -49,16 +49,10 @@ const CONTEXT_ACTIONS: Record<PageContext, QuickAction[]> = {
       message: "Show patient journey",
     },
     {
-      icon: <ShieldTick size={ICON_SIZE} variant="Bulk" />,
-      title: "Active meds & safety",
-      subtitle: "Active medications with cited DDI, allergy & duplicate-order checks",
-      message: "Show active meds and safety",
-    },
-    {
-      icon: <SearchStatus size={ICON_SIZE} variant="Bulk" />,
-      title: "Why flagged today",
-      subtitle: "Concrete events that fired since this patient's last contact",
-      message: "Why is this patient flagged today",
+      icon: <Activity size={ICON_SIZE} variant="Bulk" />,
+      title: "Recent trends",
+      subtitle: "Vital + lab trends Velora can pull for this patient · BP · HbA1c · eGFR · Lipid · Hb · …",
+      message: "Show recent trends",
     },
   ],
   // RxPad actions are built dynamically — see buildRxPadActions()

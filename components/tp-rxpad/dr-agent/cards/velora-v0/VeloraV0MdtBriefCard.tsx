@@ -580,10 +580,10 @@ function MedicalHistorySubheadingTag({
   const iconName = iconForHistoryGroup(group.title)
   return (
     <span
-      className={`mr-[6px] inline-flex shrink-0 items-center gap-[5px] rounded-[4px] px-[7px] py-[3px] text-[12px] font-semibold leading-[1.35] ${toneClass}`}
+      className={`mr-[6px] inline-flex shrink-0 items-center gap-[6px] rounded-[5px] px-[8px] py-[3.5px] text-[13px] font-semibold leading-[1.35] ${toneClass}`}
     >
       {iconName && (
-        <TPMedicalIcon name={iconName} variant="bulk" size={12} color="currentColor" className="shrink-0 opacity-80" />
+        <TPMedicalIcon name={iconName} variant="bulk" size={14} color="currentColor" className="shrink-0 opacity-80" />
       )}
       <span>{group.title}</span>
     </span>
@@ -1211,20 +1211,23 @@ function MultiSelectFilter({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[12px] text-tp-blue-700 transition-colors"
+        aria-label={`Filter by ${label.toLowerCase()}`}
+        title={label}
+        className="inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[13px] text-tp-blue-700 transition-colors"
         style={{
           background:
             count > 0 ? "rgba(75, 74, 213, 0.14)" : "rgba(75, 74, 213, 0.06)",
         }}
       >
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-blue-500/80">
-          {label}
-        </span>
-        <span className="max-w-[140px] truncate font-semibold text-tp-blue-700">
+        {/* The "SPECIALTY" / "DOCTOR" pre-label is dropped — the value
+            ("All specialties", "All doctors", or the selected list)
+            already tells the doctor what this chip filters, and the
+            popover header repeats the label for accessibility. */}
+        <span className="max-w-[160px] truncate font-semibold text-tp-blue-700">
           {valueLabel}
         </span>
         <ArrowDown2
-          size={12}
+          size={13}
           variant="Linear"
           className={`shrink-0 text-tp-blue-500/70 transition-transform ${open ? "rotate-180" : ""}`}
         />

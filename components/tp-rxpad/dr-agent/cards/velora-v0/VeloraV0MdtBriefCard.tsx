@@ -968,42 +968,65 @@ function VisitCard({
         </div>
       </div>
       <div className="flex flex-col gap-[2px] py-[4px]">
-        <VisitSection iconName="Virus" label="Symptoms" content={c.symptoms} />
-        <VisitSection iconName="medical-service" label="Examination" content={c.examination} />
-        <VisitSection iconName="Diagnosis" label="Diagnosis" content={findings} />
-        <VisitSection iconName="Tablets" label="Medications" content={c.medications} layout="inline" />
-        <VisitSection iconName="health care" label="Advice" content={c.advice} />
-        <VisitSection
-          iconNode={<Calendar2 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
-          label="Follow Up"
-          content={c.followUp}
-        />
-        <VisitSection iconName="medical book" label="Investigations" content={c.investigations} />
-        <VisitSection iconName="medical-service" label="Planned surgery" content={c.surgery} />
-        <VisitSection iconName="medical-record" label="Vaccinations" content={c.vaccinations} layout="inline" />
-        <VisitSection
-          iconNode={<Note1 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
-          label="Follow Up Notes"
-          content={c.additionalNotes}
-        />
-        {/* Empty visit — surface a polite placeholder + sidebar link.
-            The header above stays visible so the visit doesn't read as
-            missing. */}
-        {!hasAnyData && (
-          <div className="px-[12px] py-[8px]">
-            <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
-              No findings, medications or plan recorded for this Rx.{" "}
-              {onOpenInSidebar && (
-                <button
-                  type="button"
-                  onClick={onOpenInSidebar}
-                  className="text-tp-violet-600 underline-offset-2 hover:underline focus:outline-none focus:underline"
-                >
-                  View other details
-                </button>
-              )}
-            </p>
+        {/* IPD with a discharge-summary payload is its OWN content shape:
+            an IPD admission is a multi-day stay, not a single Rx event,
+            so the OPD-style sections (Symptoms · Examination · Diagnosis
+            · Medications · Advice · Follow Up) do NOT collectively
+            represent it. When `dischargeSummary` is present we render
+            the full structured discharge block (admission line · final
+            dx · presenting · hospital course · condition · exam at
+            discharge · advice · warning signs · functional) — that's
+            the comprehensive record the hospital produced at exit.
+            IPD without a discharge summary still falls back to the
+            OPD-style sections below (incomplete data — flagged via the
+            "View other details" placeholder when totally empty). */}
+        {c.visitType === "IPD" && c.dischargeSummary ? (
+          <div className="px-[12px] pb-[6px] pt-[2px]">
+            <DischargeSummaryBlock ds={c.dischargeSummary} />
           </div>
+        ) : (
+          <>
+            <VisitSection iconName="Virus" label="Symptoms" content={c.symptoms} />
+            <VisitSection iconName="medical-service" label="Examination" content={c.examination} />
+            <VisitSection iconName="Diagnosis" label="Diagnosis" content={findings} />
+            <VisitSection iconName="Tablets" label="Medications" content={c.medications} layout="inline" />
+            <VisitSection iconName="health care" label="Advice" content={c.advice} />
+            <VisitSection
+              iconNode={<Calendar2 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
+              label="Follow Up"
+              content={c.followUp}
+            />
+            <VisitSection iconName="medical book" label="Investigations" content={c.investigations} />
+            <VisitSection iconName="medical-service" label="Planned surgery" content={c.surgery} />
+            <VisitSection iconName="medical-record" label="Vaccinations" content={c.vaccinations} layout="inline" />
+            <VisitSection
+              iconNode={<Note1 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
+              label="Follow Up Notes"
+              content={c.additionalNotes}
+            />
+            {/* Empty visit — surface a polite placeholder + sidebar link.
+                The header above stays visible so the visit doesn't read
+                as missing. For IPD specifically we also flag that the
+                discharge summary itself wasn't ingested. */}
+            {!hasAnyData && (
+              <div className="px-[12px] py-[8px]">
+                <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
+                  {c.visitType === "IPD"
+                    ? "Discharge summary not on file for this admission."
+                    : "No findings, medications or plan recorded for this Rx."}{" "}
+                  {onOpenInSidebar && (
+                    <button
+                      type="button"
+                      onClick={onOpenInSidebar}
+                      className="text-tp-violet-600 underline-offset-2 hover:underline focus:outline-none focus:underline"
+                    >
+                      View other details
+                    </button>
+                  )}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

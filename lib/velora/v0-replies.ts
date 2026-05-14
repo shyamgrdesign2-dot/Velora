@@ -3243,6 +3243,43 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
           doctor: "Dr Ajay Choksey",
           headline: "Inpatient admission — Dr Ajay Choksey",
           medications: "**Lactihep 200ML Syrup** | **Ursocol 300MG Tablet** | **Nusam 400MG Tablet** | **Folimax D3 Forte Tablet** | **INJ Vit -K ( 30 MG ) In 100 ML Ns IV Over 1 Hour** | **Nexpro 40MG Tablet** | **Lesuride 25MG Tablet**",
+          // IPD admissions render as a structured discharge summary
+          // instead of the OPD per-section blocks. Every field below
+          // is sourced verbatim from this patient's OMOP `note` rows
+          // (Presenting Complaints + Discharge Condition were ingested
+          // for real; Hospital Course / Discharge Advice / Warning
+          // Signs / Functional are stubs marked TBD per the P6 doc
+          // §1.2 — these `note_title`s exist in the source EMR but
+          // aren't yet ETL'd into OMOP).
+          dischargeSummary: {
+            admissionLine: "Admitted 24 Feb 2026 · discharged 26 Feb 2026 · 3-day inpatient stay · Gastroenterology, Dr Ajay Choksey",
+            finalDiagnosis:
+              "**Wilson's disease** on chelation (Penicillamine + Zinc) with acute decompensation · **Acute viral hepatitis A** (HAV IgM positive) · Hypothyroidism on Thyroxine (background)",
+            presentingComplaints:
+              "H/O jaundice · H/O fever · abdominal pain · burning micturition · decreased oral intake · itching over body since 1-1.5 months",
+            hospitalCourse:
+              "Admitted in decompensated state with conjugated hyperbilirubinaemia, elevated transaminases (SGPT > 1000), coagulopathy and early ascites. Acute HAV superimposed on chronic Wilson's-related liver disease. Started on IV Vit-K, Lactulose prophylaxis for HE, Ursodeoxycholic acid, Pantoprazole. Aldactone added for ascites. Penicillamine + Zinc chelation continued. Serial LFTs trended downward over the 3-day stay.",
+            dischargeCondition: "Better · clinically stable · tolerating oral intake · no signs of encephalopathy.",
+            dischargeExam:
+              "GC: fair · afebrile · icterus present · abdomen soft · mild hepatomegaly · no shifting dullness on discharge day",
+            dischargeAdvice: [
+              "Continue Penicillamine + Zinc per chronic Wilson's regimen",
+              "Lactulose 15 ml HS — titrate to 2-3 soft stools / day",
+              "Ursocol 300 mg BD",
+              "Aldactone 25 mg OD — review with electrolytes at next visit",
+              "Strict no-alcohol, no-paracetamol > 2 g/day, no hepatotoxic OTC",
+              "Low-copper diet · avoid shellfish, organ meat, chocolate, nuts",
+              "OPD review with Dr Choksey in 1 week with repeat LFT + INR",
+            ],
+            warningSigns: [
+              "New-onset confusion / drowsiness / sleep reversal (encephalopathy)",
+              "Worsening jaundice or dark urine",
+              "Bleeding gums, easy bruising, melaena, haematemesis",
+              "Increasing abdominal distension or fever",
+            ],
+            functionalAssessment:
+              "Ambulant unaided · able to tolerate oral intake · school may resume after 1 week with no contact sport for 4 weeks pending repeat LFT.",
+          },
         },
         {
           date: "24 Feb 2026",

@@ -12,6 +12,11 @@ import { FloatingTooltip, HighlightLine, InfoTip, SourceInfoTip, shortDate } fro
 import { useVeloraViewMode } from "../../shell/VeloraViewModeContext"
 import { TPMedicalIcon } from "@/components/tp-ui"
 import { VisitSection } from "./visit-sections"
+import {
+  isBodySigned,
+  loadGuidelineSelection,
+  type GuidelineSelection,
+} from "@/lib/velora/guideline-registry"
 import type {
   VeloraV0MdtBriefData,
   VeloraV0Attribution,
@@ -1559,6 +1564,22 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   // consultation. -1 means "no auto-expand, just render collapsed list".
   const [sidebarInitialVisitIdx, setSidebarInitialVisitIdx] = useState<number>(-1)
   const openRec = openSidebarIdx >= 0 ? data.specialties[openSidebarIdx] ?? null : null
+  // Admin signed-library — Stack 2 panels and collisions filter against
+  // this. Hydrate from localStorage on mount; refresh when the page
+  // gets focus (so saving in the Guideline Settings sidebar is
+  // reflected the next time the user comes back to the card without a
+  // full page reload).
+  const [guidelineSelection, setGuidelineSelection] = useState<GuidelineSelection>({})
+  useEffect(() => {
+    setGuidelineSelection(loadGuidelineSelection())
+    const refresh = () => setGuidelineSelection(loadGuidelineSelection())
+    window.addEventListener("focus", refresh)
+    window.addEventListener("storage", refresh)
+    return () => {
+      window.removeEventListener("focus", refresh)
+      window.removeEventListener("storage", refresh)
+    }
+  }, [])
   // Accordion: every specialty starts COLLAPSED by default — only the
   // medical-history section is expanded on first paint, matching the
   // design call "everything else is one click away". When the doctor
@@ -1969,16 +1990,32 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           </p>
 
           {/* "Where they collide" — list of independent detector fires.
-              Each entry: kind badge (DDI / Coordination gap), title with drug pair,
-              bullet points, cited guideline chip. */}
+              Each entry: kind badge (DDI / Coordination gap), title
+              with drug pair, bullet points, cited guideline chip.
+              Filtered against the admin's signed library: collisions
+              whose cited body isn't in `guidelineSelection` are
+              dropped entirely (no "AI opinion" leak). The count of
+              suppressed fires is surfaced as a footnote so the doctor
+              knows the filter is engaged. */}
           {(() => {
-            const entries = data.collisions ?? (data.collide ? [{
+            const allEntries = data.collisions ?? (data.collide ? [{
               kind: "coordination-gap" as const,
               title: data.collide.headline,
               points: [data.collide.detail],
               rule: data.collide.rule,
             }] : [])
-            if (entries.length === 0) return null
+            const entries = allEntries.filter((e) => isBodySigned(e.rule?.body, guidelineSelection))
+            const hidden = allEntries.length - entries.length
+            if (entries.length === 0 && hidden === 0) return null
+            if (entries.length === 0 && hidden > 0) {
+              return (
+                <div className="rounded-[10px] border border-dashed border-tp-slate-200 bg-tp-slate-50/60 px-[12px] py-[9px] text-[12.5px] italic leading-[1.5] text-tp-slate-500">
+                  {hidden} cross-team flag{hidden === 1 ? "" : "s"} suppressed — the
+                  cited guideline {hidden === 1 ? "body is" : "bodies are"} not in
+                  this hospital's signed library. Open <span className="font-semibold not-italic text-tp-slate-700">Guidelines (admin)</span> to adjust.
+                </div>
+              )
+            }
             return (
               <div data-mdt-anchor="collide" className="flex flex-col gap-[8px] rounded-[10px] border border-tp-warning-200 bg-tp-warning-50/60 px-[10px] py-[9px]">
                 <div className="flex items-center gap-[5px] text-[13px] font-semibold text-tp-warning-800">
@@ -1991,26 +2028,49 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 {entries.map((entry, idx) => (
                   <CollideEntryCard key={idx} entry={entry} />
                 ))}
+                {hidden > 0 && (
+                  <p className="px-[2px] text-[11px] italic text-tp-slate-500">
+                    + {hidden} additional flag{hidden === 1 ? "" : "s"} hidden — not in this hospital's signed library.
+                  </p>
+                )}
               </div>
             )
           })()}
 
-          {data.syntheses.map((s, idx) => (
-            <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "synthesis" : undefined}>
-              <SectionSummaryBar
-                label={s.panelTitle}
-                icon="medical-report"
-                trailing={<GuidelineChip {...s.guideline} />}
-              />
-              <ul className="flex flex-col gap-[3px] pl-[8px]">
-                {s.rows.map((row, i) => (
-                  <SynthesisBullet key={i} row={row} />
+          {/* Guideline-anchored panels — filtered against the admin's
+              signed library the same way collisions are. Hidden panels
+              count surfaces as a footnote under the visible ones. */}
+          {(() => {
+            const visibleSyntheses = (data.syntheses ?? []).filter((s) =>
+              isBodySigned(s.guideline?.body, guidelineSelection),
+            )
+            const hiddenCount = (data.syntheses?.length ?? 0) - visibleSyntheses.length
+            return (
+              <>
+                {visibleSyntheses.map((s, idx) => (
+                  <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "synthesis" : undefined}>
+                    <SectionSummaryBar
+                      label={s.panelTitle}
+                      icon="medical-report"
+                      trailing={<GuidelineChip {...s.guideline} />}
+                    />
+                    <ul className="flex flex-col gap-[3px] pl-[8px]">
+                              {s.rows.map((row, i) => (
+                          <SynthesisBullet key={i} row={row} />
+                        ))}
+                    </ul>
+                    {/* `s.note` (Why this panel) is intentionally NOT rendered in the live card —
+                        the deep-dive doc surfaces per-panel reasoning. Keeps the chat surface clean. */}
+                  </div>
                 ))}
-              </ul>
-              {/* `s.note` (Why this panel) is intentionally NOT rendered in the live card —
-                  the deep-dive doc surfaces per-panel reasoning. Keeps the chat surface clean. */}
-            </div>
-          ))}
+                {hiddenCount > 0 && (
+                  <p className="px-[2px] text-[11px] italic text-tp-slate-500">
+                    + {hiddenCount} panel{hiddenCount === 1 ? "" : "s"} hidden — cited body not in this hospital's signed library.
+                  </p>
+                )}
+              </>
+            )
+          })()}
 
           {data.pendingMdtItems && data.pendingMdtItems.length > 0 && (
             <div data-mdt-anchor="pending" className="flex flex-col gap-[4px]">

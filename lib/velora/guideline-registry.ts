@@ -517,3 +517,54 @@ export function defaultSelection(): GuidelineSelection {
   }
   return out
 }
+
+/** "Is this guideline body currently signed by the hospital?"
+ *  Used by the synthesis renderer to filter out panels / collisions
+ *  whose cited body isn't in the admin's saved library.
+ *
+ *  Selection semantics (matches Q1 default):
+ *   • Selection completely empty / unset → treat as default-signed
+ *     (every body in the catalogue is in policy). Brand-new
+ *     hospitals see everything until the admin prunes.
+ *   • Selection has ANY non-empty specialty array → strict filter.
+ *     A body is signed iff at least one of its `id`s appears in
+ *     ANY specialty's saved selection.
+ *
+ *  Body name matching is tolerant of formatting variation: the
+ *  citation strings used in code ("ASA / DAS", "ACC / AHA") may
+ *  differ in casing / punctuation from the catalogue strings
+ *  ("ASA / DAS", "ACC/AHA"). We normalise both sides to
+ *  lowercase-alphanumeric and require an exact or prefix match.
+ */
+export function isBodySigned(
+  body: string | undefined,
+  selection: GuidelineSelection,
+): boolean {
+  if (!body) return true
+  // Empty / "all defaults" selection → everything signed.
+  const hasAny = Object.values(selection).some((arr) => (arr?.length ?? 0) > 0)
+  if (!hasAny) return true
+  const target = normaliseBody(body)
+  for (const [specialty, ids] of Object.entries(selection)) {
+    if (!ids || ids.length === 0) continue
+    const cat = GUIDELINE_CATALOGUE[specialty as SpecialtyKey]
+    if (!cat) continue
+    for (const id of ids) {
+      const entry = cat.find((g) => g.id === id)
+      if (!entry) continue
+      const sourceBody = normaliseBody(entry.body)
+      if (
+        sourceBody === target ||
+        sourceBody.startsWith(target) ||
+        target.startsWith(sourceBody)
+      ) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function normaliseBody(body: string): string {
+  return body.toLowerCase().replace(/[^a-z0-9]/g, "")
+}

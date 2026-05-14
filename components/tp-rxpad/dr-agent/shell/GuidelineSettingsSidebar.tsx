@@ -88,7 +88,27 @@ export function GuidelineSettingsSidebar({
   const handleSave = () => {
     saveGuidelineSelection(selection)
     setSavedFlash(true)
-    setTimeout(() => setSavedFlash(false), 2200)
+    // Notify any open agent surface that the signed library changed,
+    // so its synthesis renderer re-filters without waiting for window
+    // `focus`. We use the standard `storage` event vocabulary (with a
+    // bespoke key) so existing focus listeners pick it up too.
+    if (typeof window !== "undefined") {
+      try {
+        window.dispatchEvent(new StorageEvent("storage", { key: "velora-v0-guideline-settings" }))
+      } catch {
+        // Old browsers without StorageEvent constructor — fall back to
+        // a synthetic Event; the consumer's listener ignores `key`
+        // mismatches anyway.
+        window.dispatchEvent(new Event("storage"))
+      }
+    }
+    // Brief "Saved" flash, then auto-close. 1 s is short enough that
+    // the admin sees the confirmation but doesn't sit waiting for the
+    // panel to dismiss.
+    setTimeout(() => {
+      setSavedFlash(false)
+      onClose()
+    }, 1000)
   }
 
   return createPortal(

@@ -93,12 +93,14 @@ export function CardShell({
         backgroundClip: "padding-box, border-box",
       }}
     >
-      {/* Header */}
+      {/* Header — bleeds into the body via a soft violet → white
+          gradient. No hairline stroke between header and body; the
+          gradient itself carries the transition so the card reads as
+          one piece instead of two stacked rectangles. */}
       <div
         className={cn("flex gap-[7px] px-3 py-[11px]", date ? "items-start" : "items-center")}
         style={{
-          background: "linear-gradient(180deg, rgba(75,74,213,0.05) 0%, #FFFFFF 100%)",
-          borderBottom: "1px solid var(--tp-slate-50, #F8FAFC)",
+          background: "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
         }}
       >
         {/* Icon — always TP blue */}

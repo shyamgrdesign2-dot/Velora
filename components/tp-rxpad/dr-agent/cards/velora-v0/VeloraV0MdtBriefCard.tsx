@@ -494,6 +494,55 @@ function SpecialtySidebar({
  * Tooltip contents — sources list + reasoning sentence — render through a
  * FloatingTooltip portal so they escape any clipping ancestor.
  */
+/**
+ * isMedicationActive — single source of truth for "is this drug still
+ * being taken by the patient on the date the doctor is viewing the
+ * card?".
+ *
+ * Inputs the function expects on each medical-history item (populated
+ * by the OMOP generator from `drug_exposure_start_date` +
+ * `days_supply`):
+ *
+ *   prescribedAt  — ISO date the prescription was issued.
+ *   daysSupply    — number of days the prescription covers from that
+ *                   date.
+ *
+ * Decision rule:
+ *   • Both fields missing  → assume active (legacy mocks; conservative
+ *     fallback so we never hide a drug we just don't have metadata
+ *     for).
+ *   • Only prescribedAt set → active while `today ≥ prescribedAt`. No
+ *     end date means "open-ended" until cancelled.
+ *   • Both set             → active iff `prescribedAt ≤ today ≤
+ *     prescribedAt + daysSupply`.
+ *
+ * The `today` argument is injected so test code can pin the date.
+ * Production calls pass `new Date()` from the render path.
+ */
+function isMedicationActive(
+  item: { prescribedAt?: string; daysSupply?: number },
+  today: Date = new Date(),
+): boolean {
+  if (!item.prescribedAt) return true
+  const start = Date.parse(item.prescribedAt)
+  if (Number.isNaN(start)) return true
+  const t = today.getTime()
+  if (t < start) return false
+  if (item.daysSupply === undefined) return true
+  const end = start + item.daysSupply * 24 * 60 * 60 * 1000
+  return t <= end
+}
+
+/** Filter a Medical-history group's items down to the "still active"
+ *  subset using the rule above. Applied only when the group is the
+ *  Active-medications group; every other group renders unfiltered. */
+function filterActiveMedicationItems<T extends { prescribedAt?: string; daysSupply?: number }>(
+  items: T[],
+  today: Date = new Date(),
+): T[] {
+  return items.filter((i) => isMedicationActive(i, today))
+}
+
 /** Pick a TPMedicalIcon token for a medical-history group chip, based on
  *  the group's title text. Returns null when no sensible icon maps — the
  *  chip then renders without an icon, no failure. */
@@ -518,12 +567,15 @@ function MedicalHistorySubheadingTag({
   // MedicalHistorySectionTooltip on the section heading above, so the
   // body chips stay clean. Tone palette preserved.
   const tone = group.tone ?? "neutral"
+  // Inner section chips (Co-morbidities, Surgical history, Allergies,
+  // Active medications, Family / Social, Additional history) all use
+  // the violet inner-content palette. Only the top-level "Medical
+  // history" section bar stays neutral slate; everything one level
+  // deeper carries the violet accent.
   const toneClass =
     tone === "primary"
       ? "bg-tp-error-50 text-tp-error-700"
-      : tone === "positive"
-        ? "bg-tp-violet-50 text-tp-violet-700"
-        : "bg-tp-slate-100 text-tp-slate-700"
+      : "bg-tp-violet-50 text-tp-violet-700"
   const iconName = iconForHistoryGroup(group.title)
   return (
     <span
@@ -880,9 +932,9 @@ function VisitCard({
       <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[10px] border-b border-tp-violet-100 bg-tp-violet-50/60 px-[10px] py-[8px]">
         <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[2px]">
           <span className="text-[13.5px] font-semibold text-tp-violet-700">{c.doctor}</span>
-          <span className="inline-flex items-center rounded-[4px] bg-white/80 px-[6px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-700 ring-1 ring-tp-violet-100">
-            {specialtyLabel}
-          </span>
+          {/* Specialty pill removed — the parent specialty heading
+              already names the team, so repeating it on every visit
+              row read as visual noise. */}
           {c.visitType === "IPD" && (
             <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
               IPD
@@ -1201,7 +1253,19 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           "Referral × Visit",
         ]}
       >
-        <div className="flex flex-col gap-[10px]">
+        {/* Cross-brief body — wrapped in a quiet vintage-ish vertical
+            wash so the long-form content reads as one continuous
+            canvas (filters → medical history → specialty stack)
+            instead of bare white. The tint is intentionally barely
+            visible (alpha ≤ 0.04) so it doesn't compete with the
+            content. */}
+        <div
+          className="flex flex-col gap-[10px] -mx-3 -my-[10px] px-3 py-[10px]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(124,58,237,0.025) 0%, rgba(124,58,237,0.01) 35%, rgba(15,23,42,0.012) 65%, rgba(124,58,237,0.025) 100%)",
+          }}
+        >
           {/* The view-mode toggle (Detailed ↔ Concise) lives next to the
               Velora brand-tag in the agent header, not inside the card.
               The card just reads `viewMode` from the shell context and
@@ -1265,11 +1329,20 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   icon="medical-service"
                   trailing={<MedicalHistorySectionTooltip groups={filteredHistory} />}
                 />
-                <div className="flex flex-col gap-[12px] pl-[2px]">
+                <div className="flex flex-col gap-[12px] px-[10px] py-[6px]">
                   {filteredHistory.map((group, gi) => {
-                    const hasItems = group.items.length > 0
+                    // Active medications: filter to the subset whose
+                    // prescribedAt + daysSupply window covers today.
+                    // Items that didn't carry those fields (legacy mock
+                    // rows) pass through unchanged so we never hide a
+                    // drug for lack of metadata.
+                    const isActiveMedsGroup = /active medication/i.test(group.title)
+                    const renderItems = isActiveMedsGroup
+                      ? filterActiveMedicationItems(group.items)
+                      : group.items
+                    const hasItems = renderItems.length > 0
                     const joinedText = hasItems
-                      ? group.items.map((it) => it.text).join(" | ")
+                      ? renderItems.map((it) => it.text).join(" | ")
                       : ""
                     return (
                       <p key={gi} className="text-[13.5px] leading-[1.55] text-tp-slate-700">
@@ -1278,7 +1351,9 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                           <HighlightLine text={joinedText} plain />
                         ) : (
                           <span className="italic text-tp-slate-400">
-                            No data from patient record
+                            {isActiveMedsGroup
+                              ? "No medications active in the current prescribed window"
+                              : "No data from patient record"}
                           </span>
                         )}
                       </p>

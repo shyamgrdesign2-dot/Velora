@@ -1031,6 +1031,15 @@ export interface VeloraV0MedicalHistoryGroup {
     /** Legacy per-item tooltip text — no longer used by the card. Sources
      *  are now consolidated at the group level. */
     source?: string
+    /** ISO date string (YYYY-MM-DD) the prescription / item was issued.
+     *  For Active medications this drives the "is it still active" check
+     *  along with `daysSupply` below. Omitted → the item is assumed
+     *  always-active (back-compat with legacy mocks). */
+    prescribedAt?: string
+    /** Number of days the prescription covers from `prescribedAt`. Used
+     *  by the Active-medications filter: an item is rendered only when
+     *  `today` is within [prescribedAt, prescribedAt + daysSupply]. */
+    daysSupply?: number
   }>
   /** Group-level source attribution — surfaces in a tooltip on the
    *  subheading info icon. Each entry is one OMOP-grounded consultation that

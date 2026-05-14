@@ -143,7 +143,7 @@ function SpecialtyHeading({
 }) {
   const meta = specialtyMetaSegments(rec)
   return (
-    <div className="group/section-header sticky top-0 z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-violet-50 px-2 py-[5px] shadow-[0_1px_0_rgba(124,58,237,0.06)] backdrop-blur">
+    <div className="group/section-header sticky top-0 z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/70 px-2 py-[5px] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur">
       <button
         type="button"
         onClick={onToggle}
@@ -155,19 +155,19 @@ function SpecialtyHeading({
           name="medical-service"
           variant="bulk"
           size={18}
-          color="var(--tp-violet-600, #7C3AED)"
+          color="var(--tp-slate-500, #64748B)"
           className="shrink-0"
         />
         <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
-          <span className="text-[14px] font-semibold leading-none text-tp-violet-600">
+          <span className="text-[14px] font-semibold leading-none text-tp-slate-700">
             {rec.source.specialty}
           </span>
           {meta.length > 0 && (
-            <span className="text-[11.5px] leading-[1.35] text-tp-violet-400">
+            <span className="text-[11.5px] leading-[1.35] text-tp-slate-400">
               <span>(</span>
               {meta.map((s, i) => (
                 <React.Fragment key={i}>
-                  {i > 0 && <span className="mx-[6px] text-tp-violet-300">|</span>}
+                  {i > 0 && <span className="mx-[6px] text-tp-slate-300">|</span>}
                   <span>{s}</span>
                 </React.Fragment>
               ))}
@@ -182,7 +182,7 @@ function SpecialtyHeading({
           type="button"
           onClick={onToggle}
           aria-label={expanded ? "Collapse section" : "Expand section"}
-          className="flex shrink-0 items-center rounded-[4px] p-[2px] text-tp-violet-500 transition-colors hover:bg-tp-violet-100/70 hover:text-tp-violet-700"
+          className="flex shrink-0 items-center rounded-[4px] p-[2px] text-tp-slate-500 transition-colors hover:bg-tp-slate-200/60 hover:text-tp-slate-700"
         >
           {expanded ? (
             <ArrowSquareUp size={18} variant="Linear" />
@@ -847,20 +847,21 @@ function VisitCard({
     !!c.followUp || !!c.investigations || !!c.advice || !!c.surgery ||
     !!c.vaccinations || !!c.additionalNotes
   return (
-    <div className="rounded-[10px] border border-tp-slate-100 bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
-      {/* Header strip — informational only (no toggle). Doctor (semibold)
-          · specialty pill · IPD chip on the left, date pill on the right.
-          Sticky so it hovers under the specialty heading while the user
-          scrolls through this visit's body.
+    <div className="rounded-[10px] border border-tp-violet-100 bg-white shadow-[0_1px_0_rgba(124,58,237,0.06)]">
+      {/* Header strip — informational only (no toggle). Doctor (semibold,
+          violet to flag clinical attribution) · specialty pill · IPD chip
+          on the left, date pill on the right. Sticky so it hovers under
+          the specialty heading while the user scrolls through this visit's
+          body.
           NOTE: the outer wrapper is NOT `overflow-hidden` — sticky
           positioning silently breaks when an ancestor clips overflow, so
           the header would scroll away with the rest of the card. The
           `rounded-t-[10px]` here keeps the sticky bar visually aligned
           with the parent's rounded outline. */}
-      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[10px] border-b border-tp-slate-100/80 bg-tp-slate-50 px-[10px] py-[8px]">
+      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[10px] border-b border-tp-violet-100 bg-tp-violet-50/60 px-[10px] py-[8px]">
         <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[2px]">
-          <span className="text-[13.5px] font-semibold text-tp-slate-800">{c.doctor}</span>
-          <span className="inline-flex items-center rounded-[4px] bg-tp-violet-50 px-[6px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-700">
+          <span className="text-[13.5px] font-semibold text-tp-violet-700">{c.doctor}</span>
+          <span className="inline-flex items-center rounded-[4px] bg-white/80 px-[6px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-700 ring-1 ring-tp-violet-100">
             {specialtyLabel}
           </span>
           {c.visitType === "IPD" && (
@@ -869,11 +870,10 @@ function VisitCard({
             </span>
           )}
         </div>
-        {/* Date pill — soft slate-50 chip with a 4px radius (no outer
-            stroke, default Inter font family). The minimalist chrome
-            keeps the date legible without competing with the specialty
-            pill on the left. */}
-        <span className="shrink-0 rounded-[4px] bg-tp-slate-50 px-[8px] py-[2px] text-[11px] font-semibold text-tp-slate-600">
+        {/* Date pill — quiet white chip with a 4px radius (no outer
+            stroke, default Inter font family). Sits on the violet header
+            without competing for attention. */}
+        <span className="shrink-0 rounded-[4px] bg-white/80 px-[8px] py-[2px] text-[11px] font-semibold text-tp-slate-600">
           {c.date}
         </span>
       </div>
@@ -946,22 +946,25 @@ function DetailedSpecialtyBody({
 
   const specialtyLabel = rec.source.specialty.split("·")[0].trim()
 
-  // Vertical timeline line — runs along the left edge of the visit
-  // stack so the consultations read as points along a chronology, not
-  // a flat list. A small dot marker is placed against each visit's
-  // header row for visual anchoring.
+  // Vertical timeline rail — soft violet line down the left edge of
+  // the visit stack so the consultations read as points along the
+  // patient's chronology. Each visit's marker is a violet-500 dot
+  // wrapped in a softer violet-100 halo (achieved through a 3px ring)
+  // so the marker reads as a "target" against the rail. IPD visits
+  // swap the violet palette for red to keep the existing critical
+  // signal.
   return (
-    <div className="relative pl-[18px]">
+    <div className="relative pl-[22px]">
       <span
         aria-hidden="true"
-        className="absolute left-[6px] top-[14px] bottom-[14px] w-px bg-tp-slate-200"
+        className="absolute left-[8px] top-[14px] bottom-[14px] w-px bg-tp-violet-200"
       />
       <div className="flex flex-col gap-[10px]">
         {consultations.map((c, ci) => (
           <div key={ci} className="relative">
             <span
               aria-hidden="true"
-              className={`absolute -left-[15px] top-[16px] inline-block h-[8px] w-[8px] rounded-full ring-[2px] ring-white ${c.visitType === "IPD" ? "bg-tp-error-500" : "bg-tp-slate-300"}`}
+              className={`absolute -left-[18px] top-[16px] inline-block h-[8px] w-[8px] rounded-full ring-[3px] ${c.visitType === "IPD" ? "bg-tp-error-500 ring-tp-error-100" : "bg-tp-violet-500 ring-tp-violet-100"}`}
             />
             <VisitCard
               consultation={c}
@@ -1241,7 +1244,6 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 <SectionSummaryBar
                   label="Medical history"
                   icon="medical-service"
-                  variant="specialty"
                   trailing={<MedicalHistorySectionTooltip groups={filteredHistory} />}
                 />
                 <div className="flex flex-col gap-[12px] pl-[2px]">

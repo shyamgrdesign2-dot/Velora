@@ -804,9 +804,12 @@ export function ChatBubble({
               <div
                 className="rounded-[12px] rounded-br-[0px] px-3 py-2 text-[14px] leading-[18px] text-tp-slate-800"
                 style={{
-                  // High-legibility frosted bubble: nearly opaque white with strong saturated blur
-                  // so it pops cleanly against whatever hue the rotating wash is currently at.
-                  background: "rgba(255, 255, 255, 0.94)",
+                  // Quiet grey bubble — clearly differentiates the user
+                  // turn from the white/elevated assistant cards below it.
+                  // Slate-100-with-tint over a slight blur keeps it
+                  // readable against the rotating background wash.
+                  background: "rgba(241, 245, 249, 0.92)",
+                  border: "1px solid rgba(15, 23, 42, 0.06)",
                   backdropFilter: "blur(14px) saturate(1.4)",
                   WebkitBackdropFilter: "blur(14px) saturate(1.4)",
                 }}

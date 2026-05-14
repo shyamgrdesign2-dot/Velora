@@ -42,13 +42,21 @@ export function PatientSelector({
   // Draft selection — only used when confirmCtaLabel is set. Initialised to the current
   // committed selection on every open so the UI always shows where the user already is.
   const [draftId, setDraftId] = useState<string>(selectedId)
+  // Snapshot of the selected ID at the moment the sheet OPENED. Used
+  // by the list-sort logic so the "selected patient appears first"
+  // ordering does not shift mid-interaction when the user picks a
+  // different row. The next open captures a fresh snapshot.
+  const [sortAnchorId, setSortAnchorId] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen) {
       setSearch("")
       setShowInfoTip(false)
       setDraftId(selectedId)
+      setSortAnchorId(selectedId)
       setTimeout(() => searchRef.current?.focus(), 150)
+    } else {
+      setSortAnchorId(null)
     }
   }, [isOpen, selectedId])
   useEffect(() => {
@@ -93,9 +101,12 @@ export function PatientSelector({
         })
       : patients.filter((p) => p.isToday) // Default: today's appointments only
 
-    // Selected patient always appears first
-    if (!isUniversalSelected && visibleSelectedId) {
-      const idx = base.findIndex((p) => p.id === visibleSelectedId)
+    // Sort the open-time selection to the top — but ONLY based on the
+    // sheet's *open-time* anchor, not the live draft. This keeps the
+    // row that the user just tapped in its original position; the
+    // selection-on-top reordering happens only on the next open.
+    if (!isUniversalSelected && sortAnchorId) {
+      const idx = base.findIndex((p) => p.id === sortAnchorId)
       if (idx > 0) {
         const copy = [...base]
         const [selected] = copy.splice(idx, 1)
@@ -104,7 +115,7 @@ export function PatientSelector({
       }
     }
     return base
-  }, [patients, search, visibleSelectedId, isUniversalSelected, isSearching])
+  }, [patients, search, sortAnchorId, isUniversalSelected, isSearching])
   if (!isOpen) return null
 
   return (

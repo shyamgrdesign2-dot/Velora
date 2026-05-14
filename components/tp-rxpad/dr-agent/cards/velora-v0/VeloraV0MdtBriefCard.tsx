@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, Clock, ArrowDown2 } from "iconsax-reactjs"
+import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, ArrowDown2 } from "iconsax-reactjs"
 import { FlagArrow } from "../../shared/FlagArrow"
 import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
@@ -1065,83 +1065,6 @@ function DetailedSpecialtyBody({
 }
 
 /**
- * PatientJourneySnapshot — terse cross-hospital snapshot rendered above
- * the Medical history section. Mirrors the look of the standalone
- * Patient Journey card's header ("PAST · N months · N encounters" with
- * a date-range pill) so the doctor sees the course of care at this
- * hospital in one glance before drilling into specialties.
- *
- * Numbers are computed from the data already in `specialties` (no extra
- * fields needed). When the data doesn't expose a usable date range it
- * falls back gracefully — section still shows visits + months.
- */
-function PatientJourneySnapshot({ data }: { data: VeloraV0MdtBriefData }) {
-  // Total encounters across every specialty. Prefer the explicit
-  // `consultationCount` (set by the generator), fall back to the
-  // consultations array length when missing.
-  const totalEncounters = data.specialties.reduce((sum, rec) => {
-    if (typeof rec.consultationCount === "number") return sum + rec.consultationCount
-    return sum + (rec.consultations?.length ?? 0)
-  }, 0)
-  // Aggregate date range across every specialty's `dateRangeLabel`.
-  // The labels are already strings ("9 May 2025 - 30 Apr 2026") — pick
-  // the earliest start and the latest end heuristically by parsing.
-  const range = useMemo(() => {
-    const parseDate = (s: string): number | null => {
-      const t = Date.parse(s)
-      return Number.isNaN(t) ? null : t
-    }
-    let minStart: { label: string; ts: number } | null = null
-    let maxEnd: { label: string; ts: number } | null = null
-    for (const rec of data.specialties) {
-      const lbl = rec.dateRangeLabel
-      if (!lbl) continue
-      // Split "A - B" / "A – B" / "A" forms.
-      const parts = lbl.split(/\s*[–-]\s*/)
-      const start = parts[0]?.trim()
-      const end = (parts[1] ?? parts[0])?.trim()
-      const sTs = start ? parseDate(start) : null
-      const eTs = end ? parseDate(end) : null
-      if (start && sTs !== null && (!minStart || sTs < minStart.ts)) {
-        minStart = { label: start, ts: sTs }
-      }
-      if (end && eTs !== null && (!maxEnd || eTs > maxEnd.ts)) {
-        maxEnd = { label: end, ts: eTs }
-      }
-    }
-    if (!minStart && !maxEnd) return null
-    if (minStart && maxEnd && minStart.label !== maxEnd.label) {
-      return `${minStart.label} – ${maxEnd.label}`
-    }
-    return (minStart ?? maxEnd)!.label
-  }, [data.specialties])
-  const months = Math.max(1, Math.round((data.windowDays ?? 0) / 30))
-  const specialtyCount = data.specialties.length
-  return (
-    <div data-mdt-anchor="patient-journey-snapshot" className="flex flex-col gap-[3px] rounded-[10px] border border-tp-slate-100 bg-gradient-to-b from-tp-violet-50/40 to-white px-[12px] py-[10px]">
-      <div className="flex items-center gap-[6px] text-[11px] font-semibold uppercase tracking-[0.08em] text-tp-slate-400">
-        <Clock size={12} variant="Bulk" />
-        <span>Patient journey</span>
-      </div>
-      <div className="flex items-end justify-between gap-[10px]">
-        <span className="text-[15.5px] font-bold leading-tight text-tp-slate-900">
-          {months} month{months === 1 ? "" : "s"}
-          <span className="mx-[6px] text-tp-slate-300">·</span>
-          {totalEncounters} encounter{totalEncounters === 1 ? "" : "s"}
-          <span className="mx-[6px] text-tp-slate-300">·</span>
-          {specialtyCount} specialt{specialtyCount === 1 ? "y" : "ies"}
-        </span>
-        {range && (
-          <span className="shrink-0 rounded-full bg-tp-slate-100 px-[10px] py-[3px] font-mono text-[11px] text-tp-slate-600">
-            {range}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
-
-/**
  * BriefFilterBar — minimal two-dropdown filter that sits below the card
  * header. Specialty filter is built from `data.specialties`; doctor
  * filter is built from the union of consultation doctors, scoped to the
@@ -1186,9 +1109,12 @@ function BriefFilterBar({
   )
 }
 
-/** One filter dropdown — chip-style trigger with a native select stacked
- *  on top (visually invisible) so we get the OS dropdown UI for free
- *  while keeping the trigger look matched to the rest of the card. */
+/** One filter dropdown — soft "pressed-card" chip with no outer stroke.
+ *  Native <select> stacked invisibly on top gives us the OS dropdown UI
+ *  for free; the visual chip uses a quiet slate-50 background with the
+ *  selected value treated as the headline + a faint chevron. Hover gets
+ *  a subtle slate-100 step so the affordance is still obvious without
+ *  needing a border. */
 function FilterDropdown({
   label,
   value,
@@ -1201,11 +1127,12 @@ function FilterDropdown({
   onChange: (v: string) => void
 }) {
   return (
-    <label className="relative inline-flex cursor-pointer items-center gap-[6px] rounded-full border border-tp-slate-200 bg-white px-[10px] py-[4px] text-[12px] text-tp-slate-700 transition-colors hover:border-tp-slate-300 hover:bg-tp-slate-50">
-      <span className="font-semibold text-tp-slate-500">{label}</span>
-      <span className="text-tp-slate-300">|</span>
-      <span className="max-w-[180px] truncate font-medium text-tp-slate-800">{value}</span>
-      <ArrowDown2 size={12} variant="Linear" className="shrink-0 text-tp-slate-500" />
+    <label className="relative inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] bg-tp-slate-50 px-[10px] py-[5px] text-[12px] text-tp-slate-700 transition-colors hover:bg-tp-slate-100">
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-slate-400">
+        {label}
+      </span>
+      <span className="max-w-[180px] truncate font-semibold text-tp-slate-800">{value}</span>
+      <ArrowDown2 size={12} variant="Linear" className="shrink-0 text-tp-slate-400" />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1347,12 +1274,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               The card just reads `viewMode` from the shell context and
               switches its specialty-body renderer accordingly. */}
 
-          {/* ── Patient journey snapshot + filters ───────────────────────
-              Sits above the medical-history section so the doctor sees
-              the course of care (months · encounters · specialties) and
-              can scope the rendered specialties / visits down to a
-              single specialty or a single doctor before reading. */}
-          <PatientJourneySnapshot data={data} />
+          {/* ── Filters ─────────────────────────────────────────────────
+              The patient-journey snapshot (months · encounters · range)
+              that used to sit here moved out into the chat preamble — the
+              card opens directly to the filter row + medical history. */}
           <BriefFilterBar
             specialties={specialtyOptions}
             selectedSpecialty={filterSpecialty}

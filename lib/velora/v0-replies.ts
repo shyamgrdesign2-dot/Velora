@@ -58,8 +58,7 @@ function buildBriefPreamble(data: VeloraV0MdtBriefData): string {
     if (typeof rec.consultationCount === "number") return sum + rec.consultationCount
     return sum + (rec.consultations?.length ?? 0)
   }, 0)
-  const specialtyNames = data.specialties.map((r) => r.source.specialty).filter(Boolean)
-  const specialtyCount = specialtyNames.length
+  const specialtyCount = data.specialties.map((r) => r.source.specialty).filter(Boolean).length
   // Unique doctor names across the whole window.
   const doctorSet = new Set<string>()
   for (const rec of data.specialties) {
@@ -92,16 +91,9 @@ function buildBriefPreamble(data: VeloraV0MdtBriefData): string {
       ? `${minStart.label} – ${maxEnd.label}`
       : (minStart ?? maxEnd)?.label ?? null
 
-  // Compose the specialty list as a natural-language phrase.
-  const joinNames = (names: string[]): string => {
-    if (names.length === 0) return ""
-    if (names.length === 1) return names[0]
-    if (names.length === 2) return `${names[0]} and ${names[1]}`
-    return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`
-  }
-  const specialtyListPhrase = joinNames(specialtyNames)
-
-  // Build the sentence(s).
+  // Build the sentence — minimal, no specialty list, no fluff. Keeps
+  // the preamble readable on a single short line and lets the card
+  // below do the heavy lifting.
   const opening = `Here's the cross-consultation brief for **${data.patientName}**.`
   const middleBits: string[] = []
   if (encounters > 0) {
@@ -111,7 +103,6 @@ function buildBriefPreamble(data: VeloraV0MdtBriefData): string {
   } else if (specialtyCount > 0) {
     middleBits.push(`**${specialtyCount} specialt${specialtyCount === 1 ? "y" : "ies"}**`)
   }
-  if (specialtyListPhrase) middleBits.push(`— ${specialtyListPhrase} —`)
   middleBits.push(`over **${months} month${months === 1 ? "" : "s"}**`)
   if (range) middleBits.push(`(${range})`)
   let main = ""

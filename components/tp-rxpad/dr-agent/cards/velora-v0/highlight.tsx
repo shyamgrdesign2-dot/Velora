@@ -2,7 +2,7 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { InfoCircle } from "iconsax-reactjs"
+import { Info } from "lucide-react"
 import { FlagArrow } from "../../shared/FlagArrow"
 
 /** Shorten "24 Apr 2026" → "24 Apr '26"; passes other inputs through. */
@@ -204,7 +204,7 @@ export function InfoTip({ text }: { text: string }) {
         onBlur={() => setOpen(false)}
         tabIndex={0}
       >
-        <InfoCircle size={12} variant="Linear" />
+        <Info size={12} strokeWidth={1.75} />
       </span>
       <FloatingTooltip
         open={open}
@@ -241,7 +241,7 @@ export function SourceInfoTip({ source, reason }: { source: string; reason?: str
         tabIndex={0}
         aria-label="Source"
       >
-        <InfoCircle size={14} variant="Linear" />
+        <Info size={14} strokeWidth={1.75} />
       </span>
       <FloatingTooltip
         open={open}

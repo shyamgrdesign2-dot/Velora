@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, ArrowDown2 } from "iconsax-reactjs"
+import { Hospital, Flag, Diagram, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1, ArrowDown2 } from "iconsax-reactjs"
+import { Info } from "lucide-react"
 import { FlagArrow } from "../../shared/FlagArrow"
 import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
@@ -618,7 +619,7 @@ function MedicalHistorySectionTooltip({
         tabIndex={0}
         aria-label="Sources for medical history"
       >
-        <InfoCircle size={14} variant="Linear" />
+        <Info size={14} strokeWidth={1.75} />
       </span>
       <FloatingTooltip
         open={open}
@@ -700,7 +701,7 @@ function SpecialtySectionTooltip({ rec }: { rec: VeloraV0Attribution }) {
         tabIndex={0}
         aria-label={`Sources for ${rec.source.specialty}`}
       >
-        <InfoCircle size={14} variant="Linear" />
+        <Info size={14} strokeWidth={1.75} />
       </span>
       <FloatingTooltip
         open={open}
@@ -1050,102 +1051,244 @@ function DetailedSpecialtyBody({
 }
 
 /**
- * BriefFilterBar — minimal two-dropdown filter that sits below the card
- * header. Specialty filter is built from `data.specialties`; doctor
- * filter is built from the union of consultation doctors, scoped to the
- * selected specialty.
+ * BriefFilterBar — two multi-select dropdowns that ride along the
+ * Cross-consultation brief's CardShell header (right side, before the
+ * chevron). Each chip opens a popover with checkbox options so the
+ * doctor can pick any subset of specialties / doctors. An empty
+ * selection is treated as "all" — same no-op default the row had
+ * before the multi-select upgrade.
  *
- * "All specialties" + "All doctors" is the default state and a no-op
- * (every specialty / every visit renders). Selecting a specific
- * specialty narrows the list of available doctors; selecting a specific
- * doctor narrows the visits inside the rendered specialty to that
- * doctor only.
+ * Specialty options come from `data.specialties`; doctor options are
+ * the union of consultation doctors, scoped to the selected
+ * specialties when any are active.
  */
 function BriefFilterBar({
   specialties,
-  selectedSpecialty,
-  onSpecialtyChange,
+  selectedSpecialties,
+  onSpecialtiesChange,
   doctors,
-  selectedDoctor,
-  onDoctorChange,
+  selectedDoctors,
+  onDoctorsChange,
 }: {
   specialties: string[]
-  selectedSpecialty: string
-  onSpecialtyChange: (v: string) => void
+  selectedSpecialties: Set<string>
+  onSpecialtiesChange: (next: Set<string>) => void
   doctors: string[]
-  selectedDoctor: string
-  onDoctorChange: (v: string) => void
+  selectedDoctors: Set<string>
+  onDoctorsChange: (next: Set<string>) => void
 }) {
+  const toggle = (set: Set<string>, value: string): Set<string> => {
+    const next = new Set(set)
+    if (next.has(value)) next.delete(value)
+    else next.add(value)
+    return next
+  }
   return (
-    <div className="flex flex-wrap items-center gap-[8px]">
-      <FilterDropdown
+    <div className="flex flex-wrap items-center gap-[6px]">
+      <MultiSelectFilter
         label="Specialty"
-        value={selectedSpecialty}
-        options={["All specialties", ...specialties]}
-        onChange={onSpecialtyChange}
+        allLabel="All specialties"
+        options={specialties}
+        selected={selectedSpecialties}
+        onToggle={(v) => onSpecialtiesChange(toggle(selectedSpecialties, v))}
+        onClear={() => onSpecialtiesChange(new Set())}
       />
-      <FilterDropdown
+      <MultiSelectFilter
         label="Doctor"
-        value={selectedDoctor}
-        options={["All doctors", ...doctors]}
-        onChange={onDoctorChange}
+        allLabel="All doctors"
+        options={doctors}
+        selected={selectedDoctors}
+        onToggle={(v) => onDoctorsChange(toggle(selectedDoctors, v))}
+        onClear={() => onDoctorsChange(new Set())}
       />
     </div>
   )
 }
 
-/** One filter dropdown — soft "pressed-card" chip with no outer stroke.
- *  Native <select> stacked invisibly on top gives us the OS dropdown UI
- *  for free; the visual chip uses a quiet slate-50 background with the
- *  selected value treated as the headline + a faint chevron. Hover gets
- *  a subtle slate-100 step so the affordance is still obvious without
- *  needing a border. */
-function FilterDropdown({
+/**
+ * MultiSelectFilter — single multi-select chip with a custom popover.
+ *
+ * Trigger reads as a quiet primary-blue chip ("Specialty | All
+ * specialties ▾" by default, "Specialty | Oncology +2" when a subset
+ * is picked). Clicking it opens a card-styled popover anchored under
+ * the chip with one row per option. Each row carries a checkbox; the
+ * popover stays open while the doctor toggles multiple items, then
+ * dismisses on outside click / Escape. An explicit "Clear" row lets
+ * the doctor wipe the selection back to the no-op default.
+ *
+ * Built on plain divs (no <select>) so the popover can show
+ * checkboxes — native <select multiple> on macOS / iOS is ugly
+ * and breaks the visual language of the rest of the card.
+ */
+function MultiSelectFilter({
   label,
-  value,
+  allLabel,
   options,
-  onChange,
+  selected,
+  onToggle,
+  onClear,
 }: {
   label: string
-  value: string
+  allLabel: string
   options: string[]
-  onChange: (v: string) => void
+  selected: Set<string>
+  onToggle: (value: string) => void
+  onClear: () => void
 }) {
+  const [open, setOpen] = useState(false)
+  const [coords, setCoords] = useState<{ top: number; right: number } | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+  // Position the popover relative to the trigger via fixed coordinates.
+  // The popover renders into document.body (portal) so it escapes the
+  // CardShell's `overflow-hidden` clipping — same trick the
+  // FloatingTooltip helper uses.
+  useEffect(() => {
+    if (!open || !triggerRef.current) return
+    const update = () => {
+      const el = triggerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      setCoords({
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+      })
+    }
+    update()
+    window.addEventListener("scroll", update, true)
+    window.addEventListener("resize", update)
+    return () => {
+      window.removeEventListener("scroll", update, true)
+      window.removeEventListener("resize", update)
+    }
+  }, [open])
+  // Outside-click / Escape close.
+  useEffect(() => {
+    if (!open) return
+    const handlePointer = (e: MouseEvent) => {
+      const t = e.target as Node
+      if (
+        triggerRef.current?.contains(t) ||
+        popoverRef.current?.contains(t)
+      ) {
+        return
+      }
+      setOpen(false)
+    }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("mousedown", handlePointer)
+    document.addEventListener("keydown", handleKey)
+    return () => {
+      document.removeEventListener("mousedown", handlePointer)
+      document.removeEventListener("keydown", handleKey)
+    }
+  }, [open])
+  const count = selected.size
+  const valueLabel =
+    count === 0
+      ? allLabel
+      : count === 1
+        ? Array.from(selected)[0]
+        : `${Array.from(selected)[0]} +${count - 1}`
   return (
-    <label
-      className="relative inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[12px] text-tp-blue-700 transition-colors"
-      style={{
-        // Soft primary-blue chip with a faint primary-blue ring so the
-        // filter row reads as an interactive control surface (matches
-        // the brand primary used by the agent's send button, copy
-        // affordance, and other clickable accents).
-        background: "rgba(75, 74, 213, 0.06)",
-      }}
-      onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLLabelElement).style.background = "rgba(75, 74, 213, 0.12)"
-      }}
-      onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLLabelElement).style.background = "rgba(75, 74, 213, 0.06)"
-      }}
-    >
-      <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-blue-500/80">
-        {label}
-      </span>
-      <span className="max-w-[180px] truncate font-semibold text-tp-blue-700">{value}</span>
-      <ArrowDown2 size={12} variant="Linear" className="shrink-0 text-tp-blue-500/70" />
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="absolute inset-0 cursor-pointer opacity-0"
-        aria-label={`Filter by ${label.toLowerCase()}`}
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[12px] text-tp-blue-700 transition-colors"
+        style={{
+          background:
+            count > 0 ? "rgba(75, 74, 213, 0.14)" : "rgba(75, 74, 213, 0.06)",
+        }}
       >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-blue-500/80">
+          {label}
+        </span>
+        <span className="max-w-[140px] truncate font-semibold text-tp-blue-700">
+          {valueLabel}
+        </span>
+        <ArrowDown2
+          size={12}
+          variant="Linear"
+          className={`shrink-0 text-tp-blue-500/70 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && coords &&
+        createPortal(
+          <div
+            ref={popoverRef}
+            role="listbox"
+            aria-multiselectable
+            className="overflow-hidden rounded-[10px] border border-tp-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.10)]"
+            style={{
+              position: "fixed",
+              top: coords.top,
+              right: coords.right,
+              minWidth: 200,
+              maxWidth: 280,
+              zIndex: 10000,
+            }}
+          >
+            <div className="flex items-center justify-between gap-[6px] border-b border-tp-slate-100 px-[10px] py-[6px] text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-slate-400">
+              <span>{label}</span>
+              <button
+                type="button"
+                onClick={onClear}
+                disabled={count === 0}
+                className="rounded-[4px] px-[6px] py-[2px] text-[10.5px] font-semibold text-tp-blue-600 transition-colors enabled:hover:bg-tp-blue-50 disabled:cursor-default disabled:text-tp-slate-300"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="max-h-[280px] overflow-y-auto py-[2px]">
+              {options.length === 0 ? (
+                <div className="px-[12px] py-[10px] text-[12px] italic text-tp-slate-400">
+                  No options available
+                </div>
+              ) : (
+                options.map((opt) => {
+                  const isOn = selected.has(opt)
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      role="option"
+                      aria-selected={isOn}
+                      onClick={() => onToggle(opt)}
+                      className="flex w-full items-center gap-[8px] px-[10px] py-[7px] text-left text-[12.5px] text-tp-slate-700 transition-colors hover:bg-tp-blue-50/60"
+                    >
+                      <span
+                        className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border ${isOn ? "border-tp-blue-500 bg-tp-blue-500" : "border-tp-slate-300 bg-white"}`}
+                        aria-hidden
+                      >
+                        {isOn && (
+                          <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
+                            <path
+                              d="M3.5 8.5l3 3 6-7"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
+                      </span>
+                      <span className="truncate">{opt}</span>
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
+    </>
   )
 }
 
@@ -1175,11 +1318,13 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
       else next.add(idx)
       return next
     })
-  // Filter state — "All specialties" / "All doctors" is the no-op default.
-  const ALL_SPECIALTIES = "All specialties"
-  const ALL_DOCTORS = "All doctors"
-  const [filterSpecialty, setFilterSpecialty] = useState<string>(ALL_SPECIALTIES)
-  const [filterDoctor, setFilterDoctor] = useState<string>(ALL_DOCTORS)
+  // Filter state — empty Set means "all", same no-op default the
+  // single-select version used to express as "All specialties" /
+  // "All doctors". Multi-select via custom popover (see
+  // MultiSelectFilter above) — checking N specialties / doctors
+  // narrows the rendered specialty + consultation list to the union.
+  const [filterSpecialties, setFilterSpecialties] = useState<Set<string>>(() => new Set())
+  const [filterDoctors, setFilterDoctors] = useState<Set<string>>(() => new Set())
   // Available specialty labels for the dropdown (unique, in source order).
   const specialtyOptions = useMemo(() => {
     const seen = new Set<string>()
@@ -1194,15 +1339,15 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
     return out
   }, [data.specialties])
   // Doctor options — when no specialty is selected, list every doctor
-  // across every specialty; when a specialty is selected, restrict to
-  // that specialty's doctors only.
+  // across every specialty; when one or more specialties are picked,
+  // restrict to that team's doctors only.
   const doctorOptions = useMemo(() => {
     const seen = new Set<string>()
     const out: string[] = []
     const scope =
-      filterSpecialty === ALL_SPECIALTIES
+      filterSpecialties.size === 0
         ? data.specialties
-        : data.specialties.filter((r) => r.source.specialty === filterSpecialty)
+        : data.specialties.filter((r) => filterSpecialties.has(r.source.specialty))
     for (const rec of scope) {
       for (const c of rec.consultations ?? []) {
         const name = c.doctor?.trim()
@@ -1213,42 +1358,49 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
       }
     }
     return out
-  }, [data.specialties, filterSpecialty])
-  // Reset doctor filter when it stops being valid under the new specialty.
+  }, [data.specialties, filterSpecialties])
+  // Drop doctor selections that stop being valid when the specialty
+  // scope changes (e.g. doctor picked, then specialty filter excludes
+  // their team). Without this the chip would silently render zero
+  // visits with no obvious reason.
   useEffect(() => {
-    if (filterDoctor !== ALL_DOCTORS && !doctorOptions.includes(filterDoctor)) {
-      setFilterDoctor(ALL_DOCTORS)
+    if (filterDoctors.size === 0) return
+    const valid = new Set(doctorOptions)
+    let changed = false
+    const next = new Set<string>()
+    for (const d of filterDoctors) {
+      if (valid.has(d)) next.add(d)
+      else changed = true
     }
-  }, [doctorOptions, filterDoctor])
+    if (changed) setFilterDoctors(next)
+  }, [doctorOptions, filterDoctors])
   // Filter specialties + consultations for render.
   const filteredSpecialties = useMemo(() => {
     return data.specialties
       .map((rec, originalIdx) => ({ rec, originalIdx }))
       .filter(({ rec }) => {
-        if (filterSpecialty !== ALL_SPECIALTIES && rec.source.specialty !== filterSpecialty) {
+        if (filterSpecialties.size > 0 && !filterSpecialties.has(rec.source.specialty)) {
           return false
         }
-        if (filterDoctor !== ALL_DOCTORS) {
-          const inThisTeam = (rec.consultations ?? []).some(
-            (c) => c.doctor?.trim() === filterDoctor,
+        if (filterDoctors.size > 0) {
+          const hasOne = (rec.consultations ?? []).some(
+            (c) => c.doctor && filterDoctors.has(c.doctor.trim()),
           )
-          if (!inThisTeam) return false
+          if (!hasOne) return false
         }
         return true
       })
       .map(({ rec, originalIdx }) => {
-        if (filterDoctor === ALL_DOCTORS) return { rec, originalIdx }
-        // Scope consultations to the chosen doctor without mutating
-        // the underlying object.
+        if (filterDoctors.size === 0) return { rec, originalIdx }
         const scoped: VeloraV0Attribution = {
           ...rec,
           consultations: (rec.consultations ?? []).filter(
-            (c) => c.doctor?.trim() === filterDoctor,
+            (c) => c.doctor && filterDoctors.has(c.doctor.trim()),
           ),
         }
         return { rec: scoped, originalIdx }
       })
-  }, [data.specialties, filterSpecialty, filterDoctor])
+  }, [data.specialties, filterSpecialties, filterDoctors])
   // View-mode read from the agent-shell context. Single icon toggle next
   // to the Velora brand-tag drives every brief card on the surface.
   const { viewMode } = useVeloraViewMode()
@@ -1267,6 +1419,16 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           "Drug Exposure × Provider",
           "Referral × Visit",
         ]}
+        headerExtra={
+          <BriefFilterBar
+            specialties={specialtyOptions}
+            selectedSpecialties={filterSpecialties}
+            onSpecialtiesChange={setFilterSpecialties}
+            doctors={doctorOptions}
+            selectedDoctors={filterDoctors}
+            onDoctorsChange={setFilterDoctors}
+          />
+        }
       >
         {/* Cross-brief body — wrapped in a quiet vintage-ish vertical
             wash so the long-form content reads as one continuous
@@ -1286,18 +1448,10 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               The card just reads `viewMode` from the shell context and
               switches its specialty-body renderer accordingly. */}
 
-          {/* ── Filters ─────────────────────────────────────────────────
-              The patient-journey snapshot (months · encounters · range)
-              that used to sit here moved out into the chat preamble — the
-              card opens directly to the filter row + medical history. */}
-          <BriefFilterBar
-            specialties={specialtyOptions}
-            selectedSpecialty={filterSpecialty}
-            onSpecialtyChange={setFilterSpecialty}
-            doctors={doctorOptions}
-            selectedDoctor={filterDoctor}
-            onDoctorChange={setFilterDoctor}
-          />
+          {/* The filter row used to sit here; it now rides the CardShell
+              header (right side, before the chevron) via the
+              `headerExtra` slot so the doctor can scope specialties /
+              doctors without scrolling the body. */}
 
           {/* ── Section 1 · Medical issues ──────────────────────────────
               Surfaced once at the top so per-specialty sections only describe

@@ -920,16 +920,18 @@ function VisitCard({
     !!c.vaccinations || !!c.additionalNotes
   return (
     <div
-      // Cyclic / "acyclic" gradient border — strong violet at top and
-      // bottom, faded through the middle. Same trick CardShell uses:
-      // a transparent 1-px border filled by a vertical gradient via
+      // Cyclic gradient border — strong violet at top and bottom,
+      // faded through the middle. Same trick CardShell uses: a
+      // transparent 1-px border filled by a vertical gradient via
       // `background-image` + `background-clip: padding-box, border-box`.
+      // The inner fill is plain white (no body wash) — only the
+      // header strip below carries violet tint.
       // No box-shadow (system rule: shadows are not used).
       className="rounded-[12px]"
       style={{
         border: "1px solid transparent",
         backgroundImage:
-          "linear-gradient(180deg, rgba(237, 233, 254, 0.55) 0%, rgba(245, 243, 255, 0.30) 28%, #FFFFFF 70%, #FFFFFF 100%), linear-gradient(180deg, rgba(124,58,237,0.35) 0%, rgba(124,58,237,0.05) 50%, rgba(124,58,237,0.35) 100%)",
+          "linear-gradient(#FFFFFF, #FFFFFF), linear-gradient(180deg, rgba(124,58,237,0.35) 0%, rgba(124,58,237,0.05) 50%, rgba(124,58,237,0.35) 100%)",
         backgroundOrigin: "border-box",
         backgroundClip: "padding-box, border-box",
       }}

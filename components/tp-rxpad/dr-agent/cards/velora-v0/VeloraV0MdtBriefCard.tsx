@@ -920,13 +920,18 @@ function VisitCard({
     !!c.vaccinations || !!c.additionalNotes
   return (
     <div
-      // No outer stroke; the soft top-down violet gradient + the
-      // shadow underneath carry the card outline on their own. Reads
-      // as a quiet "raised note" rather than a fenced rectangle.
-      className="rounded-[12px] shadow-[0_2px_6px_rgba(124,58,237,0.08)]"
+      // Cyclic / "acyclic" gradient border — strong violet at top and
+      // bottom, faded through the middle. Same trick CardShell uses:
+      // a transparent 1-px border filled by a vertical gradient via
+      // `background-image` + `background-clip: padding-box, border-box`.
+      // No box-shadow (system rule: shadows are not used).
+      className="rounded-[12px]"
       style={{
-        background:
-          "linear-gradient(180deg, rgba(237, 233, 254, 0.55) 0%, rgba(245, 243, 255, 0.30) 28%, #FFFFFF 70%, #FFFFFF 100%)",
+        border: "1px solid transparent",
+        backgroundImage:
+          "linear-gradient(180deg, rgba(237, 233, 254, 0.55) 0%, rgba(245, 243, 255, 0.30) 28%, #FFFFFF 70%, #FFFFFF 100%), linear-gradient(180deg, rgba(124,58,237,0.35) 0%, rgba(124,58,237,0.05) 50%, rgba(124,58,237,0.35) 100%)",
+        backgroundOrigin: "border-box",
+        backgroundClip: "padding-box, border-box",
       }}
     >
       {/* Header strip — informational only (no toggle). Doctor (semibold,
@@ -1155,13 +1160,12 @@ function MultiSelectFilter({
 }) {
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState<{ top: number; right: number } | null>(null)
-  // Display order is snapshotted when the popover opens — selected
-  // items move to the top, unselected items keep their source order
-  // below. We deliberately DON'T resort while open so the doctor's
-  // checkboxes don't shuffle out from under their cursor; the next
-  // open re-snapshots fresh.
-  const [displayOrder, setDisplayOrder] = useState<string[]>(options)
   // Outside-click / Escape close + position calc happen via refs.
+  // NOTE on order: options render in source order (specialties: the
+  // order specialty cards appear in the brief; doctors: first-seen
+  // order). We do NOT reorder selected items to the top — the doctor
+  // expects the checkbox they just tapped to STAY where it is so
+  // it's still under their cursor for a follow-up toggle.
   const triggerRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
   // Position the popover relative to the trigger via fixed coordinates.
@@ -1210,23 +1214,8 @@ function MultiSelectFilter({
       document.removeEventListener("keydown", handleKey)
     }
   }, [open])
-  // When the source `options` list changes (e.g. specialty filter
-  // narrowed the doctor list), keep displayOrder in sync only while
-  // the popover is closed. While it's open we keep the snapshot.
-  useEffect(() => {
-    if (!open) setDisplayOrder(options)
-  }, [options, open])
   const handleTriggerClick = () => {
-    setOpen((wasOpen) => {
-      if (!wasOpen) {
-        // Just opening — snapshot the sort: selected on top (in source
-        // order), unselected below (in source order).
-        const sel = options.filter((o) => selected.has(o))
-        const rest = options.filter((o) => !selected.has(o))
-        setDisplayOrder([...sel, ...rest])
-      }
-      return !wasOpen
-    })
+    setOpen((wasOpen) => !wasOpen)
   }
   const count = selected.size
   // Summary chip text:
@@ -1302,51 +1291,41 @@ function MultiSelectFilter({
               </button>
             </div>
             <div className="max-h-[280px] overflow-y-auto py-[2px]">
-              {displayOrder.length === 0 ? (
+              {options.length === 0 ? (
                 <div className="px-[12px] py-[10px] text-[12px] italic text-tp-slate-400">
                   No options available
                 </div>
               ) : (
-                displayOrder.map((opt, idx) => {
+                options.map((opt) => {
                   const isOn = selected.has(opt)
-                  const prev = displayOrder[idx - 1]
-                  const prevOn = prev ? selected.has(prev) : false
-                  // Hairline divider between the "selected" block and
-                  // the "unselected" block once selected items have
-                  // been sorted to the top.
-                  const showDivider = idx > 0 && prevOn && !isOn
                   return (
-                    <React.Fragment key={opt}>
-                      {showDivider && (
-                        <div className="my-[2px] h-px bg-tp-slate-100" aria-hidden />
-                      )}
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isOn}
-                        onClick={() => onToggle(opt)}
-                        className="flex w-full items-center gap-[8px] px-[10px] py-[7px] text-left text-[12.5px] text-tp-slate-700 transition-colors hover:bg-tp-blue-50/60"
+                    <button
+                      key={opt}
+                      type="button"
+                      role="option"
+                      aria-selected={isOn}
+                      onClick={() => onToggle(opt)}
+                      className="flex w-full items-center gap-[8px] px-[10px] py-[7px] text-left text-[12.5px] text-tp-slate-700 transition-colors hover:bg-tp-blue-50/60"
+                    >
+                      <span
+                        className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border ${isOn ? "border-tp-blue-500 bg-tp-blue-500" : "border-tp-slate-300 bg-white"}`}
+                        aria-hidden
                       >
-                        <span
-                          className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border ${isOn ? "border-tp-blue-500 bg-tp-blue-500" : "border-tp-slate-300 bg-white"}`}
-                          aria-hidden
-                        >
-                          {isOn && (
-                            <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
-                              <path
-                                d="M3.5 8.5l3 3 6-7"
-                                fill="none"
-                                stroke="white"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </span>
-                        <span className="truncate">{opt}</span>
-                      </button>
-                    </React.Fragment>
+                        {isOn && (
+                          <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true">
+                            <path
+                              d="M3.5 8.5l3 3 6-7"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
+                      </span>
+                      <span className="truncate">{opt}</span>
+                    </button>
                   )
                 })
               )}
@@ -1564,7 +1543,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   icon="medical-service"
                   trailing={<MedicalHistorySectionTooltip groups={filteredHistory} />}
                 />
-                <div className="flex flex-col gap-[12px] px-[10px] py-[6px]">
+                <div className="flex flex-col gap-[12px] pl-[2px]">
                   {filteredHistory.map((group, gi) => {
                     // Drug-name casing policy (Active medications +
                     // every other group):

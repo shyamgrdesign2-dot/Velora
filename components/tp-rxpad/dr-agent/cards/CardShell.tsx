@@ -96,9 +96,13 @@ export function CardShell({
       {/* Header — bleeds into the body via a soft violet → white
           gradient. No hairline stroke between header and body; the
           gradient itself carries the transition so the card reads as
-          one piece instead of two stacked rectangles. */}
+          one piece instead of two stacked rectangles. Every child
+          (icon, title-stack, header-extra, chevron) is vertically
+          centre-aligned via `items-center` so the filter chips and
+          chevron line up with the title block on the same baseline
+          midline. */}
       <div
-        className={cn("flex gap-[7px] px-3 py-[11px]", date ? "items-start" : "items-center")}
+        className="flex items-center gap-[7px] px-3 py-[11px]"
         style={{
           background: "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
         }}

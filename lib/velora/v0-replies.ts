@@ -572,7 +572,26 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "coordination-gap",
-      title: "**Oncology surveillance window** · 12 visits ending Mar '26 → next contact due",
+      title: "Oncology surveillance overdue",
+      clinicalConcern:
+        "12 oncology visits ended Mar '26. With metastatic disease + lung-mets on the condition row, NCCN expects CEA every 3-6 months and imaging every 6-12 months — neither order is on file since Mar.",
+      pendingItems: [
+        {
+          specialty: "Oncology",
+          action: "Next surveillance visit",
+          context: "Last contact 19 Mar 2026; NCCN cadence has lapsed by 6+ months.",
+        },
+        {
+          specialty: "Oncology",
+          action: "CEA serum tumour marker",
+          context: "NCCN §SURV-1 expects every 3-6 months × 5 years post-resection.",
+        },
+        {
+          specialty: "Oncology / Radiology",
+          action: "CT C/A/P imaging",
+          context: "NCCN §SURV-2 expects every 6-12 months × 3 years post-resection; lung-met flag tightens urgency.",
+        },
+      ],
       points: [
         "12 oncology visits with **Dr Pankaj Shah / Dr Mithun Shah** through Mar 2026.",
         "**Metastatic disease + lung metastasis most likely** on the condition_occurrence row — surveillance cadence directly drives prognosis.",
@@ -591,7 +610,50 @@ export const SURESH_PATEL_BRIEF_MOCK: VeloraV0MdtBriefData = {
     },
     {
       kind: "ddi",
-      title: "**Gabapentinoid double-dose** · Neurosurgery + Neurology + Pain Specialist streams overlap",
+      title: "Cumulative gabapentinoid stack across 3 teams + serotonergic overlap",
+      clinicalConcern:
+        "Three specialties are independently writing prescriptions that touch the same active ingredients. Gabapentin appears in three forms (oral + oral combo + topical) across Neurosurgery and Neurology; Nortriptyline (a TCA) layers serotonergic risk on top of the short-course Morphine added by Pain Specialist. Single-active-ingredient principle says one team should own this Rx.",
+      specialtiesInvolved: [
+        {
+          specialty: "Neurosurgery",
+          date: "11 Jun · 18 Jul '25",
+          drugs: ["Gabator NT (Gabapentin 300 + Nortriptyline 10)"],
+          note: "Post-op cervical-radic stream.",
+        },
+        {
+          specialty: "Neurology",
+          date: "20 Dec '25",
+          drugs: ["Gabantin GRS 300", "Progaba 6 % gel"],
+          note: "Layered oral + topical gabapentinoid for the same indication.",
+        },
+        {
+          specialty: "Pain Specialist",
+          date: "5 May '26",
+          drugs: ["Morphine 10 mg PO (short course)"],
+          note: "Closed short course — confirm no refill on next visit.",
+        },
+      ],
+      sharedIngredients: [
+        {
+          ingredient: "Gabapentin",
+          appearsIn: [
+            { brand: "Gabator NT", specialty: "Neurosurgery" },
+            { brand: "Gabantin GRS 300", specialty: "Neurology" },
+            { brand: "Progaba 6 % gel", specialty: "Neurology" },
+          ],
+          effect: "Cumulative gabapentinoid exposure across oral + topical routes — sedation + dizziness compounds.",
+        },
+        {
+          ingredient: "Nortriptyline",
+          appearsIn: [{ brand: "Gabator NT", specialty: "Neurosurgery" }],
+          effect: "TCA on top of opioid (Morphine) → serotonin-syndrome surveillance window.",
+        },
+        {
+          ingredient: "Morphine",
+          appearsIn: [{ brand: "Morphine 10 mg PO", specialty: "Pain Specialist" }],
+          effect: "Opioid added to the CNS-depressant stack — Beers 2023 flags opioid + sedative stack in adults ≥ 60.",
+        },
+      ],
       points: [
         "Neurosurgery (Dr Kalpesh Shah / Dr Saija) Rx **Gabator NT** (Gabapentin 300 + Nortriptyline 10) on the 11 Jun / 18 Jul 2025 visits.",
         "Neurology (Dr Nikhil Dave) added **Gabantin GRS 300** + **Progaba 6% gel** on 20 Dec 2025.",
@@ -2005,7 +2067,26 @@ export const ASHA_KRISHNAN_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "coordination-gap",
-      title: "**Allergy review absent across all Rx** · single anchor chronic + recurrent acute pattern",
+      title: "Allergy review absent across every prescription",
+      clinicalConcern:
+        "Hypertension is the chronic anchor and recurrent viral pharyngitis episodes layer prescriptions on top. The record carries zero allergy-verification rows; every Rx is being written on an unverified safety premise. The fix is one structured allergy review at the next Internal Medicine visit.",
+      pendingItems: [
+        {
+          specialty: "Internal Medicine",
+          action: "Document drug + food + contrast allergy status",
+          context: "12 months of prescribing across 4 providers without an explicit allergy row — earliest verification will retroactively protect every Rx in scope.",
+        },
+        {
+          specialty: "Internal Medicine",
+          action: "Recurrent-URI workup if frequency persists ≥ 3 / year",
+          context: "Pattern of episodic viral pharyngitis layered on chronic HTN — immunological workup (Ig profile) is the next step if frequency holds.",
+        },
+        {
+          specialty: "Plastic surgery / Internal Medicine",
+          action: "Annual influenza + pneumococcal vaccination review",
+          context: "Standing post-op + chronic-disease consideration; no vaccination row on file this year.",
+        },
+      ],
       points: [
         "Hypertension (Active) is the chronic anchor; recurrent viral pharyngitis episodes layer on top.",
         "**No allergy entry** in condition_occurrence or observation across the consultation window.",
@@ -2571,7 +2652,33 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "ddi",
-      title: "**Glimepiride double-dose** · Diabetology + Cardiology streams both Rx sulfonylurea",
+      title: "Sulfonylurea double-dose across Diabetology + Cardiology",
+      clinicalConcern:
+        "Two teams are prescribing the same active ingredient (Glimepiride) through two different brand names. Hypoglycaemia risk amplifies because the patient is also on a β-blocker (Metoprolol) which masks the warning symptoms — one team must own the sulfonylurea Rx.",
+      specialtiesInvolved: [
+        {
+          specialty: "Diabetology",
+          date: "11 visits",
+          drugs: ["Amaryl M 1 (Glimepiride 1 + Metformin 500)"],
+          note: "Primary glycaemic regimen.",
+        },
+        {
+          specialty: "Cardiology",
+          date: "secondary-prevention bundle",
+          drugs: ["Amaryl 1 (Glimepiride 1)"],
+          note: "Separately added by Dr Bhavesh Roy.",
+        },
+      ],
+      sharedIngredients: [
+        {
+          ingredient: "Glimepiride",
+          appearsIn: [
+            { brand: "Amaryl M 1", specialty: "Diabetology" },
+            { brand: "Amaryl 1", specialty: "Cardiology" },
+          ],
+          effect: "Cumulative sulfonylurea exposure — hypoglycaemia risk compounds, masked by Metoprolol on board.",
+        },
+      ],
       points: [
         "Diabetology (Dr Nimit Shah) carries **Amaryl M 1** (Glimepiride 1 + Metformin 500) across 11 visits.",
         "Cardiology (Dr Bhavesh Roy) Rx **Amaryl 1** (Glimepiride 1) separately as part of the secondary-prevention bundle.",
@@ -2590,7 +2697,21 @@ export const MEERA_JOSHI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     },
     {
       kind: "coordination-gap",
-      title: "**DAPT duration likely exceeded** · secondary-prevention de-escalation review overdue",
+      title: "DAPT duration review overdue post-CVA",
+      clinicalConcern:
+        "Aspirin + Clopidogrel have been running together for ~10 months after CVA in a chronic-coronary-syndrome patient. ESC says the bleed-vs-event balance shifts after 12 months — Cardiology should review for de-escalation to monotherapy at the 12-month mark.",
+      pendingItems: [
+        {
+          specialty: "Cardiology",
+          action: "Schedule a DAPT-duration review",
+          context: "10 months on Aspirin + Clopidogrel per drug_exposure; bleeding-risk concern beyond 12 months.",
+        },
+        {
+          specialty: "Cardiology",
+          action: "Bleed-risk score (PRECISE-DAPT / HAS-BLED) at the review",
+          context: "Cited as the de-escalation gate per ESC 2024.",
+        },
+      ],
       points: [
         "Aspirin + Clopidogrel running ∼ 10 months post-CVA per drug_exposure.",
         "Post-CVA + chronic CCS: bleeding risk increases beyond 12 months.",
@@ -3165,7 +3286,21 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "coordination-gap",
-      title: "**Severe hypertriglyceridaemia trajectory** · pancreatitis-risk territory",
+      title: "Fibrate-gap on severe hypertriglyceridaemia",
+      clinicalConcern:
+        "Recurrent acute pancreatitis with TG-driven aetiology is on the active problem list. Rozuvastatin + Ezetimibe are on board, but the fibrate or omega-3 add-on indicated above TG > 500 mg/dL has not been started. Each recurrence is preventable once TG falls below 500.",
+      pendingItems: [
+        {
+          specialty: "Diabetology / Endocrinology",
+          action: "Start Fenofibrate (first-line) or omega-3 add-on",
+          context: "AHA hypertriglyceridaemia statement: TG > 500 mg/dL warrants fibrate to drop pancreatitis recurrence rate.",
+        },
+        {
+          specialty: "Gastroenterology",
+          action: "Recurrence-cadence follow-up",
+          context: "Set a fixed review window after fibrate initiation so the pancreatitis trajectory is owned.",
+        },
+      ],
       points: [
         "Recurrent acute pancreatitis pattern (Active per condition_occurrence) with TG-driven aetiology.",
         "Rozuvastatin + Ezetimibe on board (Rozavel EZ 20); fibrate decision documented as pending across Internal Medicine streams.",
@@ -3184,7 +3319,41 @@ export const ANITA_DESAI_BRIEF_MOCK: VeloraV0MdtBriefData = {
     },
     {
       kind: "ddi",
-      title: "**Triple anti-HTN across specialties** · no reconciliation visit on file",
+      title: "Two ARBs + two β-blockers stacked across Cardiology + Diabetology",
+      clinicalConcern:
+        "Cardiology and Diabetology are independently writing anti-HTN regimens. The patient now has TWO ARBs (Valsartan + Losartan) and TWO β-blockers (Propranolol + Metoprolol) active simultaneously — ESC/ESH says one agent per class. The fix is a single reconciliation visit, not a new prescription.",
+      specialtiesInvolved: [
+        {
+          specialty: "Cardiology",
+          date: "active stream",
+          drugs: ["Valsartan", "Amlodipine", "Propranolol"],
+          note: "Original anti-HTN bundle.",
+        },
+        {
+          specialty: "Diabetology",
+          date: "13 Apr 2026",
+          drugs: ["Losartan", "Chlorthalidone", "Metoprolol"],
+          note: "Added the second ARB + second β-blocker without removing Cardiology's set.",
+        },
+      ],
+      sharedIngredients: [
+        {
+          ingredient: "ARB class (Valsartan + Losartan)",
+          appearsIn: [
+            { brand: "Valsartan", specialty: "Cardiology" },
+            { brand: "Losartan", specialty: "Diabetology" },
+          ],
+          effect: "Same drug class, two molecules — hyperkalaemia + renal risk amplified.",
+        },
+        {
+          ingredient: "β-blocker class (Propranolol + Metoprolol)",
+          appearsIn: [
+            { brand: "Propranolol", specialty: "Cardiology" },
+            { brand: "Metoprolol", specialty: "Diabetology" },
+          ],
+          effect: "Excess HR / BP suppression + masked hypoglycaemia signs in a diabetic.",
+        },
+      ],
       points: [
         "Cardiology (Dr Bhavesh Roy) Rx Valsartan + Amlodipine + Propranolol.",
         "Diabetology (Dr Talati) added Losartan + Chlorthalidone + Metoprolol (13 Apr 2026).",
@@ -3410,7 +3579,26 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
   collisions: [
     {
       kind: "coordination-gap",
-      title: "**Wilson's disease safety monitoring** · 24-h urinary copper + ceruloplasmin not on file",
+      title: "Wilson's chelation safety monitoring incomplete",
+      clinicalConcern:
+        "Penicillamine + Zinc are actively prescribed but the AASLD-mandated safety labs (24-h urinary copper to confirm chelation, urine PCR to surveil Penicillamine-induced nephrotic syndrome) aren't on the chart. Each gap is a single Gastro order; together they form the chelation-safety bundle.",
+      pendingItems: [
+        {
+          specialty: "Gastroenterology",
+          action: "24-h urinary copper at weeks 1, 4, 12 post-initiation",
+          context: "Confirms chelation is removing copper at the expected rate — AASLD 2023.",
+        },
+        {
+          specialty: "Gastroenterology / Nephrology",
+          action: "Urine PCR monthly × 6 months",
+          context: "Surveils Penicillamine-induced nephrotic syndrome (most likely in the first 6 months).",
+        },
+        {
+          specialty: "Gastroenterology",
+          action: "Serum ceruloplasmin baseline + repeat",
+          context: "Confirmation marker for the Wilson's diagnosis; cadence per AASLD.",
+        },
+      ],
       points: [
         "Penicillamine (Cilamin) + Zinc (Zinfate) actively prescribed per drug_exposure.",
         "Standard of care: 24-h urinary copper at weeks 1, 4, 12 after initiation — not in observation rows.",
@@ -3429,7 +3617,26 @@ export const ARJUN_VERMA_BRIEF_MOCK: VeloraV0MdtBriefData = {
     },
     {
       kind: "coordination-gap",
-      title: "**Family screening for Wilson's disease** · first-degree relatives not documented",
+      title: "Family screening for Wilson's not yet initiated",
+      clinicalConcern:
+        "Wilson's is autosomal recessive — first-degree relatives carry a 25 % risk. The proband is identified; the screening cascade (ATP7B + ceruloplasmin + 24-h copper) for siblings + parents hasn't been opened yet. Family counselling is the natural starting point.",
+      pendingItems: [
+        {
+          specialty: "Gastroenterology",
+          action: "Family-screening counselling for siblings + parents",
+          context: "AASLD 2023: open the screening cascade once the proband is confirmed; the counselling visit is the trigger.",
+        },
+        {
+          specialty: "Genetics / Gastroenterology",
+          action: "ATP7B gene test for first-degree relatives",
+          context: "Highest-yield single test; resolves carrier vs affected vs unaffected with one draw.",
+        },
+        {
+          specialty: "Biochem / Pathology",
+          action: "Serum ceruloplasmin + 24-h urinary copper for first-degree relatives",
+          context: "Phenotypic confirmation when ATP7B isn't available or is equivocal.",
+        },
+      ],
       points: [
         "Wilson's is autosomal recessive — first-degree relatives carry 25% risk.",
         "AASLD recommends ATP7B + serum ceruloplasmin + 24-h copper for all first-degree relatives.",

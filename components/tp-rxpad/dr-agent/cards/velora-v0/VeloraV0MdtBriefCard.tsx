@@ -98,55 +98,99 @@ function compactDoctorsLabel(raw: string): string {
     .join(" / ")
 }
 
-/**
- * SpecialtyContextBanner — quiet inline caption at the top of every
- * specialty body.
- *
- * Shows only `N visits  |  date range`. The doctor name(s) are not
- * repeated here — each visit card below already names its doctor in
- * the header strip, and repeating the team-level doctor list above
- * was redundant.
- */
-function SpecialtyContextBanner({ rec }: { rec: VeloraV0Attribution }) {
-  const visitCount = typeof rec.consultationCount === "number" ? rec.consultationCount : null
-  const dateRange = rec.dateRangeLabel ?? null
-  const segments: string[] = []
-  if (visitCount !== null) segments.push(`${visitCount} visit${visitCount === 1 ? "" : "s"}`)
-  if (dateRange) segments.push(dateRange)
-  if (segments.length === 0) return null
-  return (
-    <div className="ml-[8px] mt-[1px] text-[12px] leading-[1.45] text-tp-slate-500">
-      <span className="text-tp-slate-400">(</span>
-      {segments.map((s, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="mx-[7px] text-tp-slate-400">|</span>}
-          <span>{s}</span>
-        </React.Fragment>
-      ))}
-      <span className="text-tp-slate-400">)</span>
-    </div>
-  )
+/** Compute the unique doctor count for a specialty record. Falls back to 0
+ *  when no per-visit consultations are present. */
+function uniqueDoctorCount(rec: VeloraV0Attribution): number {
+  const consultations = rec.consultations ?? []
+  if (consultations.length === 0) return 0
+  const set = new Set(consultations.map((c) => c.doctor.trim()).filter(Boolean))
+  return set.size
 }
 
-function HeaderTrailing({
+/** Compose the meta caption that lives inside the specialty heading bar,
+ *  to the right of the label. Format: "N doctors  ·  N visits  ·  range". */
+function specialtyMetaSegments(rec: VeloraV0Attribution): string[] {
+  const segments: string[] = []
+  const docCount = uniqueDoctorCount(rec)
+  if (docCount > 0) segments.push(`${docCount} doctor${docCount === 1 ? "" : "s"}`)
+  const visitCount = typeof rec.consultationCount === "number" ? rec.consultationCount : null
+  if (visitCount !== null) segments.push(`${visitCount} visit${visitCount === 1 ? "" : "s"}`)
+  if (rec.dateRangeLabel) segments.push(rec.dateRangeLabel)
+  return segments
+}
+
+/**
+ * SpecialtyHeading — accordion-style replacement for the old
+ * `SectionSummaryBar + SpecialtyContextBanner + open-sidebar-arrow`
+ * combo. One clickable bar carries:
+ *
+ *   icon  ·  Specialty name  ·  N doctors | N visits | date range
+ *                                            (sources ⓘ)  (chevron)
+ *
+ * Clicking the bar toggles the body inline (no sidebar). The trailing
+ * slot keeps the source ⓘ as a separate hover target so audit
+ * information stays addressable.
+ */
+function SpecialtyHeading({
   rec,
-  onOpenSidebar,
+  expanded,
+  onToggle,
 }: {
   rec: VeloraV0Attribution
-  onOpenSidebar: () => void
+  expanded: boolean
+  onToggle: () => void
 }) {
-  // Header trailing — now just the chevron click target. The doctor name,
-  // visit count and date range render as a bracketed caption inside the
-  // body (SpecialtyContextBanner). The chevron is the affordance.
+  const meta = specialtyMetaSegments(rec)
   return (
-    <button
-      type="button"
-      onClick={onOpenSidebar}
-      className="flex shrink-0 items-center rounded-[4px] p-[3px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100/80 hover:text-tp-slate-700"
-      aria-label={`Open ${rec.source.specialty} consultation timeline`}
-    >
-      <ArrowRight2 size={16} variant="Bold" />
-    </button>
+    <div className="group/section-header mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-violet-50 px-2 py-[5px]">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        aria-label={`${expanded ? "Collapse" : "Expand"} ${rec.source.specialty} section`}
+        className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+      >
+        <TPMedicalIcon
+          name="medical-service"
+          variant="bulk"
+          size={18}
+          color="var(--tp-violet-600, #7C3AED)"
+          className="shrink-0"
+        />
+        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
+          <span className="text-[14px] font-semibold leading-none text-tp-violet-600">
+            {rec.source.specialty}
+          </span>
+          {meta.length > 0 && (
+            <span className="text-[11.5px] leading-[1.35] text-tp-violet-400">
+              <span>(</span>
+              {meta.map((s, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <span className="mx-[6px] text-tp-violet-300">|</span>}
+                  <span>{s}</span>
+                </React.Fragment>
+              ))}
+              <span>)</span>
+            </span>
+          )}
+        </span>
+      </button>
+      <span className="flex shrink-0 items-center gap-[6px]">
+        <SpecialtySectionTooltip rec={rec} />
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={expanded ? "Collapse section" : "Expand section"}
+          className="flex shrink-0 items-center rounded-[4px] p-[2px] text-tp-violet-500 transition-colors hover:bg-tp-violet-100/70 hover:text-tp-violet-700"
+        >
+          {expanded ? (
+            <ArrowSquareUp size={18} variant="Linear" />
+          ) : (
+            <ArrowSquareDown size={18} variant="Linear" />
+          )}
+        </button>
+      </span>
+    </div>
   )
 }
 
@@ -177,7 +221,7 @@ function ConsultationLabsRow({ labs, hiddenNormalCount }: { labs: VeloraV0LabRes
       </span>
       {visible.map((lab, i) => (
         <React.Fragment key={`${lab.name}-${i}`}>
-          {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
+          {i > 0 && <span className="mx-[6px] text-tp-slate-300">|</span>}
           <LabChip lab={lab} />
         </React.Fragment>
       ))}
@@ -701,7 +745,7 @@ function LabResultsBlock({
       </span>
       {visible.map((lab, i) => (
         <React.Fragment key={`${lab.name}-${i}`}>
-          {i > 0 && <span className="mx-[6px] text-tp-slate-500">|</span>}
+          {i > 0 && <span className="mx-[6px] text-tp-slate-300">|</span>}
           <LabChip lab={lab} />
         </React.Fragment>
       ))}
@@ -978,17 +1022,32 @@ function DetailedSpecialtyBody({
 
   const specialtyLabel = rec.source.specialty.split("·")[0].trim()
 
+  // Vertical timeline line — runs along the left edge of the visit
+  // stack so the consultations read as points along a chronology, not
+  // a flat list. A small dot marker is placed against each visit's
+  // header row for visual anchoring.
   return (
-    <div className="flex flex-col gap-[10px] px-[2px]">
-      {consultations.map((c, ci) => (
-        <VisitCard
-          key={ci}
-          consultation={c}
-          specialtyLabel={specialtyLabel}
-          defaultExpanded={ci === 0}
-          onOpenInSidebar={onOpenVisit ? () => onOpenVisit(ci) : undefined}
-        />
-      ))}
+    <div className="relative pl-[18px]">
+      <span
+        aria-hidden="true"
+        className="absolute left-[6px] top-[14px] bottom-[14px] w-px bg-tp-slate-200"
+      />
+      <div className="flex flex-col gap-[10px]">
+        {consultations.map((c, ci) => (
+          <div key={ci} className="relative">
+            <span
+              aria-hidden="true"
+              className={`absolute -left-[15px] top-[16px] inline-block h-[8px] w-[8px] rounded-full ring-[2px] ring-white ${c.visitType === "IPD" ? "bg-tp-error-500" : "bg-tp-slate-300"}`}
+            />
+            <VisitCard
+              consultation={c}
+              specialtyLabel={specialtyLabel}
+              defaultExpanded={ci === 0}
+              onOpenInSidebar={onOpenVisit ? () => onOpenVisit(ci) : undefined}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -1004,6 +1063,19 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
   // consultation. -1 means "no auto-expand, just render collapsed list".
   const [sidebarInitialVisitIdx, setSidebarInitialVisitIdx] = useState<number>(-1)
   const openRec = openSidebarIdx >= 0 ? data.specialties[openSidebarIdx] ?? null : null
+  // Accordion: every specialty starts expanded. Click the heading to
+  // collapse it inline (no sidebar). Stored as a Set of indexes that are
+  // CURRENTLY EXPANDED so toggle is a single set-mutation.
+  const [expandedSpecialties, setExpandedSpecialties] = useState<Set<number>>(
+    () => new Set(data.specialties.map((_, i) => i)),
+  )
+  const toggleSpecialty = (idx: number) =>
+    setExpandedSpecialties((prev) => {
+      const next = new Set(prev)
+      if (next.has(idx)) next.delete(idx)
+      else next.add(idx)
+      return next
+    })
   // View-mode read from the agent-shell context. Single icon toggle next
   // to the Velora brand-tag drives every brief card on the surface.
   const { viewMode } = useVeloraViewMode()
@@ -1085,7 +1157,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                       <p key={gi} className="text-[13.5px] leading-[1.55] text-tp-slate-700">
                         <MedicalHistorySubheadingTag group={group} />
                         {hasItems ? (
-                          <HighlightLine text={joinedText} />
+                          <HighlightLine text={joinedText} plain />
                         ) : (
                           <span className="italic text-tp-slate-400">
                             No data from patient record
@@ -1116,45 +1188,28 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             </div>
           ) : null}
 
-          {data.specialties.map((rec, idx) => (
+          {data.specialties.map((rec, idx) => {
+            const isExpanded = expandedSpecialties.has(idx)
+            return (
             <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "first-specialty" : undefined}>
               <div data-mdt-anchor={idx === 0 ? "specialty-bar" : undefined}>
-                {/* Trailing slot carries the source ⓘ (audit trail of which
-                    visits this section synthesises from) AND the sidebar
-                    chevron. Two affordances, distinct shapes — info vs
-                    arrow — so the doctor reads them as separate actions. */}
-                <SectionSummaryBar
-                  label={rec.source.specialty}
-                  icon="medical-service"
-                  variant="specialty"
-                  trailing={
-                    <span className="flex shrink-0 items-center gap-[6px]">
-                      <SpecialtySectionTooltip rec={rec} />
-                      <HeaderTrailing rec={rec} onOpenSidebar={() => setOpenSidebarIdx(idx)} />
-                    </span>
-                  }
+                {/* New accordion heading — collapses/expands the body
+                    inline (no sidebar opener). Meta (N doctors · N visits
+                    · date range) lives inside the heading itself; the
+                    source ⓘ stays in the trailing slot so audit info is
+                    still one hover away. */}
+                <SpecialtyHeading
+                  rec={rec}
+                  expanded={isExpanded}
+                  onToggle={() => toggleSpecialty(idx)}
                 />
               </div>
-              {/* Body — Findings / Medications / Plan as bulleted rows.
-                  The "**Label**:" prefix is rendered as a small uppercase chip
-                  so Findings / Medications / Plan are unmistakably labels
-                  rather than blurry inline text. Medications rows whose
-                  payload starts with the literal phrase "No ongoing" are
-                  filtered out — when the team has nothing currently active,
-                  the row simply doesn't render rather than saying "none".
-                  (The provenance paragraph that used to live above this body
-                  is gone — its date-range / doctor / count content now lives
-                  in the section heading's trailing slot.) */}
-              {/* Doctor / visit-count / date-range wallet banner — restates
-                  the team's identity inside the body so a doctor scanning
-                  Findings → Medications → Plan doesn't have to track back
-                  up to the heading. Renders just under the section bar. */}
-              <SpecialtyContextBanner rec={rec} />
-              {/* Detailed view (default) — iterate consultations and
-                  render the doctor's exact diagnosis / medications /
-                  plan sub-blocks verbatim. Concise view — fall back to
-                  the grouped-by-label lines render below. */}
-              {viewMode === "detailed" ? (
+              {/* Body — only renders when this specialty is expanded.
+                  Detailed view (default) iterates consultations as
+                  visit cards arranged along a vertical timeline; concise
+                  view falls back to the grouped-by-label lines render. */}
+              {isExpanded && (
+              viewMode === "detailed" ? (
                 <div data-mdt-anchor={idx === 0 ? "specialty-body" : undefined}>
                   <DetailedSpecialtyBody
                     rec={rec}
@@ -1256,13 +1311,15 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   />
                 )}
               </div>
+              )
               )}
               {/* Open-loops block removed per design call — the Stack 1
                   card now stays strictly within "what the doctor wrote",
                   no inferred-gap commentary. Coordination gaps surface
                   in the separate Clinical synthesis card below. */}
             </div>
-          ))}
+            )
+          })}
         </div>
       </CardShell>
       </div>

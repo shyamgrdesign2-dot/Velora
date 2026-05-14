@@ -60,11 +60,11 @@ function tokenise(input: string): Run[] {
 }
 
 function PipeDivider() {
-  // Unified divider colour — slate-500 keeps the pipe visible enough to
-  // function as a separator AND matches the header-trailing parentheses
-  // so all "structural punctuation" reads as one design layer regardless
-  // of where it appears.
-  return <span className="mx-[7px] text-tp-slate-500">|</span>
+  // Lighter divider — slate-300 keeps the pipe just visible enough to
+  // function as a separator without competing with the content on either
+  // side. The eye reads them as quiet "structural punctuation" rather
+  // than a parallel content layer.
+  return <span className="mx-[7px] text-tp-slate-300">|</span>
 }
 
 function PlainRun({ text }: { text: string }) {

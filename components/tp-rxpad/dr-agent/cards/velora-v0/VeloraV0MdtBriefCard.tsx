@@ -2,13 +2,14 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, CloseCircle, Calendar } from "iconsax-reactjs"
+import { Hospital, Flag, Diagram, InfoCircle, ArrowRight2, ArrowSquareDown, ArrowSquareUp, CloseCircle, Calendar, Calendar2, Note1 } from "iconsax-reactjs"
 import { FlagArrow } from "../../shared/FlagArrow"
 import { CardShell } from "../CardShell"
 import { SectionSummaryBar } from "../SectionSummaryBar"
 import { GuidelineChip } from "./VeloraStack"
 import { FloatingTooltip, HighlightLine, InfoTip, SourceInfoTip, shortDate } from "./highlight"
 import { useVeloraViewMode } from "../../shell/VeloraViewModeContext"
+import { TPMedicalIcon } from "@/components/tp-ui"
 import type {
   VeloraV0MdtBriefData,
   VeloraV0Attribution,
@@ -769,6 +770,188 @@ function SynthesisBullet({ row }: { row: VeloraV0Synthesis["rows"][number] }) {
  *  Each visit block is separated by a hairline divider so the eye reads
  *  the specialty as a chronological list of consultations.
  */
+/** Inline section bar inside a visit card — matches the PastVisitsContent
+ *  pattern from VoiceRx-L: 30px-tall slate-100/70 bar with a TPMedicalIcon
+ *  on the left and the label in slate-500 semibold. Used as the heading
+ *  for each Symptoms / Examination / Diagnosis / Medications / Advice /
+ *  Follow Up / Additional Notes block inside the consultation expansion. */
+function VisitSectionBar({
+  iconName,
+  iconNode,
+  label,
+}: {
+  iconName?: string
+  iconNode?: React.ReactNode
+  label: string
+}) {
+  return (
+    <div className="mb-[4px] flex h-[28px] w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/70 px-2 py-[3px]">
+      {iconNode ?? (iconName ? (
+        <TPMedicalIcon name={iconName} variant="bulk" size={16} color="var(--tp-slate-500, #64748B)" className="shrink-0" />
+      ) : null)}
+      <span className="flex min-h-0 min-w-0 flex-1 items-center text-left text-[13px] font-semibold leading-none text-tp-slate-500">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+/** Render a verbatim OMOP string as bullet items. The data is naturally
+ *  pipe-separated (` | `) and sometimes also slash-separated, so we split
+ *  on the pipe and emit one bullet per fragment. Single-fragment content
+ *  renders as one bullet too, keeping the row format consistent. */
+function VisitBulletList({ text }: { text: string }) {
+  const fragments = text
+    .split(/\s+\|\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (fragments.length === 0) return null
+  return (
+    <ul className="space-y-[3px] pl-[6px]">
+      {fragments.map((f, i) => (
+        <li key={i} className="flex items-start gap-[6px] text-[13.5px] leading-[20px] text-tp-slate-700">
+          <span className="mt-[8px] h-[4px] w-[4px] shrink-0 rounded-full bg-tp-slate-400" />
+          <span className="min-w-0">
+            <HighlightLine text={f} plain />
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** One per-section block inside a visit's expanded body: icon + label
+ *  bar + bulleted items. Drops out entirely when the doctor wrote
+ *  nothing for that section. */
+function VisitSection({
+  iconName,
+  iconNode,
+  label,
+  content,
+}: {
+  iconName?: string
+  iconNode?: React.ReactNode
+  label: string
+  content?: string
+}) {
+  if (!content) return null
+  return (
+    <div className="px-[12px] py-[6px]">
+      <VisitSectionBar iconName={iconName} iconNode={iconNode} label={label} />
+      <VisitBulletList text={content} />
+    </div>
+  )
+}
+
+/** One per-visit collapsible card. Header strip shows doctor · specialty
+ *  · date and a chevron; clicking the strip toggles the body. Body is the
+ *  full set of VisitSection blocks (Symptoms · Examination · Diagnosis ·
+ *  Medications · Advice · Follow Up · Additional Notes). */
+function VisitCard({
+  consultation: c,
+  specialtyLabel,
+  defaultExpanded,
+  onOpenInSidebar,
+}: {
+  consultation: VeloraV0Consultation
+  specialtyLabel: string
+  defaultExpanded: boolean
+  onOpenInSidebar?: () => void
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded)
+  const findings = c.diagnosis ?? c.findings
+  // Plan content split into its sub-fields for the structured layout.
+  const planSubLines: string[] = []
+  if (c.followUp) planSubLines.push(`Follow-up: ${c.followUp}`)
+  if (c.investigations) planSubLines.push(`Investigations: ${c.investigations}`)
+  if (c.advice) planSubLines.push(`Advice: ${c.advice}`)
+  if (c.surgery) planSubLines.push(`Planned surgery: ${c.surgery}`)
+  if (c.vaccinations) planSubLines.push(`Vaccinations: ${c.vaccinations}`)
+  if (planSubLines.length === 0 && c.plan) planSubLines.push(c.plan)
+  const planContent = planSubLines.join(" | ")
+  const hasAnyData =
+    !!findings || !!c.medications || !!c.symptoms || !!c.examination ||
+    planSubLines.length > 0 || !!c.additionalNotes
+  return (
+    <div className="overflow-hidden rounded-[10px] border border-tp-slate-100 bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+      {/* Header strip — clickable, sticky-style visual. Doctor (semibold)
+          · specialty pill · date · IPD chip · chevron. */}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="group/visit flex w-full items-center justify-between gap-[8px] bg-tp-slate-50 px-[10px] py-[8px] text-left hover:bg-tp-slate-100/60"
+      >
+        <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[2px]">
+          <span className="text-[13.5px] font-semibold text-tp-slate-800">{c.doctor}</span>
+          <span className="inline-flex items-center rounded-[4px] bg-tp-violet-50 px-[6px] py-[1px] text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-700">
+            {specialtyLabel}
+          </span>
+          <span className="text-[12px] text-tp-slate-500">{c.date}</span>
+          {c.visitType === "IPD" && (
+            <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+              IPD
+            </span>
+          )}
+        </div>
+        <span className="shrink-0 text-tp-slate-500" aria-hidden="true">
+          {expanded ? (
+            <ArrowSquareUp size={18} variant="Linear" />
+          ) : (
+            <ArrowSquareDown size={18} variant="Linear" />
+          )}
+        </span>
+      </button>
+      {expanded && (
+        <div className="flex flex-col gap-[2px] py-[4px]">
+          <VisitSection iconName="Virus" label="Symptoms" content={c.symptoms} />
+          <VisitSection iconName="medical-service" label="Examination" content={c.examination} />
+          <VisitSection iconName="Diagnosis" label="Diagnosis" content={findings} />
+          <VisitSection iconName="Tablets" label="Medications" content={c.medications} />
+          <VisitSection iconName="health care" label="Advice" content={c.advice} />
+          <VisitSection
+            iconNode={<Calendar2 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
+            label="Follow Up"
+            content={c.followUp}
+          />
+          <VisitSection iconName="medical book" label="Investigations" content={c.investigations} />
+          <VisitSection iconName="medical-service" label="Planned surgery" content={c.surgery} />
+          <VisitSection iconName="medical-record" label="Vaccinations" content={c.vaccinations} />
+          <VisitSection
+            iconNode={<Note1 size={16} variant="Bulk" color="var(--tp-slate-500, #64748B)" className="shrink-0" />}
+            label="Additional Notes"
+            content={c.additionalNotes}
+          />
+          {/* Empty visit — surface a polite placeholder + sidebar link.
+              The header above stays visible so the visit doesn't read as
+              missing. */}
+          {!hasAnyData && (
+            <div className="px-[12px] py-[8px]">
+              <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
+                No findings, medications or plan recorded for this Rx.{" "}
+                {onOpenInSidebar && (
+                  <button
+                    type="button"
+                    onClick={onOpenInSidebar}
+                    className="text-tp-violet-600 underline-offset-2 hover:underline focus:outline-none focus:underline"
+                  >
+                    View other details
+                  </button>
+                )}
+              </p>
+            </div>
+          )}
+          {/* Use planContent to keep the variable from being unused — the
+              Plan rows are emitted above via the individual VisitSection
+              calls (Follow-up / Investigations / Advice / Surgery /
+              Vaccinations); the joined string is kept for the empty-state
+              check above and reserved for future combined rendering. */}
+          {false && planContent && <span className="hidden">{planContent}</span>}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function DetailedSpecialtyBody({
   rec,
   onOpenVisit,
@@ -793,116 +976,19 @@ function DetailedSpecialtyBody({
     )
   }
 
-  /** Small chip label, inline-flow. */
-  const ChipLabel = ({ text }: { text: string }) => (
-    <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
-      {text}
-    </span>
-  )
+  const specialtyLabel = rec.source.specialty.split("·")[0].trim()
 
   return (
-    <div className="relative ml-[8px] flex flex-col gap-[12px] border-l border-tp-slate-200 pl-[14px] text-[13.5px] leading-[1.55] text-tp-slate-700">
-      {consultations.map((c, ci) => {
-        const findings = c.diagnosis ?? c.findings
-        const planRows: Array<{ label: string; content: string }> = []
-        if (c.followUp) planRows.push({ label: "Follow-up", content: c.followUp })
-        if (c.investigations) planRows.push({ label: "Investigations", content: c.investigations })
-        if (c.advice) planRows.push({ label: "Advice", content: c.advice })
-        if (c.surgery) planRows.push({ label: "Planned surgery", content: c.surgery })
-        if (c.vaccinations) planRows.push({ label: "Vaccinations", content: c.vaccinations })
-        if (c.additionalNotes) planRows.push({ label: "Additional notes", content: c.additionalNotes })
-        if (planRows.length === 0 && c.plan) planRows.push({ label: "Plan", content: c.plan })
-        // Symptoms / examination are visit-level too. Surface them when set.
-        const hasAnyData =
-          !!findings || !!c.medications || planRows.length > 0 || !!c.symptoms || !!c.examination
-        return (
-          <div key={ci} className="relative">
-            {/* Timeline dot pinned to the left rail (sits outside the
-                bordered card so the timeline reads as a single thread
-                of cards strung along the rail). */}
-            <span
-              className={`absolute -left-[20px] top-[10px] inline-block h-[8px] w-[8px] rounded-full ring-[3px] ring-white ${
-                c.visitType === "IPD" ? "bg-tp-error-500" : "bg-tp-slate-400"
-              }`}
-              aria-hidden="true"
-            />
-            {/* Bordered card per visit — groups everything the doctor
-                wrote at that visit into one visually-contained block. */}
-            <div className="flex flex-col gap-[4px] rounded-[8px] border border-tp-slate-200 bg-white px-[10px] py-[8px]">
-              {/* Visit identity strip — doctor (semibold) + date (muted) + optional IPD chip */}
-              <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[2px] text-[13px]">
-                <span className="font-semibold text-tp-slate-900">{c.doctor}</span>
-                <span className="text-tp-slate-500">{c.date}</span>
-                {c.visitType === "IPD" && (
-                  <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
-                    IPD
-                  </span>
-                )}
-              </div>
-              {c.symptoms && (
-                <p className="min-w-0">
-                  <ChipLabel text="Symptoms" />
-                  <HighlightLine text={c.symptoms} plain />
-                </p>
-              )}
-              {c.examination && (
-                <p className="min-w-0">
-                  <ChipLabel text="Examination" />
-                  <HighlightLine text={c.examination} plain />
-                </p>
-              )}
-              {findings && (
-                <p className="min-w-0">
-                  <ChipLabel text="Diagnosis" />
-                  <HighlightLine text={findings} plain />
-                </p>
-              )}
-              {c.medications && (
-                <p className="min-w-0">
-                  <ChipLabel text="Medications" />
-                  <HighlightLine text={c.medications} plain />
-                </p>
-              )}
-              {planRows.length > 0 && (
-                <div>
-                  {/* Plan chip is a normal inline-block element (not a
-                      flex-direction-column child) so it hugs its text
-                      instead of stretching to full row width. */}
-                  <ChipLabel text="Plan" />
-                  <ul className="mt-[2px] flex flex-col gap-[1px] pl-[8px] text-[13px]">
-                    {planRows.map((r, ri) => (
-                      <li key={ri} className="min-w-0">
-                        <span className="font-medium text-tp-slate-600">{r.label}: </span>
-                        <HighlightLine text={r.content} plain />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {/* When the doctor wrote nothing in any F / M / P field for
-                  this visit, surface a polite placeholder + a "View other
-                  details" link that opens the specialty sidebar with this
-                  visit auto-expanded. The sidebar may surface lab rows,
-                  visit-type metadata, or other context that didn't fit any
-                  of the top-line rendering slots. */}
-              {!hasAnyData && (
-                <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
-                  No findings, medications or plan recorded for this Rx.{" "}
-                  {onOpenVisit && (
-                    <button
-                      type="button"
-                      onClick={() => onOpenVisit(ci)}
-                      className="text-tp-violet-600 underline-offset-2 hover:underline focus:outline-none focus:underline"
-                    >
-                      View other details
-                    </button>
-                  )}
-                </p>
-              )}
-            </div>
-          </div>
-        )
-      })}
+    <div className="flex flex-col gap-[10px] px-[2px]">
+      {consultations.map((c, ci) => (
+        <VisitCard
+          key={ci}
+          consultation={c}
+          specialtyLabel={specialtyLabel}
+          defaultExpanded={ci === 0}
+          onOpenInSidebar={onOpenVisit ? () => onOpenVisit(ci) : undefined}
+        />
+      ))}
     </div>
   )
 }
@@ -972,18 +1058,17 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             // surgical history found", "Allergy review not on file") we
             // still render it so the doctor sees the explicit absence
             // rather than wondering if the section was checked.
-            // Universal rule: if OMOP didn't write it, the card doesn't
-            // show it. Drop Primary problem (duplicates each specialty's
-            // first-row Diagnosis) AND any group whose items array is
-            // empty — no synthesized "No surgical history found" filler.
+            // Drop Primary problem (duplicates each specialty's first-row
+            // Diagnosis). Keep every other group, even when items is empty
+            // — those render with a "No data from patient record"
+            // placeholder so the doctor sees the explicit absence rather
+            // than wondering if the section was checked.
             const filteredHistory = data.medicalHistory.filter(
-              (g) => g.title !== "Primary problem" && g.items.length > 0,
+              (g) => g.title !== "Primary problem",
             )
             if (filteredHistory.length === 0) return null
             return (
               <div data-mdt-anchor="medical-history" className="flex flex-col gap-[4px]">
-                {/* Section heading carries ONE ⓘ that aggregates Sources +
-                    reasoning across every Medical-history group. */}
                 <SectionSummaryBar
                   label="Medical history"
                   icon="medical-service"
@@ -992,11 +1077,20 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 />
                 <div className="flex flex-col gap-[12px] pl-[2px]">
                   {filteredHistory.map((group, gi) => {
-                    const joinedText = group.items.map((it) => it.text).join(" | ")
+                    const hasItems = group.items.length > 0
+                    const joinedText = hasItems
+                      ? group.items.map((it) => it.text).join(" | ")
+                      : ""
                     return (
                       <p key={gi} className="text-[13.5px] leading-[1.55] text-tp-slate-700">
                         <MedicalHistorySubheadingTag group={group} />
-                        <HighlightLine text={joinedText} />
+                        {hasItems ? (
+                          <HighlightLine text={joinedText} />
+                        ) : (
+                          <span className="italic text-tp-slate-400">
+                            No data from patient record
+                          </span>
+                        )}
                       </p>
                     )
                   })}

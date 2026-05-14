@@ -1112,12 +1112,27 @@ function FilterDropdown({
   onChange: (v: string) => void
 }) {
   return (
-    <label className="relative inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] bg-tp-slate-50 px-[10px] py-[5px] text-[12px] text-tp-slate-700 transition-colors hover:bg-tp-slate-100">
-      <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-slate-400">
+    <label
+      className="relative inline-flex cursor-pointer items-center gap-[6px] rounded-[8px] px-[10px] py-[5px] text-[12px] text-tp-blue-700 transition-colors"
+      style={{
+        // Soft primary-blue chip with a faint primary-blue ring so the
+        // filter row reads as an interactive control surface (matches
+        // the brand primary used by the agent's send button, copy
+        // affordance, and other clickable accents).
+        background: "rgba(75, 74, 213, 0.06)",
+      }}
+      onMouseEnter={(e) => {
+        ;(e.currentTarget as HTMLLabelElement).style.background = "rgba(75, 74, 213, 0.12)"
+      }}
+      onMouseLeave={(e) => {
+        ;(e.currentTarget as HTMLLabelElement).style.background = "rgba(75, 74, 213, 0.06)"
+      }}
+    >
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-blue-500/80">
         {label}
       </span>
-      <span className="max-w-[180px] truncate font-semibold text-tp-slate-800">{value}</span>
-      <ArrowDown2 size={12} variant="Linear" className="shrink-0 text-tp-slate-400" />
+      <span className="max-w-[180px] truncate font-semibold text-tp-blue-700">{value}</span>
+      <ArrowDown2 size={12} variant="Linear" className="shrink-0 text-tp-blue-500/70" />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1594,7 +1609,6 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               <SectionSummaryBar
                 label={s.panelTitle}
                 icon="medical-report"
-                variant="specialty"
                 trailing={<GuidelineChip {...s.guideline} />}
               />
               <ul className="flex flex-col gap-[3px] pl-[8px]">
@@ -1609,7 +1623,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
 
           {data.pendingMdtItems && data.pendingMdtItems.length > 0 && (
             <div data-mdt-anchor="pending" className="flex flex-col gap-[4px]">
-              <SectionSummaryBar label="Pending MDT" icon="emergency" variant="specialty" />
+              <SectionSummaryBar label="Pending MDT" icon="emergency" />
               <ul className="flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
                 {data.pendingMdtItems.map((item, i) => (
                   <li key={i} className="flex gap-[6px]">

@@ -9,38 +9,87 @@
 
 ## 0 · Stack 1 vs Stack 2 — the AI line in the code
 
-Before any spec table, the single architectural invariant a developer
-needs to honour while editing this card:
+> The most important section in this document. Memorise this before
+> editing a single line of the card.
 
-- **Stack 1** is the `CardShell` whose `title="Cross-consultation brief"` — the
-  big card with the medical-history block + per-specialty visit stack.
-  **Zero AI authorship.** Every string in this card comes from the
-  `VeloraV0MdtBriefData` payload, which the data generator (see
-  `lib/velora/v0-replies.ts` + the OMOP generator scripts) computes
-  directly from OMOP CDM rows. No LLM call sits between OMOP and this
-  card's children. The intent-routing call (matching the doctor's
-  free-text question to the `velora_v0_mdt_brief` output kind) is the
-  ONLY AI step that touches Stack 1.
+```
+   ╔══════════════════════════════╗   ╔══════════════════════════════╗
+   ║                              ║   ║                              ║
+   ║    STACK 1 · No-AI stack     ║   ║   STACK 2 · AI-bounded stack ║
+   ║                              ║   ║                              ║
+   ║    Verbatim from OMOP        ║   ║   AI = librarian, not author ║
+   ║    "Cross-consultation       ║   ║   "Clinical synthesis"       ║
+   ║     brief" CardShell         ║   ║    CardShell                 ║
+   ║                              ║   ║                              ║
+   ╚══════════════════════════════╝   ╚══════════════════════════════╝
+```
 
-- **Stack 2** is the `CardShell` whose `title="Clinical synthesis"` — rendered
-  immediately below Stack 1 by the same `VeloraV0MdtBriefCard`
-  component. AI is allowed to operate inside this card, but its scope
-  is bounded:
-  1. **Panel selection** — `data.syntheses[]` is the AI-selected list of
-     hospital-signed guideline panels relevant to the patient. Panel
-     content (`rows[]` with label / value / target) is verbatim from the
-     cited guideline.
-  2. **Collision ranking + titling** — `data.collisions[]` carries the
-     rule fires; their order + the human-readable `title` field are
-     AI-composed. The rule body, citation, and bullet content are not.
-  3. **Pending MDT items** — `data.pendingMdtItems[]` enumerates the
-     coordination gaps. Each item is a fully-cited next step, not an
-     LLM monologue.
+### The one-glance comparison
 
-When you add a new field to `VeloraV0MdtBriefData`, ask: *"Does this
-value get authored by AI?"* If yes, it must live in Stack 2 and ship
-with a `VeloraV0Guideline` citation. If no, it lives in Stack 1 and
-must trace to OMOP.
+|                       | **Stack 1**                                  | **Stack 2**                                                                |
+| ----------------------|----------------------------------------------|---------------------------------------------------------------------------- |
+| **Card title**        | *Cross-consultation brief*                   | *Clinical synthesis*                                                       |
+| **AI authorship**     | ❌  None                                     | ✅  Bounded                                                                |
+| **AI scope**          | Intent routing only                          | Pick panels · rank collisions · title them                                 |
+| **Source of truth**   | OMOP CDM v5.4 rows                           | Hospital-signed clinical guidelines                                        |
+| **Citation chip**     | ⓘ tooltip naming the OMOP visits / rows      | Body + year (NCCN, NICE, ESC, ADA, KDIGO, Beers, WHO HEARTS, AASM)         |
+| **Data fields on `VeloraV0MdtBriefData`** | `medicalHistory[]`, `specialties[]`, `windowDays`, `chronicConditions[]`, `freshness` | `syntheses[]`, `collisions[]`, `pendingMdtItems[]` |
+
+### Stack 1 — what "no AI" actually means
+
+```
+  ✓ Every string traces to an OMOP CDM row.
+  ✓ The generator is rule-based (lib/velora/v0-replies.ts + the
+    OMOP generator scripts under /tmp/omop_audit).
+  ✓ The ONLY AI call that touches Stack 1 is intent routing —
+    matching the doctor's free-text ("show cross-consultation
+    brief for Lakshmi") to the `velora_v0_mdt_brief` output kind.
+  ✗ No LLM call sits between OMOP and the rendered card.
+  ✗ No paraphrase, no synthesis, no "the AI thinks…".
+```
+
+What that buys the clinician: every line in the body is auditable
+back to a specific consultation row. The ⓘ tooltip on a chip is the
+proof.
+
+### Stack 2 — what "AI-bounded" actually means
+
+AI is allowed to operate **inside three specific fields**, with a
+**strict authoring boundary** on each:
+
+| Field on `VeloraV0MdtBriefData` | AI ✅ may                                                                 | AI ❌ may NOT                                                              |
+| ------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `syntheses[]`                   | Pick **which** signed-guideline panels apply to this patient               | Author the panel content. `rows[]` (label · value · target) stays verbatim |
+| `collisions[]`                  | Rank fires by severity + compose the one-line `title`                      | Author the cited rule, the citation, or the bullet content                 |
+| `pendingMdtItems[]`             | Surface cross-stack coordination next-steps                                | Issue a recommendation that isn't backed by a signed guideline             |
+
+If you trace any value on Stack 2 back to its source, you land on a
+cited guideline body — never on the LLM.
+
+### The decision rule for new fields
+
+When adding a new field to `VeloraV0MdtBriefData`, ask one question:
+
+```
+   Does this value get AUTHORED by AI?
+     │
+     ├── YES → it must live in STACK 2
+     │         and ship with a VeloraV0Guideline citation
+     │
+     └── NO  → it must live in STACK 1
+               and trace to an OMOP CDM row
+```
+
+There is **no third bucket**. "AI's opinion" without a guideline
+citation cannot land on the surface.
+
+### Quick gut-check
+
+| Symptom while reading the card | What it usually means |
+| ----------------------------- | --------------------- |
+| You see a clinical claim with no ⓘ tooltip and no citation chip | A Stack-1 value lost its source attribution — fix in the generator |
+| You see a guideline-flavoured recommendation in the Stack-1 body | A Stack-2 claim leaked into Stack 1 — move it under `collisions[]` / `syntheses[]` |
+| You see a Stack-2 panel with no citation chip | The panel forgot its `VeloraV0Guideline` — block at code review |
 
 The plain-English version of this rule is in
 [`WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md`](./WHAT-IS-THE-CROSS-CONSULTATION-BRIEF.md) §4.

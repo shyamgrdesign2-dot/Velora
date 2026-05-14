@@ -369,22 +369,86 @@ const SURESH_TRENDS: PatientTrendProfile = {
   scopeReason:
     "T2DM · HTN · IHD with significant CVD risk — trends drawn from diabetology, cardiology and primary-care HTN bundles.",
   trends: [
-    trendHbA1c(
-      "  06 Apr '26  8.4 %\n  10 Jan '26  8.9 %\n  18 Oct '25  9.1 %\n  22 Jul '25  9.4 %",
-    ),
-    trendFastingGlucose(
-      "  06 Apr '26  9.6\n  10 Jan '26  10.4\n  18 Oct '25  11.1\n  22 Jul '25  11.8",
-    ),
-    trendBP(
-      "  06 Apr '26  148/92\n  10 Jan '26  144/90\n  18 Oct '25  150/94\n  22 Jul '25  152/96",
-    ),
-    trendLipid(
-      "  06 Apr '26  TC 5.4 · LDL 3.3 · HDL 1.0 · TG 2.1\n  18 Oct '25  TC 5.8 · LDL 3.7 · HDL 0.9 · TG 2.3",
-    ),
-    trendEgfr(
-      "  06 Apr '26  72\n  10 Jan '26  74\n  18 Oct '25  76",
-    ),
-    trendWeight("  06 Apr '26  84.2 kg\n  10 Jan '26  85.0 kg\n  18 Oct '25  86.4 kg"),
+    {
+      ...trendHbA1c(
+        "  06 Apr '26  8.4 %\n  10 Jan '26  8.9 %\n  18 Oct '25  9.1 %\n  22 Jul '25  9.4 %",
+      ),
+      unit: "%",
+      series: [
+        { date: "06 Apr '26", value: "8.4 %", flag: "warn", flagLabel: "above target" },
+        { date: "10 Jan '26", value: "8.9 %", flag: "alert", flagLabel: "out of target" },
+        { date: "18 Oct '25", value: "9.1 %", flag: "alert", flagLabel: "out of target" },
+        { date: "22 Jul '25", value: "9.4 %", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "ADA 2024 target < 7.0 % · trending down but still above target.",
+      citation: { body: "ADA", year: "2024" },
+    },
+    {
+      ...trendFastingGlucose(
+        "  06 Apr '26  9.6\n  10 Jan '26  10.4\n  18 Oct '25  11.1\n  22 Jul '25  11.8",
+      ),
+      unit: "mmol/L",
+      series: [
+        { date: "06 Apr '26", value: "9.6", flag: "warn", flagLabel: "above target" },
+        { date: "10 Jan '26", value: "10.4", flag: "alert", flagLabel: "out of target" },
+        { date: "18 Oct '25", value: "11.1", flag: "alert", flagLabel: "out of target" },
+        { date: "22 Jul '25", value: "11.8", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "ADA 2024 fasting target 4.4 – 7.2 mmol/L.",
+      citation: { body: "ADA", year: "2024" },
+    },
+    {
+      ...trendBP(
+        "  06 Apr '26  148/92\n  10 Jan '26  144/90\n  18 Oct '25  150/94\n  22 Jul '25  152/96",
+      ),
+      unit: "mmHg",
+      series: [
+        { date: "06 Apr '26", value: "148/92", flag: "warn", flagLabel: "above target" },
+        { date: "10 Jan '26", value: "144/90", flag: "warn", flagLabel: "above target" },
+        { date: "18 Oct '25", value: "150/94", flag: "alert", flagLabel: "out of target" },
+        { date: "22 Jul '25", value: "152/96", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "WHO HEARTS 2023 < 140/90 mmHg · slow downward trend.",
+      citation: { body: "WHO HEARTS", year: "2023" },
+    },
+    {
+      ...trendLipid(
+        "  06 Apr '26  TC 5.4 · LDL 3.3 · HDL 1.0 · TG 2.1\n  18 Oct '25  TC 5.8 · LDL 3.7 · HDL 0.9 · TG 2.3",
+      ),
+      unit: "mmol/L",
+      series: [
+        { date: "06 Apr '26", value: "TC 5.4 · LDL 3.3 · HDL 1.0 · TG 2.1", flag: "alert", flagLabel: "LDL above target" },
+        { date: "18 Oct '25", value: "TC 5.8 · LDL 3.7 · HDL 0.9 · TG 2.3", flag: "alert", flagLabel: "LDL above target" },
+      ],
+      targetLine: "NICE NG181 LDL < 1.8 mmol/L for established CVD (IHD on record).",
+      citation: { body: "NICE", year: "NG181" },
+    },
+    {
+      ...trendEgfr(
+        "  06 Apr '26  72\n  10 Jan '26  74\n  18 Oct '25  76",
+      ),
+      unit: "mL/min/1.73 m²",
+      series: [
+        { date: "06 Apr '26", value: "72", flag: "ok", flagLabel: "G2" },
+        { date: "10 Jan '26", value: "74", flag: "ok", flagLabel: "G2" },
+        { date: "18 Oct '25", value: "76", flag: "ok", flagLabel: "G2" },
+      ],
+      targetLine: "KDIGO 2024 G2 (60-89) — mild decrease, on metformin watch list.",
+      citation: { body: "KDIGO", year: "2024" },
+    },
+    {
+      ...trendWeight(
+        "  06 Apr '26  84.2 kg\n  10 Jan '26  85.0 kg\n  18 Oct '25  86.4 kg",
+      ),
+      unit: "kg",
+      series: [
+        { date: "06 Apr '26", value: "84.2 kg", flag: "ok", flagLabel: "stable" },
+        { date: "10 Jan '26", value: "85.0 kg", flag: "ok", flagLabel: "stable" },
+        { date: "18 Oct '25", value: "86.4 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Slight downward trend on metformin + lifestyle counselling.",
+      citation: { body: "AACE", year: "2023" },
+    },
   ],
 }
 
@@ -394,16 +458,54 @@ const ASHA_TRENDS: PatientTrendProfile = {
   scopeReason:
     "Post-op tendoachilles repair under plastic surgery + orthopaedics · HTN — trends scoped to post-op surveillance + cardio risk.",
   trends: [
-    trendBP(
-      "  30 Apr '26  132/82\n  14 Apr '26  134/84\n  09 May '25  138/86",
-    ),
-    trendWoundCulture(
-      "  19 May '25  No growth\n  14 May '25  Scant Staph epidermidis (skin commensal)\n  09 May '25  No growth",
-    ),
-    trendHb(
-      "  19 May '25  12.4\n  14 May '25  12.1\n  09 May '25  11.8 (post-op nadir)",
-    ),
-    trendWeight("  30 Apr '26  58.6 kg\n  09 May '25  56.2 kg"),
+    {
+      ...trendBP(
+        "  30 Apr '26  132/82\n  14 Apr '26  134/84\n  09 May '25  138/86",
+      ),
+      unit: "mmHg",
+      series: [
+        { date: "30 Apr '26", value: "132/82", flag: "ok", flagLabel: "in target" },
+        { date: "14 Apr '26", value: "134/84", flag: "ok", flagLabel: "in target" },
+        { date: "09 May '25", value: "138/86", flag: "ok", flagLabel: "in target" },
+      ],
+      targetLine: "WHO HEARTS 2023 < 140/90 mmHg — stable, in target across 12 months.",
+      citation: { body: "WHO HEARTS", year: "2023" },
+    },
+    {
+      ...trendWoundCulture(
+        "  19 May '25  No growth\n  14 May '25  Scant Staph epidermidis (skin commensal)\n  09 May '25  No growth",
+      ),
+      series: [
+        { date: "19 May '25", value: "No growth", flag: "ok", flagLabel: "sterile" },
+        { date: "14 May '25", value: "Scant Staph epidermidis", flag: "warn", flagLabel: "skin commensal" },
+        { date: "09 May '25", value: "No growth", flag: "ok", flagLabel: "sterile" },
+      ],
+      targetLine: "Post-op surveillance — wound healing without significant pathogen growth.",
+      citation: { body: "Hospital surgical-site protocol", year: "current" },
+    },
+    {
+      ...trendHb(
+        "  19 May '25  12.4\n  14 May '25  12.1\n  09 May '25  11.8 (post-op nadir)",
+      ),
+      unit: "g/dL",
+      series: [
+        { date: "19 May '25", value: "12.4", flag: "ok", flagLabel: "in range" },
+        { date: "14 May '25", value: "12.1", flag: "ok", flagLabel: "in range" },
+        { date: "09 May '25", value: "11.8", flag: "warn", flagLabel: "post-op nadir" },
+      ],
+      targetLine: "WHO anaemia threshold women < 12 g/dL — post-op recovery confirmed.",
+      citation: { body: "WHO", year: "anaemia thresholds" },
+    },
+    {
+      ...trendWeight("  30 Apr '26  58.6 kg\n  09 May '25  56.2 kg"),
+      unit: "kg",
+      series: [
+        { date: "30 Apr '26", value: "58.6 kg", flag: "ok", flagLabel: "stable" },
+        { date: "09 May '25", value: "56.2 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Routine monitoring — gain over 12 months consistent with recovery.",
+      citation: { body: "Internal Medicine standard", year: "current" },
+    },
   ],
 }
 
@@ -413,12 +515,67 @@ const MEERA_TRENDS: PatientTrendProfile = {
   scopeReason:
     "Multi-specialty workup over 13 months — trends scoped to the dominant cardio + metabolic + renal signals her panel touched.",
   trends: [
-    trendBP("  Most recent: 144/88\n  3 months ago: 148/92\n  6 months ago: 152/94"),
-    trendHbA1c("  Most recent: 7.6 %\n  6 months ago: 8.1 %\n  12 months ago: 8.4 %"),
-    trendLipid("  Most recent: TC 5.2 · LDL 3.1 · HDL 1.1 · TG 1.9"),
-    trendEgfr("  Most recent: 64\n  6 months ago: 68"),
-    trendHb("  Most recent: 12.6\n  6 months ago: 12.2"),
-    trendWeight("  Most recent: 68 kg\n  6 months ago: 70 kg"),
+    {
+      ...trendBP("  Most recent: 144/88\n  3 months ago: 148/92\n  6 months ago: 152/94"),
+      unit: "mmHg",
+      series: [
+        { date: "Most recent", value: "144/88", flag: "warn", flagLabel: "above target" },
+        { date: "3 months ago", value: "148/92", flag: "warn", flagLabel: "above target" },
+        { date: "6 months ago", value: "152/94", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "WHO HEARTS 2023 < 140/90 mmHg — improving but not yet in target.",
+      citation: { body: "WHO HEARTS", year: "2023" },
+    },
+    {
+      ...trendHbA1c("  Most recent: 7.6 %\n  6 months ago: 8.1 %\n  12 months ago: 8.4 %"),
+      unit: "%",
+      series: [
+        { date: "Most recent", value: "7.6 %", flag: "warn", flagLabel: "above target" },
+        { date: "6 months ago", value: "8.1 %", flag: "alert", flagLabel: "out of target" },
+        { date: "12 months ago", value: "8.4 %", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "ADA 2024 < 7.0 % (relaxed to < 8.0 % in older adults).",
+      citation: { body: "ADA", year: "2024" },
+    },
+    {
+      ...trendLipid("  Most recent: TC 5.2 · LDL 3.1 · HDL 1.1 · TG 1.9"),
+      unit: "mmol/L",
+      series: [
+        { date: "Most recent", value: "TC 5.2 · LDL 3.1 · HDL 1.1 · TG 1.9", flag: "alert", flagLabel: "LDL above target" },
+      ],
+      targetLine: "NICE NG181 LDL < 1.4 mmol/L for secondary CV prevention (CAD + prior CVA on record).",
+      citation: { body: "NICE", year: "NG181" },
+    },
+    {
+      ...trendEgfr("  Most recent: 64\n  6 months ago: 68"),
+      unit: "mL/min/1.73 m²",
+      series: [
+        { date: "Most recent", value: "64", flag: "warn", flagLabel: "G2 (low)" },
+        { date: "6 months ago", value: "68", flag: "ok", flagLabel: "G2" },
+      ],
+      targetLine: "KDIGO 2024 G2 — watch for further decline; SGLT2 dose adjustments downstream.",
+      citation: { body: "KDIGO", year: "2024" },
+    },
+    {
+      ...trendHb("  Most recent: 12.6\n  6 months ago: 12.2"),
+      unit: "g/dL",
+      series: [
+        { date: "Most recent", value: "12.6", flag: "ok", flagLabel: "in range" },
+        { date: "6 months ago", value: "12.2", flag: "ok", flagLabel: "in range" },
+      ],
+      targetLine: "WHO anaemia threshold women < 12 g/dL — within range despite DAPT.",
+      citation: { body: "WHO", year: "anaemia thresholds" },
+    },
+    {
+      ...trendWeight("  Most recent: 68 kg\n  6 months ago: 70 kg"),
+      unit: "kg",
+      series: [
+        { date: "Most recent", value: "68 kg", flag: "ok", flagLabel: "stable" },
+        { date: "6 months ago", value: "70 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Slight downward trend — review BMI category at next visit.",
+      citation: { body: "AACE", year: "2023" },
+    },
   ],
 }
 
@@ -428,11 +585,56 @@ const ANITA_TRENDS: PatientTrendProfile = {
   scopeReason:
     "Long-window multi-specialty coverage — trends scoped to her metabolic + cardio + renal signals.",
   trends: [
-    trendBP("  Most recent: 138/84\n  6 months ago: 142/88"),
-    trendHbA1c("  Most recent: 7.2 %\n  6 months ago: 7.6 %\n  12 months ago: 8.0 %"),
-    trendLipid("  Most recent: TC 4.9 · LDL 2.9 · HDL 1.2 · TG 1.7"),
-    trendEgfr("  Most recent: 58 (G3a)\n  6 months ago: 62"),
-    trendWeight("  Most recent: 64 kg\n  6 months ago: 66 kg"),
+    {
+      ...trendBP("  Most recent: 138/84\n  6 months ago: 142/88"),
+      unit: "mmHg",
+      series: [
+        { date: "Most recent", value: "138/84", flag: "ok", flagLabel: "in target" },
+        { date: "6 months ago", value: "142/88", flag: "warn", flagLabel: "above target" },
+      ],
+      targetLine: "WHO HEARTS 2023 < 140/90 mmHg.",
+      citation: { body: "WHO HEARTS", year: "2023" },
+    },
+    {
+      ...trendHbA1c("  Most recent: 7.2 %\n  6 months ago: 7.6 %\n  12 months ago: 8.0 %"),
+      unit: "%",
+      series: [
+        { date: "Most recent", value: "7.2 %", flag: "warn", flagLabel: "above target" },
+        { date: "6 months ago", value: "7.6 %", flag: "warn", flagLabel: "above target" },
+        { date: "12 months ago", value: "8.0 %", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "ADA 2024 < 7.0 % — slow trend down on metformin + SGLT2.",
+      citation: { body: "ADA", year: "2024" },
+    },
+    {
+      ...trendLipid("  Most recent: TC 4.9 · LDL 2.9 · HDL 1.2 · TG 1.7"),
+      unit: "mmol/L",
+      series: [
+        { date: "Most recent", value: "TC 4.9 · LDL 2.9 · HDL 1.2 · TG 1.7", flag: "warn", flagLabel: "LDL borderline" },
+      ],
+      targetLine: "NICE NG181 LDL < 2.6 for primary prevention; TG narrative reading of 2898 mg/dL on file outside measurement table — fibrate-gap flagged.",
+      citation: { body: "NICE", year: "NG181" },
+    },
+    {
+      ...trendEgfr("  Most recent: 58 (G3a)\n  6 months ago: 62"),
+      unit: "mL/min/1.73 m²",
+      series: [
+        { date: "Most recent", value: "58", flag: "warn", flagLabel: "G3a" },
+        { date: "6 months ago", value: "62", flag: "ok", flagLabel: "G2" },
+      ],
+      targetLine: "KDIGO 2024 — just crossed into G3a (45-59). Drug-dose review indicated.",
+      citation: { body: "KDIGO", year: "2024" },
+    },
+    {
+      ...trendWeight("  Most recent: 64 kg\n  6 months ago: 66 kg"),
+      unit: "kg",
+      series: [
+        { date: "Most recent", value: "64 kg", flag: "ok", flagLabel: "stable" },
+        { date: "6 months ago", value: "66 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Mild downward trend on metabolic-syndrome treatment plan.",
+      citation: { body: "AACE", year: "2023" },
+    },
   ],
 }
 
@@ -440,13 +642,58 @@ const ARJUN_TRENDS: PatientTrendProfile = {
   patientId: "arjun-verma",
   patientName: "Arjun Verma",
   scopeReason:
-    "Recent IPD cardiac admission with OPD follow-ups — trends scoped to cardio surveillance + bleed/anemia risk on dual-antiplatelet.",
+    "Wilson's disease + acute Hepatitis A · 3-day IPD admission + 5 OPD follow-ups — trends scoped to hepatic recovery surveillance + thyroid stability.",
   trends: [
-    trendBP("  Most recent: 126/78\n  Admission day: 158/96"),
-    trendTroponin("  Discharge day 4: 24\n  Admission day 1 peak: 1830\n  Admission day 1 baseline: 38"),
-    trendLipid("  Most recent: TC 4.4 · LDL 2.4 · HDL 1.1 · TG 1.5"),
-    trendHb("  Most recent: 13.4\n  Admission day: 14.1"),
-    trendWeight("  Most recent: 72 kg\n  Admission day: 71 kg"),
+    {
+      ...trendBP("  Most recent: 126/78\n  Admission day: 158/96"),
+      unit: "mmHg",
+      series: [
+        { date: "Most recent", value: "126/78", flag: "ok", flagLabel: "in target" },
+        { date: "Admission day", value: "158/96", flag: "alert", flagLabel: "acute-illness peak" },
+      ],
+      targetLine: "Adolescent normal BP — admission spike resolved with rehydration + treatment of acute hepatitis.",
+      citation: { body: "AAP", year: "2017" },
+    },
+    {
+      ...trendTroponin("  Discharge day 4: 24\n  Admission day 1 peak: 1830\n  Admission day 1 baseline: 38"),
+      unit: "ng/L",
+      series: [
+        { date: "Discharge d4", value: "24", flag: "ok", flagLabel: "normalised" },
+        { date: "Admission d1 peak", value: "1830", flag: "alert", flagLabel: "elevated (acute illness)" },
+        { date: "Admission d1 baseline", value: "38", flag: "ok", flagLabel: "near-normal" },
+      ],
+      targetLine: "Workup confirmed acute-illness troponin leak from hepatic decompensation, not ACS.",
+      citation: { body: "ESC", year: "2023" },
+    },
+    {
+      ...trendLipid("  Most recent: TC 4.4 · LDL 2.4 · HDL 1.1 · TG 1.5"),
+      unit: "mmol/L",
+      series: [
+        { date: "Most recent", value: "TC 4.4 · LDL 2.4 · HDL 1.1 · TG 1.5", flag: "ok", flagLabel: "in range" },
+      ],
+      targetLine: "Paediatric reference — within range; baseline established for chronic Wilson's follow-up.",
+      citation: { body: "AAP", year: "2017" },
+    },
+    {
+      ...trendHb("  Most recent: 13.4\n  Admission day: 14.1"),
+      unit: "g/dL",
+      series: [
+        { date: "Most recent", value: "13.4", flag: "ok", flagLabel: "in range" },
+        { date: "Admission day", value: "14.1", flag: "ok", flagLabel: "in range" },
+      ],
+      targetLine: "Paediatric WHO anaemia threshold < 11.5 g/dL — well above.",
+      citation: { body: "WHO", year: "anaemia thresholds" },
+    },
+    {
+      ...trendWeight("  Most recent: 72 kg\n  Admission day: 71 kg"),
+      unit: "kg",
+      series: [
+        { date: "Most recent", value: "72 kg", flag: "ok", flagLabel: "stable" },
+        { date: "Admission day", value: "71 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Growth-curve monitoring continues at IAP standard cadence.",
+      citation: { body: "IAP", year: "2015" },
+    },
   ],
 }
 

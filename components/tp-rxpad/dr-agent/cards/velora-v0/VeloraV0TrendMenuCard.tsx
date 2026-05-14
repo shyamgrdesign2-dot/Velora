@@ -1,8 +1,10 @@
 "use client"
 
-import React from "react"
+import React, { useRef, useState } from "react"
 import { Activity, Health, InfoCircle as IconsaxInfo } from "iconsax-reactjs"
+import { Info } from "lucide-react"
 import { CardShell } from "../CardShell"
+import { FloatingTooltip } from "./highlight"
 import type { VeloraV0TrendMenuData } from "../../types"
 
 /**
@@ -38,6 +40,7 @@ export function VeloraV0TrendMenuCard({
         "OMOP `observation`",
         "Hospital-signed guideline panels",
       ]}
+      headerExtra={<WhyTheseTrendsTip scopeReason={data.scopeReason} />}
     >
       <div className="flex flex-col gap-[10px]">
         {/* Guardrail banner — only when this card surfaces because the
@@ -58,13 +61,6 @@ export function VeloraV0TrendMenuCard({
           </div>
         )}
 
-        {/* Scope reason — why these trends were picked for this patient. */}
-        <p className="text-[12.5px] leading-[1.5] text-tp-slate-500">
-          <span className="font-semibold text-tp-slate-600">Why these trends</span>
-          <span className="mx-[6px] text-tp-slate-300">·</span>
-          {data.scopeReason}
-        </p>
-
         {/* Vital trends group */}
         {vitals.length > 0 && (
           <TrendChipGroup
@@ -72,7 +68,6 @@ export function VeloraV0TrendMenuCard({
             label="Bedside vitals"
             chips={vitals}
             onPillTap={onPillTap}
-            chipTone="vital"
           />
         )}
 
@@ -83,7 +78,6 @@ export function VeloraV0TrendMenuCard({
             label="Lab parameters"
             chips={labs}
             onPillTap={onPillTap}
-            chipTone="lab"
           />
         )}
 
@@ -99,32 +93,61 @@ export function VeloraV0TrendMenuCard({
   )
 }
 
+/** "Why these trends" tooltip — info-icon trigger in the CardShell
+ *  header trailing slot. Hover reveals the per-patient scope reason
+ *  (problem list + signed-guideline context that drives the chip
+ *  selection). Moved out of always-visible inline text per design
+ *  call — the chips below are the focus; the reasoning is one hover
+ *  away, not on the page by default. */
+function WhyTheseTrendsTip({ scopeReason }: { scopeReason: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  return (
+    <>
+      <span
+        ref={ref}
+        className="inline-flex cursor-help items-center gap-[4px] rounded-[6px] px-[6px] py-[3px] text-[11px] font-semibold text-tp-violet-700 transition-colors hover:bg-tp-violet-50"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        tabIndex={0}
+        aria-label="Why these trends were picked for this patient"
+      >
+        <Info size={12} strokeWidth={2} aria-hidden />
+        <span>Why these trends</span>
+      </span>
+      <FloatingTooltip
+        open={open}
+        triggerRef={ref}
+        placement="top-right"
+        width={320}
+        className="rounded-[8px] bg-tp-slate-800 px-[12px] py-[9px] text-[11.5px] font-normal leading-[1.5] text-white shadow-xl"
+      >
+        <span className="block font-semibold uppercase tracking-[0.06em] text-[10px] text-tp-violet-300">
+          Why these trends
+        </span>
+        <span className="mt-[4px] block">{scopeReason}</span>
+      </FloatingTooltip>
+    </>
+  )
+}
+
 function TrendChipGroup({
   icon,
   label,
   chips,
   onPillTap,
-  chipTone,
 }: {
   icon: React.ReactNode
   label: string
   chips: VeloraV0TrendMenuData["chips"]
   onPillTap?: (message: string) => void
-  chipTone: "vital" | "lab"
 }) {
-  // Vital trends inherit the violet inner-content palette (matches the
-  // brief card); lab trends use a complementary teal so the doctor can
-  // tell the two columns apart at a glance.
-  const baseChip =
-    chipTone === "vital"
-      ? "bg-tp-violet-50 text-tp-violet-700 ring-1 ring-tp-violet-100 hover:bg-tp-violet-100/80"
-      : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100 hover:bg-emerald-100/70"
   return (
     <div className="flex flex-col gap-[6px]">
       <div className="flex items-center gap-[6px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-        <span className={chipTone === "vital" ? "text-tp-violet-500" : "text-emerald-600"}>
-          {icon}
-        </span>
+        <span className="text-tp-violet-500">{icon}</span>
         <span>{label}</span>
         <span className="text-tp-slate-300">·</span>
         <span className="font-medium normal-case tracking-normal text-tp-slate-400">
@@ -133,17 +156,55 @@ function TrendChipGroup({
       </div>
       <div className="flex flex-wrap gap-[6px]">
         {chips.map((chip) => (
-          <button
+          <AIPillButton
             key={chip.id}
-            type="button"
-            onClick={() => onPillTap?.(chip.question)}
+            label={chip.label}
             title={chip.rationale}
-            className={`inline-flex items-center gap-[5px] rounded-[8px] px-[10px] py-[5px] text-[12.5px] font-semibold transition-colors ${baseChip}`}
-          >
-            {chip.label}
-          </button>
+            onClick={() => onPillTap?.(chip.question)}
+          />
         ))}
       </div>
     </div>
+  )
+}
+
+/** AI-suggestion pill — same gradient treatment used elsewhere on the
+ *  agent surface (welcome screen cards, situation-at-a-glance
+ *  follow-ups). Reads unmistakably as a clickable AI tap target:
+ *  soft fuchsia → purple → indigo gradient background, hairline
+ *  purple ring, gradient-text label. */
+function AIPillButton({
+  label,
+  title,
+  onClick,
+}: {
+  label: string
+  title?: string
+  onClick?: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className="inline-flex shrink-0 items-center rounded-full px-[12px] py-[6px] text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.97]"
+      style={{
+        background:
+          "linear-gradient(135deg, rgba(213,101,234,0.10) 0%, rgba(103,58,172,0.10) 50%, rgba(26,25,148,0.10) 100%)",
+        border: "1px solid rgba(103,58,172,0.20)",
+      }}
+    >
+      <span
+        style={{
+          background:
+            "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}
+      >
+        {label}
+      </span>
+    </button>
   )
 }

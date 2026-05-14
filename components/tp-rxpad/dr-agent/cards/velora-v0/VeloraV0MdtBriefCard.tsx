@@ -1475,19 +1475,11 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           />
         }
       >
-        {/* Cross-brief body — wrapped in a quiet vintage-ish vertical
-            wash so the long-form content reads as one continuous
-            canvas (filters → medical history → specialty stack)
-            instead of bare white. The tint is intentionally barely
-            visible (alpha ≤ 0.04) so it doesn't compete with the
-            content. */}
-        <div
-          className="flex flex-col gap-[10px] -mx-3 -my-[10px] px-3 py-[10px]"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(124,58,237,0.025) 0%, rgba(124,58,237,0.01) 35%, rgba(15,23,42,0.012) 65%, rgba(124,58,237,0.025) 100%)",
-          }}
-        >
+        {/* Cross-brief body — plain white canvas. The card's own
+            CardShell header carries its violet → transparent gradient
+            for the top; everything below that stays on a clean
+            background so the content doesn't compete with the tint. */}
+        <div className="flex flex-col gap-[10px]">
           {/* The view-mode toggle (Detailed ↔ Concise) lives next to the
               Velora brand-tag in the agent header, not inside the card.
               The card just reads `viewMode` from the shell context and

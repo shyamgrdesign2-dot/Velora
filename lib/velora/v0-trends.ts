@@ -61,11 +61,28 @@ export interface TrendDef {
   /** Why this trend is offered to this patient. Surfaced in the design
    *  doc audit, never in the live chat. */
   rationale: string
-  /** Pre-canned reply text. In V0 we render this as text-only; future
-   *  versions plug in a chart card here. */
+  /** Pre-canned reply text (legacy fallback). Used only when the
+   *  structured `series` below is empty — the chat surface
+   *  prefers the structured `VeloraV0TrendDetailCard` rendering. */
   replyText: string
   /** Source / citation footer for the trust strip. */
   footer: string
+  /** Display unit (rendered next to the trend name on the card). */
+  unit?: string
+  /** Structured series points — drives the trend-detail card. When
+   *  populated the trends handler emits the card instead of the
+   *  legacy `replyText`. Newest reading first. */
+  series?: Array<{
+    date: string
+    value: string
+    flag?: "ok" | "warn" | "alert"
+    flagLabel?: string
+  }>
+  /** One-line target / reference statement surfaced inside the
+   *  card (e.g. "Target per WHO HEARTS 2023: < 140/90 mmHg"). */
+  targetLine?: string
+  /** Structured citation chip rendered in the card footer. */
+  citation?: { body: string; year?: string; section?: string }
 }
 
 /** One patient's available trends, computed from their condition profile
@@ -234,24 +251,115 @@ const LAKSHMI_TRENDS: PatientTrendProfile = {
   scopeReason:
     "Right breast cancer on Letrozole + Denosumab + Ca/Vit D · IHD · HTN · CKD G3a · OSA — trends drawn from oncology, cardio, nephro and pulm guidelines.",
   trends: [
-    trendBP(
-      "  12 May '26  138/82\n  29 Apr '26  142/86\n  14 Apr '26  148/90\n  02 Apr '26  152/94\n  18 Mar '26  158/98",
-    ),
-    trendEgfr(
-      "  12 May '26  48  (G3a)\n  29 Apr '26  46  (G3a)\n  02 Apr '26  44  (G3b)\n  15 Feb '26  47  (G3a)",
-    ),
-    trendCa(
-      "  12 May '26  2.32\n  29 Apr '26  2.30\n  29 Mar '26  2.18\n  28 Feb '26  2.41",
-    ),
-    trendVitD("  12 May '26  28  (insufficient)\n  29 Apr '26  24  (insufficient)\n  15 Feb '26  18  (deficient)"),
-    trendHb(
-      "  12 May '26  11.4  (mildly low)\n  29 Apr '26  11.1\n  02 Apr '26  10.8\n  15 Feb '26  11.6",
-    ),
-    trendLipid(
-      "  12 May '26  TC 4.6 · LDL 2.7 · HDL 1.1 · TG 1.6\n  18 Mar '26  TC 5.1 · LDL 3.0 · HDL 1.0 · TG 1.8",
-    ),
-    trendSpO2("  12 May '26  94 %\n  29 Apr '26  93 %\n  02 Apr '26  92 % (overnight)\n  15 Feb '26  95 %"),
-    trendWeight("  12 May '26  56.4 kg\n  29 Apr '26  56.8 kg\n  18 Mar '26  57.6 kg"),
+    {
+      ...trendBP(
+        "  12 May '26  138/82\n  29 Apr '26  142/86\n  14 Apr '26  148/90\n  02 Apr '26  152/94\n  18 Mar '26  158/98",
+      ),
+      unit: "mmHg",
+      series: [
+        { date: "12 May '26", value: "138/82", flag: "ok", flagLabel: "in target" },
+        { date: "29 Apr '26", value: "142/86", flag: "warn", flagLabel: "borderline" },
+        { date: "14 Apr '26", value: "148/90", flag: "warn", flagLabel: "above target" },
+        { date: "02 Apr '26", value: "152/94", flag: "alert", flagLabel: "out of target" },
+        { date: "18 Mar '26", value: "158/98", flag: "alert", flagLabel: "out of target" },
+      ],
+      targetLine: "Target per WHO HEARTS 2023: < 140/90 mmHg",
+      citation: { body: "WHO HEARTS", year: "2023" },
+    },
+    {
+      ...trendEgfr(
+        "  12 May '26  48  (G3a)\n  29 Apr '26  46  (G3a)\n  02 Apr '26  44  (G3b)\n  15 Feb '26  47  (G3a)",
+      ),
+      unit: "mL/min/1.73 m²",
+      series: [
+        { date: "12 May '26", value: "48", flag: "warn", flagLabel: "G3a" },
+        { date: "29 Apr '26", value: "46", flag: "warn", flagLabel: "G3a" },
+        { date: "02 Apr '26", value: "44", flag: "alert", flagLabel: "G3b" },
+        { date: "15 Feb '26", value: "47", flag: "warn", flagLabel: "G3a" },
+      ],
+      targetLine: "KDIGO 2024 staging — G1 ≥ 90 · G2 60-89 · G3a 45-59 · G3b 30-44 · G4 15-29 · G5 < 15",
+      citation: { body: "KDIGO", year: "2024" },
+    },
+    {
+      ...trendCa(
+        "  12 May '26  2.32\n  29 Apr '26  2.30\n  29 Mar '26  2.18\n  28 Feb '26  2.41",
+      ),
+      unit: "mmol/L",
+      series: [
+        { date: "12 May '26", value: "2.32", flag: "ok", flagLabel: "in range" },
+        { date: "29 Apr '26", value: "2.30", flag: "ok", flagLabel: "in range" },
+        { date: "29 Mar '26", value: "2.18", flag: "warn", flagLabel: "borderline low" },
+        { date: "28 Feb '26", value: "2.41", flag: "ok", flagLabel: "in range" },
+      ],
+      targetLine: "Reference 2.10 – 2.55 mmol/L · Denosumab patients require pre-dose Ca ≥ 2.10",
+      citation: { body: "Denosumab label / NCCN", year: "2024" },
+    },
+    {
+      ...trendVitD(
+        "  12 May '26  28  (insufficient)\n  29 Apr '26  24  (insufficient)\n  15 Feb '26  18  (deficient)",
+      ),
+      unit: "ng/mL",
+      series: [
+        { date: "12 May '26", value: "28", flag: "warn", flagLabel: "insufficient" },
+        { date: "29 Apr '26", value: "24", flag: "warn", flagLabel: "insufficient" },
+        { date: "15 Feb '26", value: "18", flag: "alert", flagLabel: "deficient" },
+      ],
+      targetLine: "Deficient < 20 · Insufficient 20-30 · Sufficient ≥ 30",
+      citation: { body: "Endocrine Society", year: "2024" },
+    },
+    {
+      ...trendHb(
+        "  12 May '26  11.4  (mildly low)\n  29 Apr '26  11.1\n  02 Apr '26  10.8\n  15 Feb '26  11.6",
+      ),
+      unit: "g/dL",
+      series: [
+        { date: "12 May '26", value: "11.4", flag: "warn", flagLabel: "mildly low" },
+        { date: "29 Apr '26", value: "11.1", flag: "warn", flagLabel: "mildly low" },
+        { date: "02 Apr '26", value: "10.8", flag: "alert", flagLabel: "moderate anaemia" },
+        { date: "15 Feb '26", value: "11.6", flag: "warn", flagLabel: "mildly low" },
+      ],
+      targetLine: "WHO anaemia threshold — women < 12 g/dL",
+      citation: { body: "WHO", year: "anaemia thresholds" },
+    },
+    {
+      ...trendLipid(
+        "  12 May '26  TC 4.6 · LDL 2.7 · HDL 1.1 · TG 1.6\n  18 Mar '26  TC 5.1 · LDL 3.0 · HDL 1.0 · TG 1.8",
+      ),
+      unit: "mmol/L",
+      series: [
+        { date: "12 May '26", value: "TC 4.6 · LDL 2.7 · HDL 1.1 · TG 1.6", flag: "alert", flagLabel: "LDL above target" },
+        { date: "18 Mar '26", value: "TC 5.1 · LDL 3.0 · HDL 1.0 · TG 1.8", flag: "alert", flagLabel: "LDL above target" },
+      ],
+      targetLine: "LDL target per NICE NG181 — < 1.8 mmol/L for established CVD (Lakshmi has IHD)",
+      citation: { body: "NICE", year: "NG181" },
+    },
+    {
+      ...trendSpO2(
+        "  12 May '26  94 %\n  29 Apr '26  93 %\n  02 Apr '26  92 % (overnight)\n  15 Feb '26  95 %",
+      ),
+      unit: "%",
+      series: [
+        { date: "12 May '26", value: "94 %", flag: "ok", flagLabel: "in range" },
+        { date: "29 Apr '26", value: "93 %", flag: "ok", flagLabel: "in range" },
+        { date: "02 Apr '26", value: "92 %", flag: "warn", flagLabel: "borderline (overnight)" },
+        { date: "15 Feb '26", value: "95 %", flag: "ok", flagLabel: "in range" },
+      ],
+      targetLine: "≥ 92 % at rest · CPAP titration pending per PSG AHI 31.2",
+      citation: { body: "AASM", year: "2023" },
+    },
+    {
+      ...trendWeight(
+        "  12 May '26  56.4 kg\n  29 Apr '26  56.8 kg\n  18 Mar '26  57.6 kg",
+      ),
+      unit: "kg",
+      series: [
+        { date: "12 May '26", value: "56.4 kg", flag: "ok", flagLabel: "stable" },
+        { date: "29 Apr '26", value: "56.8 kg", flag: "ok", flagLabel: "stable" },
+        { date: "18 Mar '26", value: "57.6 kg", flag: "ok", flagLabel: "stable" },
+      ],
+      targetLine: "Cachexia surveillance on hormonal therapy — > 5 % loss in 6 mo prompts review.",
+      citation: { body: "NCCN Supportive Care", year: "2024" },
+    },
   ],
 }
 

@@ -103,6 +103,7 @@ import { VeloraV0ActiveMedsCard } from "./velora-v0/VeloraV0ActiveMedsCard"
 import { VeloraV0WhyFlaggedCard } from "./velora-v0/VeloraV0WhyFlaggedCard"
 import { VeloraV0TrendsCard } from "./velora-v0/VeloraV0TrendsCard"
 import { VeloraV0TrendMenuCard } from "./velora-v0/VeloraV0TrendMenuCard"
+import { VeloraV0TrendDetailCard } from "./velora-v0/VeloraV0TrendDetailCard"
 import { VeloraV0PatientJourneyCard } from "./velora-v0/VeloraV0PatientJourneyCard"
 
 interface CardRendererProps {
@@ -344,6 +345,8 @@ function renderCard(
       return <VeloraV0TrendsCard data={output.data} />
     case "velora_v0_trend_menu":
       return <VeloraV0TrendMenuCard data={output.data} onPillTap={onPillTap} />
+    case "velora_v0_trend_detail":
+      return <VeloraV0TrendDetailCard data={output.data} />
 
     // -- Text-Only Kinds -----------------------------------------------------
     case "text_fact":

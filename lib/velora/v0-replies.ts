@@ -4296,13 +4296,35 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
     if (!isMenu) {
       const match = findTrendByQuestion(profile, rawMessage)
       if (match) {
-        // Specific trend matched — return the canned trend text reply.
-        // The chat surface follows it with the per-patient pivot
-        // suggestions kept inside the same category for coherence.
+        // Specific trend matched — emit the structured trend-detail
+        // card when `series` is populated; fall back to the legacy
+        // text reply for trends that haven't been restructured yet.
         const pivots = filterTrendsByCategory(profile, match.category).map((t) => ({
           label: t.quickLabel,
           message: t.question,
         }))
+        if (match.series && match.series.length > 0) {
+          return {
+            text: `Here's the ${match.quickLabel.toLowerCase()} trend for **${profile.patientName}**.`,
+            loadingHint: `Pulling ${match.quickLabel.toLowerCase()} for ${profile.patientName}…`,
+            loadingDelayMs: 900,
+            suggestions: pivots,
+            rxOutput: {
+              kind: "velora_v0_trend_detail",
+              data: {
+                patientName: profile.patientName,
+                patientMeta: "",
+                trendName: match.quickLabel,
+                category: match.category,
+                unit: match.unit,
+                series: match.series,
+                targetLine: match.targetLine,
+                citation: match.citation,
+                whyOffered: match.rationale,
+              },
+            },
+          }
+        }
         return {
           text: match.replyText,
           loadingHint: `Pulling ${match.quickLabel.toLowerCase()} for ${profile.patientName}…`,

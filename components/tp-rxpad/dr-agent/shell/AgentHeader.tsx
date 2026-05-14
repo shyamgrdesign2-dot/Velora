@@ -330,17 +330,29 @@ export function AgentHeader({
             stays the rightmost affordance and the admin-only gear is
             one tap to the left. */}
         <div className="pointer-events-auto relative z-10 flex items-center gap-[6px]">
-          {/* Admin · Guideline Settings trigger. V0: always visible
-              (the demo audience is the admin). Future: gate behind a
+          {/* Admin · Guideline Settings trigger. Now rendered as a
+              labelled chip (icon + "Guidelines" + tiny ADMIN tag) so
+              the affordance is discoverable. V0: always visible (the
+              demo audience IS the admin). Future: gate behind a
               `role === "hospital_admin"` check. */}
           <button
             type="button"
             onClick={() => setGuidelineSettingsOpen(true)}
-            className="da-agent-collapse-tag pointer-events-auto relative z-10 flex h-[32px] w-[32px] items-center justify-center rounded-[10px] text-tp-slate-600 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
+            className="da-agent-collapse-tag pointer-events-auto relative z-10 flex h-[32px] items-center gap-[5px] rounded-[10px] px-[10px] text-tp-slate-700 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
             aria-label="Open guideline settings (admin)"
-            title="Guideline Settings"
+            title="Configure which clinical guidelines this hospital follows (admin)"
           >
-            <Setting2 size={16} variant="Linear" />
+            <Setting2 size={15} variant="Bulk" className="text-tp-violet-600" />
+            <span className="text-[12.5px] font-semibold leading-none">Guidelines</span>
+            <span
+              className="rounded-[4px] px-[5px] py-[1px] text-[8.5px] font-bold uppercase leading-none text-white"
+              style={{
+                background: "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+                letterSpacing: "0.08em",
+              }}
+            >
+              Admin
+            </span>
           </button>
           <button
             type="button"

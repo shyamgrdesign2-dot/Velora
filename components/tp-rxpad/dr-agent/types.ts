@@ -760,6 +760,7 @@ export type RxAgentOutput =
   | { kind: "velora_v0_why_flagged"; data: VeloraV0WhyFlaggedData }
   | { kind: "velora_v0_trends"; data: VeloraV0TrendsData }
   | { kind: "velora_v0_trend_menu"; data: VeloraV0TrendMenuData }
+  | { kind: "velora_v0_trend_detail"; data: VeloraV0TrendDetailData }
 
 // ═══════════════ VELORA V0 — STACK 1 / STACK 2 CARD DATA ═══════════════
 // Per Velora_V0_Intent_Spec: every answer separates verifiable hospital records
@@ -1410,6 +1411,56 @@ export interface VeloraV0TrendMenuData {
    *  for an unavailable trend). The renderer surfaces a small
    *  banner above the chips so the doctor knows what went wrong. */
   guardrail?: { askedFor: string }
+}
+
+// ═══════════════ VELORA V0 — TREND DETAIL (single-trend card) ═════════════
+//
+// Card surfaced when the doctor taps a specific trend chip
+// (e.g. "Vitamin D trend"). Replaces the prior plain-text trend reply
+// with a structured, scannable card: header · series table · reference
+// line · cited guideline footer. The clinical content stays verbatim
+// from the OMOP `measurement` / `observation` rows for this patient —
+// AI authorship is bounded to picking the trend.
+
+export interface VeloraV0TrendSeriesPoint {
+  /** Reading date, in display form ("12 May '26"). */
+  date: string
+  /** Reading value, in display form. Free-text so combo values fit
+   *  ("138/82", "TC 4.6 · LDL 2.7 · HDL 1.1 · TG 1.6", "48 (G3a)"). */
+  value: string
+  /** Optional flag indicating whether the reading is in / out of
+   *  target. Drives the dot colour beside the value. */
+  flag?: "ok" | "warn" | "alert"
+  /** Optional one-word interpretation rendered next to the value
+   *  ("insufficient", "G3a", "high", "low", "severe"). */
+  flagLabel?: string
+}
+
+export interface VeloraV0TrendDetailData {
+  patientName: string
+  patientMeta: string
+  /** "Blood pressure" / "HbA1c" / "Vitamin D" — sentence-case label. */
+  trendName: string
+  /** Drives the icon + tint family (vital = violet, lab = emerald). */
+  category: "vital" | "lab"
+  /** Unit string rendered next to the trend name ("mmHg", "mmol/L",
+   *  "ng/mL", "g/dL", "%", "mL/min/1.73 m²"). */
+  unit?: string
+  /** Series rendered as a structured table, newest first. */
+  series: VeloraV0TrendSeriesPoint[]
+  /** Reference / target line for the trend
+   *  (e.g. "Target per WHO HEARTS 2023: < 140/90 mmHg"). Rendered
+   *  beneath the series as a single-line caption. */
+  targetLine?: string
+  /** Guideline citation footer. */
+  citation?: {
+    body: string
+    year?: string
+    section?: string
+  }
+  /** Optional rationale ("why this trend was offered for this
+   *  patient") — surfaces in a small "Why we picked this" caption. */
+  whyOffered?: string
 }
 
 // ═══════════════ VELORA — CARE GAP WINDOW ═══════════════

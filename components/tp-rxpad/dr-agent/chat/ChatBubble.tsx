@@ -804,13 +804,12 @@ export function ChatBubble({
               <div
                 className="rounded-[12px] rounded-br-[0px] px-3 py-2 text-[14px] leading-[18px] text-tp-slate-800"
                 style={{
-                  // Quiet grey bubble — clearly differentiates the user
-                  // turn from the white/elevated assistant cards below
-                  // it. Slate-200 tint (slightly darker than the prior
-                  // slate-100) so the bubble holds its shape against
-                  // the violet-tinted background wash without needing
-                  // an outer stroke.
-                  background: "rgba(226, 232, 240, 0.95)",
+                  // Quiet grey bubble — sits between slate-100 (too
+                  // light, lost against the violet wash) and slate-200
+                  // (too heavy). Roughly slate-150 / 94% opacity: the
+                  // bubble outline is visible without competing with
+                  // the assistant cards below it.
+                  background: "rgba(234, 238, 244, 0.94)",
                   backdropFilter: "blur(14px) saturate(1.4)",
                   WebkitBackdropFilter: "blur(14px) saturate(1.4)",
                 }}

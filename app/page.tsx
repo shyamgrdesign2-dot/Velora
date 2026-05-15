@@ -1,8 +1,15 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { DrAgentPanel } from "@/components/tp-rxpad/dr-agent/DrAgentPanel"
+import { LoginScreen } from "@/components/velora/LoginScreen"
 import { VeloraSyncProvider } from "@/lib/velora/sync-context"
 import { buildVeloraV0Reply } from "@/lib/velora/v0-replies"
+
+// localStorage key for the V0 demo auth flag. Hydration-safe: we
+// start with `null` (unknown) and resolve after mount so SSR + client
+// don't mismatch. While unknown, render nothing (split-second).
+const AUTH_KEY = "velora-v0-authed"
 
 /**
  * Velora — standalone clinical AI chat (production-leaning surface).
@@ -26,6 +33,39 @@ import { buildVeloraV0Reply } from "@/lib/velora/v0-replies"
  * remains accessible directly.
  */
 export default function VeloraHomePage() {
+  // Tri-state auth flag — null = pre-hydration (don't render),
+  // false = show login, true = show chat. Persisted in localStorage
+  // so refresh keeps the doctor signed in across reloads.
+  const [authed, setAuthed] = useState<boolean | null>(null)
+  useEffect(() => {
+    try {
+      setAuthed(window.localStorage.getItem(AUTH_KEY) === "1")
+    } catch {
+      setAuthed(false)
+    }
+  }, [])
+
+  if (authed === null) {
+    // Pre-hydration — render the gradient backdrop so we don't flash
+    // a white screen, but no card yet.
+    return <div className="h-screen w-screen bg-[#1A1948]" />
+  }
+
+  if (!authed) {
+    return (
+      <LoginScreen
+        onAuthenticated={() => {
+          try {
+            window.localStorage.setItem(AUTH_KEY, "1")
+          } catch {
+            /* localStorage blocked — proceed in-memory only. */
+          }
+          setAuthed(true)
+        }}
+      />
+    )
+  }
+
   return (
     <VeloraSyncProvider>
       <style>{`

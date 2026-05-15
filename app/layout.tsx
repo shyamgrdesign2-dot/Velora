@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mulish, Inter } from 'next/font/google'
+import { Mulish, Inter, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { TPThemeProvider } from '@/components/tp-theme-provider'
 import './globals.css'
@@ -13,6 +13,16 @@ const mulish = Mulish({
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+})
+
+// Playfair Display — serif display face used on the Velora login
+// headline ("Sign in to Velora"). Loaded via next/font so it ships
+// as a stable CSS variable (--font-display) usable anywhere.
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['600', '700', '800'],
+  style: ['normal', 'italic'],
 })
 
 
@@ -45,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${mulish.variable} ${inter.variable} font-sans antialiased`}>
+      <body className={`${mulish.variable} ${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <TPThemeProvider>
           {children}
           <Analytics />

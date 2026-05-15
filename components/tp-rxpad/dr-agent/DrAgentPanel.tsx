@@ -1264,12 +1264,47 @@ export function DrAgentPanel({
          * Hidden while a "situation at a glance" intro is still showing its own
          * inline pills under the bubble. */}
         {effectivePills.length > 0 && messages.length > 0 && !isTyping && (!glanceInlinePillsActive || !!veloraV0PivotPills) && (
-          <div className="px-[4px] pt-[8px] pb-[6px]">
-            <PillBar
-              pills={effectivePills}
-              onTap={handlePillTap}
-              disabled={false}
-            />
+          <div className="flex items-center gap-[8px] px-[4px] pt-[8px] pb-[6px]">
+            {/* Pills get the flexible left half; min-w-0 lets the
+                horizontal overflow-x scroll work without pushing the
+                chip off the row. */}
+            <div className="min-w-0 flex-1">
+              <PillBar
+                pills={effectivePills}
+                onTap={handlePillTap}
+                disabled={false}
+              />
+            </div>
+            {/* Patient chip on the right side of the pills row —
+                same greyish style as the input-box chip the embedded
+                surface used to render, but lifted up here so it sits
+                next to the suggestion pills (one row, single read).
+                Only renders in homepage mode with a real patient
+                selected. */}
+            {mode === "homepage" && selectedPatientId !== HOMEPAGE_COMMON_ID && patient.label && (
+              <button
+                type="button"
+                onClick={() => setIsPatientSheetOpen(true)}
+                aria-label={`Patient context: ${patient.label}${patient.gender && patient.age ? ` (${patient.gender}, ${patient.age}y)` : ""}`}
+                title="Switch patient"
+                className="inline-flex shrink-0 items-center gap-[4px] rounded-[6px] bg-tp-slate-100 px-[8px] py-[4px] text-tp-slate-700 transition-colors hover:bg-tp-slate-200 active:scale-[0.98]"
+                style={{ height: 26, maxWidth: 220 }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-tp-slate-500 shrink-0" aria-hidden>
+                  <path opacity="0.4" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="currentColor" />
+                  <path d="M12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z" fill="currentColor" />
+                </svg>
+                <span className="truncate text-[11px] font-semibold leading-none">{patient.label}</span>
+                {patient.gender && patient.age && (
+                  <span className="shrink-0 whitespace-nowrap text-[10.5px] font-normal leading-none text-tp-slate-400">
+                    ({patient.gender}, {patient.age}y)
+                  </span>
+                )}
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="shrink-0 text-tp-slate-400" aria-hidden>
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
           </div>
         )}
         {showAttachPanel && (

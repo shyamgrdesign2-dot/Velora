@@ -91,7 +91,17 @@ export function CardShell({
 
   return (
     <div
-      className="w-full overflow-hidden rounded-[14px] bg-white"
+      className={cn(
+        "w-full rounded-[14px] bg-white",
+        // overflow-hidden bounds the sticky header to the card's box,
+        // which means the sticky title can't extend its "stuck" range
+        // past the card. When stickyHeaderTop is set we want the
+        // opposite: the sticky range should extend to the nearest
+        // scrolling ancestor (chat-scroll) so the header stays pinned
+        // at the page top throughout. Drop overflow-hidden in that
+        // mode; rounded-t on the header below handles the visual.
+        stickyHeaderTop ? "overflow-visible" : "overflow-hidden",
+      )}
       style={{
         border: "1px solid transparent",
         backgroundImage: "linear-gradient(white, white), linear-gradient(180deg, rgba(75,74,213,0.18) 0%, rgba(75,74,213,0.04) 25%, rgba(23,23,37,0.02) 50%, rgba(75,74,213,0.04) 75%, rgba(75,74,213,0.18) 100%)",
@@ -120,11 +130,18 @@ export function CardShell({
           per-specialty visit timelines. */}
       <div
         className={cn(
-          "card-shell-header flex flex-wrap items-center gap-x-[10px] gap-y-[8px] px-3 pt-[7px] pb-[9px]",
-          stickyHeaderTop && "z-[5] backdrop-blur",
+          "card-shell-header flex flex-wrap items-center gap-x-[10px] gap-y-[5px] px-3 pt-[5px] pb-[7px]",
+          // When sticky, the header needs its own rounded top corners
+          // so it doesn't paint over the card's rounded corners (we
+          // dropped overflow-hidden on the parent to free the sticky
+          // range). z-[5] keeps the header above body content when
+          // it's pinned at the page top.
+          stickyHeaderTop && "rounded-t-[13px] z-[5] backdrop-blur",
         )}
         style={{
-          background: "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
+          background: stickyHeaderTop
+            ? "linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.88) 100%), linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)"
+            : "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
           containerType: "inline-size",
           position: stickyHeaderTop ? "sticky" : undefined,
           top: stickyHeaderTop,

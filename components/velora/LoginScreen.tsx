@@ -69,14 +69,14 @@ export function LoginScreen({
       <div className="velora-login-wash pointer-events-none absolute inset-0" aria-hidden />
 
       {/* ── Layer 2 — Animated grid scaffolding.
-            Cranked-up visibility per design call: container scaled to
-            160vmin (the grid extends past the viewport so we always
-            see the dense centre, not the fade edges), opacity nudged
-            to ~0.95, blend mode kept on screen so the white strokes
-            pop against the deep gradient. ── */}
+            Container sized to 105vmin so each cell appears tighter
+            (the SVG viewBox is fixed at 2500u, so smaller container
+            = denser grid). Stroke thickness + opacity are tuned in
+            AnimatedGrid itself; this layer just controls the
+            overall visibility. ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="velora-login-grid h-[160vmin] w-[160vmin]">
-          <AnimatedGrid className="h-full w-full opacity-95" />
+        <div className="velora-login-grid h-[105vmin] w-[105vmin]">
+          <AnimatedGrid className="h-full w-full opacity-[0.75]" />
         </div>
       </div>
 

@@ -89,7 +89,15 @@ export default function VeloraHomePage() {
             replyOverride={(message) => buildVeloraV0Reply(message)}
             autoOpenPatientSheetOnMount
             patientSelectorConfirmCtaLabel="Continue"
-            trustMarkerText="Anchored to hospital-signed guidelines · Private · Cited · You decide"
+            trustMarkerText="Your data is saved"
+            onLogout={() => {
+              try {
+                window.localStorage.removeItem(AUTH_KEY)
+              } catch {
+                /* localStorage blocked — fall back to in-memory state. */
+              }
+              setAuthed(false)
+            }}
           />
         </div>
       </div>

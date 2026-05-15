@@ -635,13 +635,66 @@ export function ChatInput({
         </div>
       )}
 
-      {/* Trust indicator — centered (single line, override-able) */}
-      <div className="mt-[4px] mb-[14px] flex items-center justify-center gap-[4px]">
-        <SecuritySafe size={12} variant="Bulk" className="shrink-0 text-tp-slate-300" />
-        <span className="whitespace-nowrap text-[11px] leading-[1.4] text-tp-slate-300">
-          {trustMarkerText ?? "Data stays private · AI-assisted, you decide"}
-        </span>
-      </div>
+      {/* Trust marker row — split flex.
+            Left:   shield icon + short trust phrase (e.g. "Your data is
+                    saved"). The shield is sized larger than before so
+                    the symbol reads at a glance, not a tiny dot.
+            Right:  patient context chip (homepage only — when both a
+                    patient name AND an `onPatientClick` handler are
+                    wired). Same greyish style as the input-box chip
+                    above; this replaces the floating top-of-navbar chip
+                    so the doctor sees the current context exactly where
+                    they'd next interact.
+
+            When there's no patient chip to render, the left block
+            stays inline-flex (auto width) and is centred by a wrapping
+            `justify-center` flex — preserving the legacy embedded
+            sidebar layout unchanged. */}
+      {(() => {
+        const showPatientChip = !!patientName && !!onPatientClick && !patientLocked
+        const trust = (
+          <span className="inline-flex items-center gap-[6px]">
+            <SecuritySafe size={14} variant="Bulk" className="shrink-0 text-tp-slate-400" />
+            <span className="whitespace-nowrap text-[11.5px] leading-[1.4] text-tp-slate-400">
+              {trustMarkerText ?? "Data stays private · AI-assisted, you decide"}
+            </span>
+          </span>
+        )
+        if (!showPatientChip) {
+          return (
+            <div className="mt-[4px] mb-[14px] flex items-center justify-center">
+              {trust}
+            </div>
+          )
+        }
+        return (
+          <div className="mt-[4px] mb-[14px] flex items-center justify-between gap-[10px]">
+            {trust}
+            <button
+              type="button"
+              onClick={onPatientClick}
+              aria-label={`Patient context: ${patientName}${patientMeta ? ` (${patientMeta})` : ""}`}
+              title="Switch patient"
+              className="inline-flex shrink-0 items-center gap-[4px] rounded-[6px] bg-tp-slate-100 px-[8px] py-[4px] text-tp-slate-700 transition-colors hover:bg-tp-slate-200 active:scale-[0.98]"
+              style={{ height: 26, maxWidth: 200 }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-tp-slate-500 shrink-0" aria-hidden>
+                <path opacity="0.4" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="currentColor" />
+                <path d="M12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z" fill="currentColor" />
+              </svg>
+              <span className="truncate text-[11px] font-semibold leading-none">{patientName}</span>
+              {patientMeta && (
+                <span className="shrink-0 whitespace-nowrap text-[10.5px] font-normal leading-none text-tp-slate-400">
+                  ({patientMeta.replace("|", ", ")})
+                </span>
+              )}
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="shrink-0 text-tp-slate-400" aria-hidden>
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        )
+      })()}
     </div>
   )
 }

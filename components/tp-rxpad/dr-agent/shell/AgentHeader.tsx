@@ -82,6 +82,10 @@ interface AgentHeaderProps {
    *  via CSS transition. Toggled by the host as the user scrolls down
    *  / back up so the chip behaves like a YouTube-style nav. */
   patientChipHidden?: boolean
+  /** Logout handler — wired by the host so the navbar's profile
+   *  dropdown can actually sign the doctor out (clear auth flag +
+   *  return to login screen) instead of just closing the menu. */
+  onLogout?: () => void
 }
 
 export function AgentHeader({
@@ -101,6 +105,7 @@ export function AgentHeader({
   patientChipMeta,
   onPatientChipClick,
   patientChipHidden,
+  onLogout,
 }: AgentHeaderProps) {
   const isV0 = variant === "v0"
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -493,19 +498,26 @@ export function AgentHeader({
                     <div className="px-[14px] py-[8px] text-[11px] uppercase tracking-wider text-tp-slate-400">
                       Zydus · TatvaPractice
                     </div>
-                    {/* Logout */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setProfileOpen(false)
-                        // Dummy logout — V0 demo surface.
-                      }}
-                      role="menuitem"
-                      className="flex w-full items-center gap-[10px] border-t border-tp-slate-100 px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-rose-50 hover:text-tp-rose-700"
-                    >
-                      <Logout size={16} variant="Bulk" className="text-tp-rose-500" />
-                      <span className="font-medium">Logout</span>
-                    </button>
+                    {/* Logout — actually signs the doctor out by
+                        firing the host-supplied callback (which
+                        clears the auth flag + returns to the login
+                        screen). Disabled when no handler is wired
+                        so embedded-mode never accidentally exposes
+                        a no-op item. */}
+                    {onLogout && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileOpen(false)
+                          onLogout()
+                        }}
+                        role="menuitem"
+                        className="flex w-full items-center gap-[10px] border-t border-tp-slate-100 px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-rose-50 hover:text-tp-rose-700"
+                      >
+                        <Logout size={16} variant="Bulk" className="text-tp-rose-500" />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

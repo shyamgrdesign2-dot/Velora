@@ -447,10 +447,10 @@ const VB = 2500
 // ---------- Tuning knobs ----------
 const SPEED = 1050         // u/s — uniform across every lane: SAME motion everywhere
 const CYCLE = 3.0          // total cycle (active travel + brief idle pause)
-const COMET_LEN = 220      // length of the bright comet (longer tail / softer fade)
-const COMET_T = 6          // comet thickness — bumped so pulses read clearly on the login surface
-const LINE_T = 6           // dim base line thickness — visible at a glance, not whisper-thin
-const CLIP_T = 7           // clip thickness (>= COMET_T)
+const COMET_LEN = 200      // length of the bright comet (longer tail / softer fade)
+const COMET_T = 4          // comet thickness — thin so the lines stay delicate, not chunky
+const LINE_T = 3.5         // dim base line thickness — visible but not heavy
+const CLIP_T = 5           // clip thickness (>= COMET_T)
 const INTERCEPT_TOL = 10   // cluster diagonals whose intercept differs by < this (snap noise)
 
 // Build a thin rotated-rectangle path for one edge (used in clip paths).
@@ -640,7 +640,7 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           d={ALL_EDGES_D}
           stroke="white"
           strokeWidth={LINE_T}
-          strokeOpacity="0.55"
+          strokeOpacity="0.40"
           strokeLinecap="square"
           fill="none"
         />

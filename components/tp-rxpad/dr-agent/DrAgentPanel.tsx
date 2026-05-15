@@ -229,6 +229,10 @@ interface DrAgentPanelProps {
   patientSelectorConfirmCtaLabel?: string
   /** Override the trust marker text under the input (e.g. add guideline anchors). */
   trustMarkerText?: React.ReactNode
+  /** Logout handler — only meaningful in homepage mode (the navbar's
+   *  profile dropdown wires to this). When unset, the menu item is
+   *  hidden entirely. */
+  onLogout?: () => void
 }
 
 const HOMEPAGE_COMMON_ID = "__homepage_common__"
@@ -250,6 +254,7 @@ export function DrAgentPanel({
   autoOpenPatientSheetOnMount = false,
   patientSelectorConfirmCtaLabel,
   trustMarkerText,
+  onLogout,
 }: DrAgentPanelProps) {
   // ── Patient Context ──
   // In homepage mode with no patient, use a special common ID for operational context
@@ -1139,24 +1144,17 @@ export function DrAgentPanel({
         showDoctorViewSelector={showDoctorViewSelector}
         intakeMode={intakeMode}
         onIntakeModeChange={handleIntakeModeChange}
-        // Homepage mode: surface the patient as a floating chip in the
-        // header (replaces the input-chip the embedded EMR mode uses).
-        // Tapping it opens the patient sheet — same handler the
-        // chat-input chip wires up.
-        patientChipLabel={
-          mode === "homepage" && selectedPatientId !== HOMEPAGE_COMMON_ID
-            ? patient.label || undefined
-            : undefined
-        }
-        patientChipMeta={
-          mode === "homepage" && selectedPatientId !== HOMEPAGE_COMMON_ID && patient.gender && patient.age
-            ? `${patient.gender}, ${patient.age}y`
-            : undefined
-        }
+        // Homepage mode: the patient context chip moved OUT of the
+        // navbar and into the bottom trust-marker row (rendered by
+        // ChatInput). We still pass `onPatientChipClick` so the
+        // navbar can detect homepage mode for its visual styling,
+        // but `patientChipLabel` is intentionally undefined so the
+        // old floating chip below the navbar doesn't render.
         onPatientChipClick={
           mode === "homepage" ? () => setIsPatientSheetOpen(true) : undefined
         }
         patientChipHidden={mode === "homepage" ? patientChipHidden : undefined}
+        onLogout={mode === "homepage" ? onLogout : undefined}
       />
       </div>
 

@@ -4,6 +4,8 @@ Six real OMOP CDM v5.4 exports — one MD per patient documents the cross-consul
 
 > Source archives live in [`data/`](./data/) under canonical names. Drift between exports is tracked in [`CROSS-VERIFICATION.md`](./CROSS-VERIFICATION.md).
 
+> **Looking for the Velora design-system / architecture docs?** They live alongside this folder at [`../velora/`](../velora/) — start with [`../velora/README.md`](../velora/README.md). This folder is the patient-data layer only.
+
 ---
 
 ## The architecture in one paragraph (read this first)

@@ -180,7 +180,7 @@ export function AgentHeader({
         className={cn(
           "relative flex items-center justify-between",
           homepageMode
-            ? "da-agent-brand-tag sticky top-0 z-30 w-full px-[20px]"
+            ? "da-agent-navbar sticky top-0 z-30 w-full px-[14px]"
             : "px-[14px]",
         )}
         style={{
@@ -188,13 +188,24 @@ export function AgentHeader({
           background: homepageMode ? undefined : "transparent",
         }}
       >
-        {/* Left: Dr. Agent brand tag — floating liquid-glass card with 10px radius */}
+        {/* Left: Velora wordmark — no pill background in homepage mode.
+            Just the sparkle icon (larger) + "Velora" text (larger) + Beta. */}
         <div className="pointer-events-auto relative z-10 flex items-center gap-[6px]">
-          <span className="da-agent-brand-tag relative flex items-center gap-[7px] rounded-[10px] py-[5px] pl-[6px] pr-[8px]">
+          <span
+            className={cn(
+              "relative flex items-center gap-[8px]",
+              homepageMode
+                ? "py-[2px]"
+                : "da-agent-brand-tag rounded-[10px] py-[5px] pl-[6px] pr-[8px]",
+            )}
+          >
             <span
-              className="relative inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-hidden"
+              className={cn(
+                "relative inline-flex shrink-0 items-center justify-center overflow-hidden",
+                homepageMode ? "h-[30px] w-[30px]" : "h-[22px] w-[22px]",
+              )}
               aria-hidden
-              style={{ borderRadius: 7 }}
+              style={{ borderRadius: homepageMode ? 9 : 7 }}
             >
               {/* Dr. Agent sparkle — same asset used in chat bubble for consistency */}
               <img
@@ -208,23 +219,28 @@ export function AgentHeader({
                 alt=""
                 draggable={false}
                 className="relative z-10"
-                width={13}
-                height={13}
+                width={homepageMode ? 17 : 13}
+                height={homepageMode ? 17 : 13}
               />
             </span>
             <span
-              className="text-[13.5px] font-semibold leading-none text-tp-slate-700"
+              className={cn(
+                "font-semibold leading-none text-tp-slate-800",
+                homepageMode ? "text-[17px]" : "text-[13.5px] text-tp-slate-700",
+              )}
               style={{ letterSpacing: "0.1px" }}
             >
               {brandTitle ?? "Velora"}
             </span>
-            {/* Beta tag — orange gradient pill sitting INSIDE the
-                brand tag, immediately after the name. Signals to the
+            {/* Beta tag — orange gradient pill. Signals to the
                 clinician that this surface is a pilot release; the
                 gradient keeps it warm without competing with the
                 violet brand tone on the rest of the agent UI. */}
             <span
-              className="inline-flex shrink-0 items-center rounded-[5px] px-[6px] py-[2px] text-[9.5px] font-bold uppercase leading-none text-white"
+              className={cn(
+                "inline-flex shrink-0 items-center rounded-[5px] font-bold uppercase leading-none text-white",
+                homepageMode ? "px-[7px] py-[3px] text-[10.5px]" : "px-[6px] py-[2px] text-[9.5px]",
+              )}
               style={{
                 background: "linear-gradient(135deg, #FB923C 0%, #F97316 50%, #EA580C 100%)",
                 letterSpacing: "0.08em",
@@ -444,7 +460,7 @@ export function AgentHeader({
                     setProfileOpen((v) => !v)
                     setKebabOpen(false)
                   }}
-                  className="da-agent-brand-tag flex h-[36px] w-[36px] items-center justify-center rounded-full text-tp-violet-700 transition-transform active:scale-[0.95]"
+                  className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-tp-slate-100 text-tp-slate-500 transition-colors hover:bg-tp-slate-200 hover:text-tp-slate-700 active:scale-[0.95]"
                   aria-haspopup="menu"
                   aria-expanded={profileOpen}
                   aria-label="Open profile menu"
@@ -602,6 +618,24 @@ export function AgentHeader({
       />
 
       <style>{`
+        /* Homepage navbar — same liquid-glass family as the brand tag,
+           but tuned for a full-width bar: softer top highlight (no
+           bright "lip" running across the page), no 1px inset border
+           (which read as a "light outline" on the left/top/bottom in
+           full-width mode), and a richer bottom edge so the navbar
+           reads as glass that catches light at the bottom seam. */
+        .da-agent-navbar {
+          background:
+            linear-gradient(180deg, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.22) 100%),
+            linear-gradient(135deg, rgba(213,101,234,0.10) 0%, rgba(103,58,172,0.07) 55%, rgba(75,74,213,0.07) 100%);
+          backdrop-filter: blur(16px) saturate(150%);
+          -webkit-backdrop-filter: blur(16px) saturate(150%);
+          border-bottom: 1px solid rgba(103,58,172,0.10);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.55),
+            inset 0 -6px 14px -8px rgba(103,58,172,0.18),
+            0 8px 20px -12px rgba(103,58,172,0.18);
+        }
         /* Dr. Agent brand tag — iOS liquid-glass with subtle AI gradient tint.
            Low bg opacity + strong blur + saturate so content scrolling behind
            is visibly diffused through the glass. */

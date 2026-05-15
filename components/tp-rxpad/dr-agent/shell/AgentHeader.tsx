@@ -180,18 +180,12 @@ export function AgentHeader({
         className={cn(
           "relative flex items-center justify-between",
           homepageMode
-            ? "sticky top-0 z-30 w-full px-[20px]"
+            ? "da-agent-brand-tag sticky top-0 z-30 w-full px-[20px]"
             : "px-[14px]",
         )}
         style={{
           height: headerHeight,
-          background: homepageMode
-            ? "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%)"
-            : "transparent",
-          backdropFilter: homepageMode ? "blur(14px) saturate(140%)" : undefined,
-          WebkitBackdropFilter: homepageMode ? "blur(14px) saturate(140%)" : undefined,
-          borderBottom: homepageMode ? "1px solid rgba(15,23,42,0.06)" : undefined,
-          boxShadow: homepageMode ? "0 1px 0 rgba(15,23,42,0.02), 0 6px 16px -10px rgba(15,23,42,0.08)" : undefined,
+          background: homepageMode ? undefined : "transparent",
         }}
       >
         {/* Left: Dr. Agent brand tag — floating liquid-glass card with 10px radius */}
@@ -442,7 +436,6 @@ export function AgentHeader({
               shape so reviewers can see where things will plug in. */}
           {homepageMode && (
             <>
-              <span aria-hidden className="mx-[2px] h-[22px] w-px bg-tp-slate-200" />
               {/* Profile dropdown */}
               <div ref={profileRef} className="relative">
                 <button
@@ -451,7 +444,7 @@ export function AgentHeader({
                     setProfileOpen((v) => !v)
                     setKebabOpen(false)
                   }}
-                  className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-tp-violet-50 text-tp-violet-700 transition-colors hover:bg-tp-violet-100 active:scale-[0.95]"
+                  className="da-agent-brand-tag flex h-[36px] w-[36px] items-center justify-center rounded-full text-tp-violet-700 transition-transform active:scale-[0.95]"
                   aria-haspopup="menu"
                   aria-expanded={profileOpen}
                   aria-label="Open profile menu"
@@ -502,13 +495,13 @@ export function AgentHeader({
                     setKebabOpen((v) => !v)
                     setProfileOpen(false)
                   }}
-                  className="flex h-[36px] w-[36px] items-center justify-center rounded-full text-tp-slate-600 transition-colors hover:bg-tp-slate-100 hover:text-tp-slate-900 active:scale-[0.95]"
+                  className="da-agent-brand-tag flex h-[36px] w-[36px] items-center justify-center rounded-full text-tp-slate-700 transition-transform active:scale-[0.95]"
                   aria-haspopup="menu"
                   aria-expanded={kebabOpen}
                   aria-label="Open session menu"
                   title="More"
                 >
-                  <More size={20} variant="Bold" className="rotate-90" />
+                  <More size={26} variant="Linear" className="rotate-90" />
                 </button>
                 {kebabOpen && (
                   <div

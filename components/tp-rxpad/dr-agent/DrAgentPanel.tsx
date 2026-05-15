@@ -1125,12 +1125,20 @@ export function DrAgentPanel({
       </div>
 
       {/* ── Chat area — transparent; inherits the animated AI wash behind the panel.
-          `pt-[52px]` leaves room for the floating header so content scrolls *under* it. ── */}
+          Top padding leaves room for the floating header so content scrolls
+          *under* it. Homepage mode uses a taller 60px navbar PLUS a floating
+          patient chip below it, so we add extra breathing room there. ── */}
       <div
         className="relative z-10 flex flex-1 flex-col overflow-hidden"
         style={{ background: "transparent" }}
       >
-        <div ref={chatScrollRef} className="da-chat-scroll flex flex-1 flex-col overflow-y-auto pt-[52px]">
+        <div
+          ref={chatScrollRef}
+          className={cn(
+            "da-chat-scroll flex flex-1 flex-col overflow-y-auto",
+            mode === "homepage" ? "pt-[120px]" : "pt-[52px]",
+          )}
+        >
           {/* Center the chat content in a reading column on wide screens; on
               < 800px viewports it fills the available width automatically. */}
           <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col px-[12px]">

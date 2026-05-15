@@ -1,10 +1,8 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import React from "react"
 import { Activity, Health, InfoCircle as IconsaxInfo } from "iconsax-reactjs"
-import { Info } from "lucide-react"
 import { CardShell } from "../CardShell"
-import { FloatingTooltip } from "./highlight"
 import { TrendChartBlock, ReferenceInfoTip } from "./VeloraV0TrendDetailCard"
 import type { VeloraV0TrendMenuData } from "../../types"
 
@@ -41,7 +39,6 @@ export function VeloraV0TrendMenuCard({
         "OMOP `observation`",
         "Hospital-signed guideline panels",
       ]}
-      headerExtra={<WhyTheseTrendsTip scopeReason={data.scopeReason} />}
     >
       <div className="flex flex-col gap-[10px]">
         {/* Guardrail banner — only when this card surfaces because the
@@ -91,46 +88,6 @@ export function VeloraV0TrendMenuCard({
         )}
       </div>
     </CardShell>
-  )
-}
-
-/** "Why these trends" tooltip — info-icon trigger in the CardShell
- *  header trailing slot. Hover reveals the per-patient scope reason
- *  (problem list + signed-guideline context that drives the chip
- *  selection). Moved out of always-visible inline text per design
- *  call — the chips below are the focus; the reasoning is one hover
- *  away, not on the page by default. */
-function WhyTheseTrendsTip({ scopeReason }: { scopeReason: string }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLSpanElement>(null)
-  return (
-    <>
-      <span
-        ref={ref}
-        className="inline-flex cursor-help items-center gap-[4px] rounded-[6px] px-[6px] py-[3px] text-[11px] font-semibold text-tp-violet-700 transition-colors hover:bg-tp-violet-50"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        tabIndex={0}
-        aria-label="Why these trends were picked for this patient"
-      >
-        <Info size={12} strokeWidth={2} aria-hidden />
-        <span>Why these trends</span>
-      </span>
-      <FloatingTooltip
-        open={open}
-        triggerRef={ref}
-        placement="top-right"
-        width={320}
-        className="rounded-[8px] bg-tp-slate-800 px-[12px] py-[9px] text-[11.5px] font-normal leading-[1.5] text-white shadow-xl"
-      >
-        <span className="block font-semibold uppercase tracking-[0.06em] text-[10px] text-tp-violet-300">
-          Why these trends
-        </span>
-        <span className="mt-[4px] block">{scopeReason}</span>
-      </FloatingTooltip>
-    </>
   )
 }
 

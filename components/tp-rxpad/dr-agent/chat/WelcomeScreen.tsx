@@ -342,14 +342,17 @@ export function WelcomeScreen({
         )}
       </p>
 
-      {/* Quick action cards — single-column stack, full width each.
-          Previous build used a 2×2 grid; subtitles routinely got cut
-          off at narrow widths (the 2-line clamp ate the meaning).
-          One-column rows give each card the full chat-column width so
-          the subtitle can breathe; we also lay the card out as a
-          horizontal row (icon on the left, title-stack on the right)
-          to put the icon-text relationship into a single read. */}
-      <div className="relative z-[1] mt-[16px] flex w-full flex-col gap-[10px]">
+      {/* Quick action cards — responsive grid.
+          Narrow (chat column < 768px viewport):  single column stack,
+                                                 full-width rows so the
+                                                 subtitle can wrap fully
+                                                 without truncation.
+          Wide  (≥ 768px viewport):              2×2 grid; there's
+                                                 horizontal room for
+                                                 the subtitle to live
+                                                 next to the title in a
+                                                 normal-density card. */}
+      <div className="relative z-[1] mt-[16px] grid w-full grid-cols-1 gap-[10px] md:grid-cols-2">
         {actions.map((action, i) => (
           <button
             key={i}

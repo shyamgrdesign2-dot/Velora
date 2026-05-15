@@ -1170,7 +1170,11 @@ export function DrAgentPanel({
           ref={chatScrollRef}
           className={cn(
             "da-chat-scroll flex flex-1 flex-col overflow-y-auto",
-            mode === "homepage" ? "pt-[96px]" : "pt-[52px]",
+            // Homepage navbar is 42px tall; the patient chip moved
+            // out of the floating area into the bottom trust row,
+            // so we only need ≈ the navbar height up top — no extra
+            // chip-clearing buffer.
+            mode === "homepage" ? "pt-[46px]" : "pt-[52px]",
           )}
           // Sticky-offset tokens for nested cards. The Velora brief
           // CardShell header sticks below the navbar; SpecialtyHeading

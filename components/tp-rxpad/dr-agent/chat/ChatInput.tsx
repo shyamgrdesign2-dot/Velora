@@ -669,7 +669,9 @@ export function ChatInput({
         }
         return (
           <div className="mt-[4px] mb-[14px] flex items-center justify-between gap-[10px]">
-            {trust}
+            {/* Patient chip on the LEFT — this is where the doctor's
+                attention lands first (chat threads read top-to-left),
+                and lets the trust marker breathe on the right. */}
             <button
               type="button"
               onClick={onPatientClick}
@@ -692,6 +694,7 @@ export function ChatInput({
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
+            {trust}
           </div>
         )
       })()}

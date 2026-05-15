@@ -1838,6 +1838,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                 <SectionSummaryBar
                   label="Medical history"
                   icon="medical-service"
+                  stickyTop="var(--velora-specialty-sticky-top, 0px)"
                   trailing={<MedicalHistorySectionTooltip groups={filteredHistory} />}
                 />
                 <div className="flex flex-col gap-[12px] pl-[2px]">
@@ -1907,15 +1908,19 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             </div>
           ) : null}
 
-          {/* Specialty / Doctor filter row — moved here from the
-              CardShell header so the card title can hug the top
-              cleanly. Sits between Medical history and the per-
-              specialty list with a hairline divider above and below:
-              the divider above signals "we're now switching surfaces"
-              (history → visit timeline); the filters scope the list
-              below them; the second divider closes the band so the
-              specialty rows that follow read as their own group. */}
-          <div className="mt-[4px] flex flex-col gap-[8px]">
+          {/* Specialty / Doctor filter row — sticks at the same lane
+              as the SectionSummaryBar so the filters stay accessible
+              while the doctor scrolls through the specialty list.
+              The whole band (top divider · filter row · bottom
+              divider) pins together; once it scrolls past, the
+              first specialty heading takes over the same lane. */}
+          <div
+            className="mt-[4px] z-[3] flex flex-col gap-[8px] bg-white/95 py-[2px] backdrop-blur"
+            style={{
+              position: "sticky",
+              top: "var(--velora-specialty-sticky-top, 0px)",
+            }}
+          >
             <div className="h-px w-full bg-tp-slate-100" aria-hidden />
             <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[6px]">
               <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400">

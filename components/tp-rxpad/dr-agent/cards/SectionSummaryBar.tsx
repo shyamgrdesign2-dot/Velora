@@ -16,6 +16,10 @@ export interface SectionSummaryBarProps {
   className?: string
   /** Bottom margin under the bar (default 4px to match SBAR) */
   marginBottom?: boolean
+  /** When set, the bar uses `position: sticky` at this CSS top
+   *  offset. Pass a token like `"var(--velora-specialty-sticky-top, 0px)"`
+   *  so the host scroll container can drive the cascade. */
+  stickyTop?: string
 }
 
 /**
@@ -32,9 +36,10 @@ export function SectionSummaryBar({
   trailing,
   className,
   marginBottom = true,
+  stickyTop,
 }: SectionSummaryBarProps) {
   const resolvedName = icon ?? SECTION_TAG_ICON_MAP[label]
-  const barBg = variant === "specialty" ? "bg-tp-violet-50" : "bg-tp-slate-100/70"
+  const barBg = variant === "specialty" ? "bg-tp-violet-50" : "bg-tp-slate-100/85"
   const labelColor = variant === "specialty" ? "text-tp-violet-600" : "text-tp-slate-500"
   const iconColor = variant === "specialty"
     ? "var(--tp-violet-600, #7C3AED)"
@@ -46,8 +51,14 @@ export function SectionSummaryBar({
         "group/section-header flex h-[30px] w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] px-2 py-[3px]",
         marginBottom && "mb-[4px]",
         barBg,
+        stickyTop && "z-[3] backdrop-blur",
         className,
       )}
+      style={
+        stickyTop
+          ? { position: "sticky", top: stickyTop }
+          : undefined
+      }
     >
       {iconSlot ?? (resolvedName ? (
         <TPMedicalIcon

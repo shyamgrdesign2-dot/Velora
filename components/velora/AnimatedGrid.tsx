@@ -628,17 +628,16 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <rect width={VB} height={VB} fill="url(#fadeRadial)" />
         </mask>
 
-        {/* Comet pulse — soft pink glow passing along the line.
-            Transparent rose tail fading into a brighter pink head
-            (#FBCFE8 → #F9A8D4 → #F472B6). Pink-on-violet-grid feels
-            on-brand for the Velora AI palette while still reading
-            as a clear glow — pinker than the base scaffolding,
-            but kept within the warm half of the wheel. */}
+        {/* Comet pulse — soft Velora-violet glow (same hue family
+            as the spark icon and the AI wash). Light lavender tail
+            fading into a slightly-more-saturated violet head — far
+            lighter than the previous pink-400, so it reads as a
+            glow, not a reddish line. */}
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="#FBCFE8" stopOpacity="0" />
-          <stop offset="0.50" stopColor="#FBCFE8" stopOpacity="0.50" />
-          <stop offset="0.85" stopColor="#F9A8D4" stopOpacity="0.90" />
-          <stop offset="1"    stopColor="#F472B6" stopOpacity="1" />
+          <stop offset="0"    stopColor="#EDE9FE" stopOpacity="0" />
+          <stop offset="0.50" stopColor="#E9D5FF" stopOpacity="0.55" />
+          <stop offset="0.85" stopColor="#C4B5FD" stopOpacity="0.90" />
+          <stop offset="1"    stopColor="#A78BFA" stopOpacity="1" />
         </linearGradient>
         {/* Base-line stroke — uses the Velora AI gradient family
             (pink → violet → indigo → blue) at low opacity so the
@@ -651,11 +650,15 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <stop offset="0.75" stopColor="#6B5FE0" />
           <stop offset="1"   stopColor="#4FACFE" />
         </linearGradient>
-        {/* Glow filter for the comet — soft Gaussian blur so the
-            "passing light" reads as glow, not a sharp dash. */}
-        <filter id="cometGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1.2" result="coloredBlur" />
+        {/* Glow filter for the comet — heavier Gaussian blur so
+            the lighter-violet pulse still reads as a luminous halo
+            instead of a thin trail. The blur is drawn underneath
+            the original via feMerge so the pulse keeps its sharp
+            head while the surrounding area glows. */}
+        <filter id="cometGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.6" result="coloredBlur" />
           <feMerge>
+            <feMergeNode in="coloredBlur" />
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>

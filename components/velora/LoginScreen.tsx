@@ -121,6 +121,21 @@ export function LoginScreen({
         }}
       />
 
+      {/* ── Layer 3b — Card halo.
+            A tighter soft-white radial directly behind the sign-in
+            card so the grid + comet trails appear to dim out where
+            they meet the card. Without this the lines feel like
+            they're running straight under the glass instead of
+            fading away as they approach the focus area. ── */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 30% 35% at 50% 50%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0) 100%)",
+        }}
+      />
+
       {/* ── Layer 4 — Card.
             Liquid-glass treatment: translucent white over the wash,
             backdrop-blur so the violet/blue smear behind the card

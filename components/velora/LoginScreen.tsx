@@ -82,15 +82,19 @@ export function LoginScreen({
         }}
       />
 
-      {/* ── Layer 2 — Animated grid scaffolding. Strokes painted in
-            tp-violet-200 (a soft pale tone) via `currentColor`, so
-            the geometry reads as a delicate scaffolding instead of
-            a bold violet rule. Container clamped to 70vmin so the
-            cells stay small on bigger screens — previously at
-            105vmin the SVG filled the entire viewport and individual
-            cells came out chunky on desktop. ── */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-[#C4B5FD]">
-        <div className="velora-login-grid h-[70vmin] w-[70vmin]">
+      {/* ── Layer 2 — Animated grid scaffolding.
+            Base strokes painted in #DDD6FE (Tailwind violet-200) via
+            `currentColor` — even paler than before so the geometry
+            reads as ghostly scaffolding. The traveling comet pulses
+            keep their own hard-coded darker violet (#7C3AED → #4338CA
+            gradient in AnimatedGrid) so they actually pop against
+            the now-very-light base lines.
+            Container shrunk further from 70vmin → 54vmin so the
+            cells stay small on desktop (≈ 27px on a 1440-wide
+            screen) and the pattern feels like ambient texture
+            rather than the dominant visual. ── */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-[#DDD6FE]">
+        <div className="velora-login-grid h-[54vmin] w-[54vmin]">
           <AnimatedGrid className="h-full w-full opacity-95" />
         </div>
       </div>

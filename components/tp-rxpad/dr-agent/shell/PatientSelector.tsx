@@ -15,7 +15,7 @@ interface PatientSelectorProps {
   className?: string
   isOpen?: boolean
   onClose?: () => void
-  /** Override heading text (default: "Select Chat Context") */
+  /** Override heading text (default: "Select patient") */
   title?: string
   /** When set, the sheet switches to a "draft + commit" flow: search moves to the top,
    *  clicking a row only stages the selection, and a sticky CTA at the bottom commits.
@@ -32,7 +32,7 @@ function CloseIcon({ size = 24, color = "currentColor" }: { size?: number; color
 }
 
 export function PatientSelector({
-  selectedId, onSelect, externalPatients, showUniversalOption, universalOptionId, className, isOpen, onClose, title = "Select Chat Context", confirmCtaLabel,
+  selectedId, onSelect, externalPatients, showUniversalOption, universalOptionId, className, isOpen, onClose, title = "Select patient", confirmCtaLabel,
 }: PatientSelectorProps) {
   const [search, setSearch] = useState("")
   const [showInfoTip, setShowInfoTip] = useState(false)

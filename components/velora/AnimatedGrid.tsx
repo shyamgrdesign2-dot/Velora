@@ -627,11 +627,16 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <rect width={VB} height={VB} fill="url(#fadeRadial)" />
         </mask>
 
+        {/* Comet pulse — uses a darker saturated violet so the
+            traveling pulses pop against the very pale base stroke
+            (which inherits `currentColor`). The whole tail fades
+            from transparent to a deeper indigo head so the eye
+            tracks each pulse as a clear "telemetry blip". */}
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="currentColor" stopOpacity="0" />
-          <stop offset="0.55" stopColor="currentColor" stopOpacity="0.4" />
-          <stop offset="0.9"  stopColor="currentColor" stopOpacity="0.9" />
-          <stop offset="1"    stopColor="currentColor" stopOpacity="1" />
+          <stop offset="0"    stopColor="#7C3AED" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#7C3AED" stopOpacity="0.55" />
+          <stop offset="0.9"  stopColor="#5B21B6" stopOpacity="0.95" />
+          <stop offset="1"    stopColor="#4338CA" stopOpacity="1" />
         </linearGradient>
       </defs>
 

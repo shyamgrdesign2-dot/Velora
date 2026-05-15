@@ -1119,7 +1119,7 @@ export function DrAgentPanelV0({
         onSelect={handlePatientChange}
         isOpen={patientSelectorOpen}
         onClose={() => setPatientSelectorOpen(false)}
-        title="Select Chat Context"
+        title="Select patient"
       />
 
       {/* Animation keyframes */}

@@ -1779,16 +1779,6 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           "Referral × Visit",
         ]}
         stickyHeaderTop="var(--velora-card-sticky-top, 0px)"
-        headerExtra={
-          <BriefFilterBar
-            specialties={specialtyOptions}
-            selectedSpecialties={filterSpecialties}
-            onSpecialtiesChange={setFilterSpecialties}
-            doctors={doctorOptions}
-            selectedDoctors={filterDoctors}
-            onDoctorsChange={setFilterDoctors}
-          />
-        }
       >
         {/* Cross-brief body — plain white canvas. The card's own
             CardShell header carries its violet → transparent gradient
@@ -1881,7 +1871,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                       ? renderItems.map((it) => it.text).join(" | ")
                       : ""
                     return (
-                      <p key={gi} className="text-[13.5px] leading-[1.55] text-tp-slate-700">
+                      <p key={gi} className="text-[14px] leading-[1.65] text-tp-slate-700">
                         <MedicalHistorySubheadingTag group={group} />
                         {hasItems ? (
                           <HighlightLine text={joinedText} plain />
@@ -1906,7 +1896,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
                   {headlines.length}
                 </span>
               </div>
-              <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[13.5px] leading-[1.5] text-tp-slate-700">
+              <ul className="ml-[2px] flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.65] text-tp-slate-700">
                 {headlines.map((h, i) => (
                   <li key={i} className="flex gap-[6px]">
                     <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-500" />
@@ -1916,6 +1906,32 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               </ul>
             </div>
           ) : null}
+
+          {/* Specialty / Doctor filter row — moved here from the
+              CardShell header so the card title can hug the top
+              cleanly. Sits between Medical history and the per-
+              specialty list with a hairline divider above and below:
+              the divider above signals "we're now switching surfaces"
+              (history → visit timeline); the filters scope the list
+              below them; the second divider closes the band so the
+              specialty rows that follow read as their own group. */}
+          <div className="mt-[4px] flex flex-col gap-[8px]">
+            <div className="h-px w-full bg-tp-slate-100" aria-hidden />
+            <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[6px]">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+                Filter
+              </span>
+              <BriefFilterBar
+                specialties={specialtyOptions}
+                selectedSpecialties={filterSpecialties}
+                onSpecialtiesChange={setFilterSpecialties}
+                doctors={doctorOptions}
+                selectedDoctors={filterDoctors}
+                onDoctorsChange={setFilterDoctors}
+              />
+            </div>
+            <div className="h-px w-full bg-tp-slate-100" aria-hidden />
+          </div>
 
           {filteredSpecialties.map(({ rec, originalIdx }, mapIdx) => {
             const isExpanded = expandedSpecialties.has(originalIdx)

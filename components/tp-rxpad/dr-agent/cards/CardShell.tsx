@@ -120,7 +120,7 @@ export function CardShell({
           per-specialty visit timelines. */}
       <div
         className={cn(
-          "card-shell-header flex flex-wrap items-center gap-x-[10px] gap-y-[8px] px-3 py-[10px]",
+          "card-shell-header flex flex-wrap items-center gap-x-[10px] gap-y-[8px] px-3 pt-[7px] pb-[9px]",
           stickyHeaderTop && "z-[5] backdrop-blur",
         )}
         style={{

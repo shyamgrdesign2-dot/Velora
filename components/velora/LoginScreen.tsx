@@ -89,17 +89,18 @@ export function LoginScreen({
         </div>
       </div>
 
-      {/* ── Layer 3 — Stronger radial vignette. Aggressive fade on
-            all four sides so only the centre of the wash + grid is
-            crisp; the corners go almost white. The user explicitly
-            asked for "increase the fade a bit more" — these stops
-            push the dark-edge falloff well into the centre. ── */}
+      {/* ── Layer 3 — Soft radial vignette.
+            Pulled back so the corners stay tinted (a hint of the
+            wash colour bleeds through at the edges) instead of
+            going almost solid white. The card sits in the bright
+            centre; the wash gradient is still visible around the
+            edges. ── */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 62% 55% at 50% 50%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.70) 75%, rgba(255,255,255,0.92) 100%)",
+            "radial-gradient(ellipse 90% 80% at 50% 50%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 60%, rgba(255,255,255,0.38) 85%, rgba(255,255,255,0.55) 100%)",
         }}
       />
 
@@ -219,18 +220,23 @@ export function LoginScreen({
           </form>
 
           <p className="mt-[18px] text-center text-[11.5px] leading-[1.5] text-tp-slate-400">
-            New here? Velora accounts are provisioned by your hospital admin.
+            New here? Contact your hospital.
           </p>
         </div>
       </div>
 
       <style>{`
-        /* Wash layer — chat-bg.gif scaled past the viewport and
+        /* Wash layer — chat-bg.gif scaled WELL past the viewport and
            heavily blurred + saturated so the doctor sees a soft
-           tinted backdrop rather than a recognisable GIF. */
+           tinted backdrop rather than a recognisable GIF.
+           Heavy blur (160px) makes the colour transitions read as a
+           slow ambient drift instead of a tight loopable animation.
+           Scale 2.4 enlarges each colour patch so any movement in
+           the underlying GIF covers a smaller fraction of the
+           screen — the perceived speed drops a lot. */
         .velora-login-wash {
-          filter: blur(60px) saturate(135%);
-          transform: scale(1.25);
+          filter: blur(160px) saturate(135%);
+          transform: scale(2.4);
         }
 
         /* Soft drift on the grid so the lines don't feel static. */

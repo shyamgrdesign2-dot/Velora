@@ -28,13 +28,15 @@ import type {
 } from "../../types"
 
 /**
- * Cross-consultation brief — Intent ① (flagship). Two CardShells:
+ * Cross-consultation brief — Intent ① (flagship). Single CardShell:
  *
  *   Card 1 · Cross-consultation brief   chronic-conditions headline +
  *                                       per-specialty Findings / Medications /
  *                                       Plan with a provenance line under each
  *                                       specialty heading.
- *   Card 2 · Clinical synthesis         cross-team interpretation panels.
+ *
+ * The Clinical synthesis card (Stack 2) was removed per design call —
+ * cross-team interpretation panels are no longer surfaced inline here.
  *
  * Internal identifiers still say "MDT" (file name, type names, intent key) —
  * the rename is user-visible only. See VeloraV0MdtBriefData JSDoc for why.
@@ -2036,8 +2038,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               )}
               {/* Open-loops block removed per design call — the Stack 1
                   card now stays strictly within "what the doctor wrote",
-                  no inferred-gap commentary. Coordination gaps surface
-                  in the separate Clinical synthesis card below. */}
+                  no inferred-gap commentary. */}
             </div>
             )
           })}
@@ -2045,156 +2046,6 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
       </CardShell>
       </div>
 
-      {/* ── Card 2 · Clinical synthesis ── */}
-      <div data-mdt-anchor="card2-header">
-      <CardShell
-        icon={<Diagram size={15} variant="Bulk" />}
-        title="Clinical synthesis"
-        date={`Cross-team interpretation · ${patientLine}`}
-        dataSources={[
-          "DDI rule-base",
-          "Guideline panels (ESC · ADA · KDIGO · NICE)",
-          "Note metadata",
-        ]}
-      >
-        <div className="flex flex-col gap-[10px]">
-          <p className="text-[14px] leading-[1.5] text-tp-slate-600">
-            Curated cross-team groupings from <strong className="font-semibold">published guidelines</strong>,
-            applied to this patient's data. AI picks <em>which panels apply</em>; it does not author the claims.
-          </p>
-
-          {/* "Where they collide" — list of independent detector fires.
-              Each entry: kind badge (DDI / Coordination gap), title
-              with drug pair, bullet points, cited guideline chip.
-              Filtered against the admin's signed library: collisions
-              whose cited body isn't in `guidelineSelection` are
-              dropped entirely (no "AI opinion" leak). The count of
-              suppressed fires is surfaced as a footnote so the doctor
-              knows the filter is engaged. */}
-          {(() => {
-            const allEntries = data.collisions ?? (data.collide ? [{
-              kind: "coordination-gap" as const,
-              title: data.collide.headline,
-              points: [data.collide.detail],
-              rule: data.collide.rule,
-            }] : [])
-            const entries = allEntries.filter((e) => isBodySigned(e.rule?.body, guidelineSelection))
-            const hidden = allEntries.length - entries.length
-            if (entries.length === 0 && hidden === 0) return null
-            if (entries.length === 0 && hidden > 0) {
-              return (
-                <div className="rounded-[10px] border border-dashed border-tp-slate-200 bg-tp-slate-50/60 px-[12px] py-[9px] text-[12.5px] italic leading-[1.5] text-tp-slate-500">
-                  {hidden} cross-team flag{hidden === 1 ? "" : "s"} suppressed — the
-                  cited guideline {hidden === 1 ? "body is" : "bodies are"} not in
-                  this hospital's signed library. Open <span className="font-semibold not-italic text-tp-slate-700">Guidelines (admin)</span> to adjust.
-                </div>
-              )
-            }
-            return (
-              <div data-mdt-anchor="collide" className="flex flex-col gap-[8px] rounded-[10px] border border-tp-warning-200 bg-tp-warning-50/60 px-[10px] py-[9px]">
-                <div className="flex items-center gap-[5px] text-[13px] font-semibold text-tp-warning-800">
-                  <Flag size={13} variant="Bulk" />
-                  <span>Where they collide</span>
-                  <span className="ml-[4px] rounded-full bg-white px-[6px] py-[1px] text-[10px] font-bold text-tp-warning-700">
-                    {entries.length}
-                  </span>
-                </div>
-                {entries.map((entry, idx) => (
-                  <CollideEntryCard key={idx} entry={entry} />
-                ))}
-                {hidden > 0 && (
-                  <p className="px-[2px] text-[11px] italic text-tp-slate-500">
-                    + {hidden} additional flag{hidden === 1 ? "" : "s"} hidden — not in this hospital's signed library.
-                  </p>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* Guideline-anchored panels — filtered against the admin's
-              signed library the same way collisions are. Hidden panels
-              count surfaces as a footnote under the visible ones. */}
-          {(() => {
-            const visibleSyntheses = (data.syntheses ?? []).filter((s) =>
-              isBodySigned(s.guideline?.body, guidelineSelection),
-            )
-            const hiddenCount = (data.syntheses?.length ?? 0) - visibleSyntheses.length
-            return (
-              <>
-                {visibleSyntheses.map((s, idx) => {
-                  // Pick the panel-level "why" caption. Prefer the
-                  // panel's `note` (panel-specific reasoning); fall
-                  // back to the guideline's `whyPicked` (rule-level
-                  // reasoning) so even older mocks without a `note`
-                  // surface a usable explanation inline.
-                  const whyApplies = s.note ?? s.guideline.whyPicked
-                  return (
-                    <div key={idx} className="flex flex-col gap-[4px]" data-mdt-anchor={idx === 0 ? "synthesis" : undefined}>
-                      <SectionSummaryBar
-                        label={s.panelTitle}
-                        icon="medical-report"
-                        trailing={<GuidelineChip {...s.guideline} />}
-                      />
-                      {/* Why this panel applies — surfaces the panel's
-                          patient-specific reasoning IN the card body so
-                          the doctor doesn't have to hover the ⓘ to
-                          learn why Velora picked it. Reads as a small
-                          violet-tinted caption beneath the title, with
-                          a sparkle glyph so it's visually clear it's
-                          the AI-reasoning line (the only AI-authored
-                          piece on this card, per the Stack 1 / Stack 2
-                          doctrine). */}
-                      {whyApplies && (
-                        <div className="ml-[2px] mt-[2px] flex items-start gap-[6px] rounded-[6px] bg-tp-violet-50/50 px-[10px] py-[6px] text-[12px] leading-[1.5] text-tp-slate-600">
-                          <Sparkles
-                            size={12}
-                            strokeWidth={2}
-                            className="mt-[2px] shrink-0 text-tp-violet-500"
-                            aria-hidden
-                          />
-                          <span>
-                            <span className="text-[10px] font-semibold uppercase tracking-[0.05em] text-tp-violet-600">
-                              Why this panel applies&nbsp;·&nbsp;
-                            </span>
-                            {whyApplies}
-                          </span>
-                        </div>
-                      )}
-                      <ul className="flex flex-col gap-[3px] pl-[8px]">
-                        {s.rows.map((row, i) => (
-                          <SynthesisBullet key={i} row={row} />
-                        ))}
-                      </ul>
-                    </div>
-                  )
-                })}
-                {hiddenCount > 0 && (
-                  <p className="px-[2px] text-[11px] italic text-tp-slate-500">
-                    + {hiddenCount} panel{hiddenCount === 1 ? "" : "s"} hidden — cited body not in this hospital's signed library.
-                  </p>
-                )}
-              </>
-            )
-          })()}
-
-          {data.pendingMdtItems && data.pendingMdtItems.length > 0 && (
-            <div data-mdt-anchor="pending" className="flex flex-col gap-[4px]">
-              <SectionSummaryBar label="Pending MDT" icon="emergency" />
-              <ul className="flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.55] text-tp-slate-700">
-                {data.pendingMdtItems.map((item, i) => (
-                  <li key={i} className="flex gap-[6px]">
-                    <span className="mt-[8px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Defence line removed from the live card — surfaced in the deep-dive doc instead. */}
-        </div>
-      </CardShell>
-      </div>
 
       {/* Specialty sidebar — slide-in panel showing per-consultation timeline.
           Opens when the doctor clicks the chevron on any specialty header. */}

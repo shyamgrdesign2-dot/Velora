@@ -134,13 +134,20 @@ export function CardShell({
           // When sticky, the header needs its own rounded top corners
           // so it doesn't paint over the card's rounded corners (we
           // dropped overflow-hidden on the parent to free the sticky
-          // range). z-[5] keeps the header above body content when
-          // it's pinned at the page top.
-          stickyHeaderTop && "rounded-t-[13px] z-[5] backdrop-blur",
+          // range). z-[31] takes the header ABOVE the homepage
+          // navbar (z-30) so when pinned at viewport y=0, the title
+          // visually replaces the navbar instead of hiding behind it.
+          stickyHeaderTop && "rounded-t-[13px] z-[31] backdrop-blur",
         )}
         style={{
+          // Sticky mode lays a near-opaque white wash UNDER the
+          // violet tint so when the title is pinned at viewport y=0
+          // and overlaps the area the navbar used to occupy, no
+          // navbar pixels bleed through. Non-sticky mode just uses
+          // the soft violet wash — same look as the Recent-trends
+          // card.
           background: stickyHeaderTop
-            ? "linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.88) 100%), linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)"
+            ? "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 100%), linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)"
             : "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
           containerType: "inline-size",
           position: stickyHeaderTop ? "sticky" : undefined,

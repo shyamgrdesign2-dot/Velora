@@ -342,8 +342,14 @@ export function WelcomeScreen({
         )}
       </p>
 
-      {/* Quick action cards — 2x2 grid, full width */}
-      <div className="relative z-[1] mt-[16px] grid grid-cols-2 gap-[10px] w-full">
+      {/* Quick action cards — single-column stack, full width each.
+          Previous build used a 2×2 grid; subtitles routinely got cut
+          off at narrow widths (the 2-line clamp ate the meaning).
+          One-column rows give each card the full chat-column width so
+          the subtitle can breathe; we also lay the card out as a
+          horizontal row (icon on the left, title-stack on the right)
+          to put the icon-text relationship into a single read. */}
+      <div className="relative z-[1] mt-[16px] flex w-full flex-col gap-[10px]">
         {actions.map((action, i) => (
           <button
             key={i}
@@ -360,10 +366,10 @@ export function WelcomeScreen({
               }
               onActionClick(outgoing)
             }}
-            className="welcome-canned-card group relative flex flex-col items-start text-left transition-all overflow-hidden"
+            className="welcome-canned-card group relative flex w-full items-start gap-[12px] text-left transition-all overflow-hidden"
             style={{
               borderRadius: 14,
-              padding: "14px 12px 16px",
+              padding: "12px 14px",
               // Whisper-light fill + minimal translucent-white stroke so the card still
               // reads as a distinct surface against the subtle rotating wash behind.
               background: "rgba(255,255,255,0.55)",
@@ -382,19 +388,36 @@ export function WelcomeScreen({
               }}
             />
 
-            {/* Icon — gradient colored, bare (no background) */}
-            <span className="relative z-[1] mb-[8px] welcome-icon-grad" style={{ opacity: 0.85 }}>
+            {/* Icon — gradient colored, bare (no background). Sits on
+                the left of the row, centred against the title line. */}
+            <span
+              className="welcome-icon-grad relative z-[1] mt-[1px] flex h-[22px] w-[22px] shrink-0 items-center justify-center"
+              style={{ opacity: 0.85 }}
+            >
               {action.icon}
             </span>
 
-            {/* Title — 15px semibold */}
-            <span className="relative z-[1] text-[15px] font-semibold leading-[20px] w-full" style={{ color: "var(--tp-slate-700, #454551)" }}>
-              {action.title}
-            </span>
-
-            {/* Subtitle — 13px with 2-line clamp */}
-            <span className="relative z-[1] mt-[4px] text-[13px] font-normal leading-[18px] w-full welcome-card-subtitle" style={{ color: "var(--tp-slate-400, #A2A2A8)" }}>
-              {action.subtitle}
+            {/* Title + subtitle stacked on the right. min-w-0 lets the
+                flex item shrink so long text wraps cleanly instead of
+                pushing the row past 100 %. */}
+            <span className="relative z-[1] flex min-w-0 flex-1 flex-col">
+              {/* Title — 15px semibold */}
+              <span
+                className="text-[15px] font-semibold leading-[20px]"
+                style={{ color: "var(--tp-slate-700, #454551)" }}
+              >
+                {action.title}
+              </span>
+              {/* Subtitle — 13px, NO truncation. With the row spanning
+                  the full chat-column width, 2 lines are now almost
+                  always enough and any overflow wraps to a 3rd line
+                  rather than being silently clipped. */}
+              <span
+                className="mt-[3px] text-[13px] font-normal leading-[18px]"
+                style={{ color: "var(--tp-slate-400, #A2A2A8)" }}
+              >
+                {action.subtitle}
+              </span>
             </span>
           </button>
         ))}
@@ -408,12 +431,9 @@ export function WelcomeScreen({
         .welcome-icon-grad svg rect {
           fill: url(#welcomeIconGrad);
         }
-        .welcome-card-subtitle {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
+        /* (welcome-card-subtitle line-clamp removed — single-column
+           rows give the subtitle the full card width, so any natural
+           wrap is preferable to a silent truncation.) */
         .welcome-canned-card {
           cursor: pointer;
           transition: transform 0.15s ease, box-shadow 0.15s ease;

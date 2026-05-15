@@ -94,14 +94,23 @@ export function LoginScreen({
 
       {/* ── Layer 2 — Animated grid scaffolding.
             Base strokes use the Velora AI gradient (pink → violet →
-            indigo → blue) at 30 % opacity — the grid feels like the
+            indigo → blue) at 12 % opacity — the grid feels like the
             Velora brand instead of a flat lavender tint.
-            Comet pulses ride along it with a warm peach → white
-            gradient + soft Gaussian glow filter so each traveling
-            pulse reads as a glow passing along the line (warm comet
-            against the cool violet scaffolding). ── */}
+            Comet pulses ride along it with a soft violet glow.
+            Sizing: 88vmin on desktop, but a floor of 520px so the
+            pattern stays visible on narrow phones. The overflow
+            beyond the viewport gets clipped by the parent's
+            `overflow-hidden` + the corner vignette, so the visible
+            area is the dense centre of the SVG — exactly what we
+            want at any width. ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="velora-login-grid h-[88vmin] w-[88vmin]">
+        <div
+          className="velora-login-grid"
+          style={{
+            width: "max(520px, 88vmin)",
+            height: "max(520px, 88vmin)",
+          }}
+        >
           <AnimatedGrid className="h-full w-full opacity-90" />
         </div>
       </div>

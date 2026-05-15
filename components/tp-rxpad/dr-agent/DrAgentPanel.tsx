@@ -1138,6 +1138,21 @@ export function DrAgentPanel({
             "da-chat-scroll flex flex-1 flex-col overflow-y-auto",
             mode === "homepage" ? "pt-[120px]" : "pt-[52px]",
           )}
+          // Sticky-offset tokens for nested cards. The Velora brief
+          // CardShell header sticks below the navbar; SpecialtyHeading
+          // sticks below the CardShell header; the visit-card header
+          // sticks below the specialty heading. Setting these as CSS
+          // vars at the scroll container keeps the cascade in one
+          // place — child components just consume `var(--velora-*)`.
+          style={
+            mode === "homepage"
+              ? ({
+                  ["--velora-card-sticky-top" as never]: "60px",
+                  ["--velora-specialty-sticky-top" as never]: "130px",
+                  ["--velora-visit-sticky-top" as never]: "176px",
+                } as React.CSSProperties)
+              : undefined
+          }
         >
           {/* Center the chat content in a reading column on wide screens; on
               < 800px viewports it fills the available width automatically. */}

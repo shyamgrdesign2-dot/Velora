@@ -35,7 +35,7 @@ export function VisitSectionBar({
       {iconNode ?? (iconName ? (
         <TPMedicalIcon name={iconName} variant="bulk" size={16} color="var(--tp-slate-500, #64748B)" className="shrink-0" />
       ) : null)}
-      <span className="flex min-h-0 min-w-0 flex-1 items-center text-left text-[13px] font-semibold leading-none text-tp-slate-500">
+      <span className="flex min-h-0 min-w-0 flex-1 items-center text-left text-[14px] font-semibold leading-none text-tp-slate-500">
         {label}
       </span>
     </div>
@@ -55,7 +55,7 @@ export function VisitBulletList({ text }: { text: string }) {
   return (
     <ul className="space-y-[3px] pl-[6px]">
       {fragments.map((f, i) => (
-        <li key={i} className="flex items-start gap-[6px] text-[13.5px] leading-[20px] text-tp-slate-700">
+        <li key={i} className="flex items-start gap-[6px] text-[14px] leading-[1.6] text-tp-slate-700">
           <span className="mt-[8px] h-[4px] w-[4px] shrink-0 rounded-full bg-tp-slate-400" />
           <span className="min-w-0">
             <HighlightLine text={f} plain />
@@ -77,7 +77,7 @@ export function VisitInlineList({ text }: { text: string }) {
     .filter(Boolean)
   if (fragments.length === 0) return null
   return (
-    <p className="pl-[6px] text-[13.5px] leading-[1.6] text-tp-slate-700">
+    <p className="pl-[6px] text-[14px] leading-[1.65] text-tp-slate-700">
       {fragments.map((f, i) => (
         <React.Fragment key={i}>
           {i > 0 && <span className="mx-[7px] text-tp-slate-300">|</span>}
@@ -185,7 +185,7 @@ export function VisitBody({ fields }: { fields: VisitBodyFields }) {
       />
       {!hasAny && (
         <div className="px-[12px] py-[8px]">
-          <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
+          <p className="min-w-0 text-[12px] italic text-tp-slate-500">
             No detail recorded for this Rx.
           </p>
         </div>

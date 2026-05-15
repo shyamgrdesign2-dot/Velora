@@ -151,7 +151,10 @@ function SpecialtyHeading({
 }) {
   const meta = specialtyMetaSegments(rec)
   return (
-    <div className="group/section-header sticky top-0 z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/70 px-2 py-[5px] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur">
+    <div
+      className="group/section-header sticky z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/85 px-2 py-[6px] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur"
+      style={{ top: "var(--velora-specialty-sticky-top, 0px)" }}
+    >
       <button
         type="button"
         onClick={onToggle}
@@ -166,12 +169,12 @@ function SpecialtyHeading({
           color="var(--tp-slate-500, #64748B)"
           className="shrink-0"
         />
-        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-[8px] gap-y-[1px]">
+        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-[8px] gap-y-[2px]">
           <span className="text-[14px] font-semibold leading-none text-tp-slate-700">
             {rec.source.specialty}
           </span>
           {meta.length > 0 && (
-            <span className="text-[11.5px] leading-[1.35] text-tp-slate-400">
+            <span className="text-[12px] leading-[1.5] text-tp-slate-400">
               <span>(</span>
               {meta.map((s, i) => (
                 <React.Fragment key={i}>
@@ -208,8 +211,8 @@ function SpecialtyHeading({
  *  card body (inline-flow + chip label, no bullet dot). */
 function RxRow({ label, content }: { label: string; content: string }) {
   return (
-    <p className="text-[12.5px] leading-[1.55] text-tp-slate-700">
-      <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
+    <p className="text-[14px] leading-[1.65] text-tp-slate-700">
+      <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1.5px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
         {label}
       </span>
       <HighlightLine text={content} />
@@ -251,12 +254,12 @@ function ConsultationLabsRow({ labs, hiddenNormalCount }: { labs: VeloraV0LabRes
 function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
   return (
     <div className="mt-[4px] flex flex-col gap-[7px] rounded-[8px] border border-tp-error-200/80 bg-tp-error-50/40 px-[10px] py-[9px]">
-      <div className="flex items-center gap-[5px] text-[10.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+      <div className="flex items-center gap-[5px] text-[10px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
         <Flag size={11} variant="Bulk" />
         <span>Discharge summary</span>
       </div>
       {ds.admissionLine && (
-        <p className="text-[11.5px] leading-[1.5] text-tp-slate-600">{ds.admissionLine}</p>
+        <p className="text-[12px] leading-[1.6] text-tp-slate-600">{ds.admissionLine}</p>
       )}
       <RxRow label="Final diagnosis" content={ds.finalDiagnosis} />
       {ds.presentingComplaints && <RxRow label="Presenting" content={ds.presentingComplaints} />}
@@ -268,10 +271,10 @@ function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
           <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-slate-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-slate-600">
             Advice
           </span>
-          <ul className="ml-[2px] mt-[3px] flex flex-col gap-[2px] pl-[8px] text-[12.5px] leading-[1.5] text-tp-slate-700">
+          <ul className="ml-[2px] mt-[5px] flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.65] text-tp-slate-700">
             {ds.dischargeAdvice.map((a, i) => (
               <li key={i} className="flex gap-[6px]">
-                <span className="mt-[7px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
+                <span className="mt-[9px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-slate-400" />
                 <span><HighlightLine text={a} /></span>
               </li>
             ))}
@@ -283,10 +286,10 @@ function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
           <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-error-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-error-700">
             Warning signs
           </span>
-          <ul className="ml-[2px] mt-[3px] flex flex-col gap-[2px] pl-[8px] text-[12.5px] leading-[1.5] text-tp-slate-700">
+          <ul className="ml-[2px] mt-[5px] flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.65] text-tp-slate-700">
             {ds.warningSigns.map((w, i) => (
               <li key={i} className="flex gap-[6px]">
-                <span className="mt-[7px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-error-400" />
+                <span className="mt-[9px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-error-400" />
                 <span><HighlightLine text={w} /></span>
               </li>
             ))}
@@ -953,9 +956,12 @@ function VisitCard({
           the header would scroll away with the rest of the card. The
           solid violet-50 sticky background ensures content scrolling
           behind it is cleanly masked. */}
-      <div className="group/visit sticky top-[38px] z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[12px] bg-tp-violet-50 px-[12px] py-[8px]">
+      <div
+        className="group/visit sticky z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[12px] bg-tp-violet-50 px-[12px] py-[8px]"
+        style={{ top: "var(--velora-visit-sticky-top, 38px)" }}
+      >
         <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[3px]">
-          <span className="text-[13.5px] font-semibold text-tp-violet-700">{c.doctor}</span>
+          <span className="text-[14px] font-semibold text-tp-violet-700">{c.doctor}</span>
           {/* Date pill — highlighted violet chip placed right next to the
               doctor's name (instead of floating at the far right). Same-
               tone family as the doctor's name + the card's body gradient,
@@ -968,7 +974,7 @@ function VisitCard({
               already names the team, so repeating it on every visit
               row read as visual noise. */}
           {c.visitType === "IPD" && (
-            <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+            <span className="rounded-[3px] bg-tp-error-50 px-[5px] py-[1.5px] text-[10px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
               IPD
             </span>
           )}
@@ -1017,7 +1023,7 @@ function VisitCard({
                 discharge summary itself wasn't ingested. */}
             {!hasAnyData && (
               <div className="px-[12px] py-[8px]">
-                <p className="min-w-0 text-[12.5px] italic text-tp-slate-500">
+                <p className="min-w-0 text-[12px] italic leading-[1.6] text-tp-slate-500">
                   {c.visitType === "IPD"
                     ? "Discharge summary not on file for this admission."
                     : "No findings, medications or plan recorded for this Rx."}{" "}
@@ -1054,7 +1060,7 @@ function DetailedSpecialtyBody({
   // verbatim render from the team-level `lines` array.
   if (consultations.length === 0) {
     return (
-      <div className="flex flex-col gap-[8px] pl-[8px] text-[13.5px] leading-[1.55] text-tp-slate-700">
+      <div className="flex flex-col gap-[8px] pl-[8px] text-[14px] leading-[1.65] text-tp-slate-700">
         {rec.lines.map((line, i) => (
           <p key={i} className="min-w-0">
             <HighlightLine text={line} />
@@ -1763,7 +1769,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
       {/* ── Card 1 · Hospital records grouped by specialty ── */}
       <div data-mdt-anchor="card1-header">
       <CardShell
-        icon={<Hospital size={15} variant="Bulk" />}
+        icon={<Hospital size={19} variant="Bulk" />}
         title="Cross-consultation brief"
         date={patientLine}
         dataSources={[
@@ -1772,6 +1778,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           "Drug Exposure × Provider",
           "Referral × Visit",
         ]}
+        stickyHeaderTop="var(--velora-card-sticky-top, 0px)"
         headerExtra={
           <BriefFilterBar
             specialties={specialtyOptions}

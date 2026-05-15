@@ -61,6 +61,11 @@ interface CardShellProps {
   headerExtra?: React.ReactNode
   /** Data source label(s) for provenance tooltip — shown as info icon when no donut chart */
   dataSources?: string[]
+  /** When set, the card header sticks at this CSS value while the body
+   *  scrolls. Pass a token like `"var(--velora-card-sticky-top, 60px)"`
+   *  so the host (chat-scroll) can establish the offset from a single
+   *  source of truth. Off by default — most surfaces don't sticky. */
+  stickyHeaderTop?: string
   children: React.ReactNode
 }
 
@@ -78,6 +83,7 @@ export function CardShell({
   sidebarLink,
   headerExtra,
   dataSources,
+  stickyHeaderTop,
   children,
 }: CardShellProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
@@ -96,24 +102,42 @@ export function CardShell({
       {/* Header — bleeds into the body via a soft violet → white
           gradient. No hairline stroke between header and body; the
           gradient itself carries the transition so the card reads as
-          one piece instead of two stacked rectangles. Every child
-          (icon, title-stack, header-extra, chevron) is vertically
-          centre-aligned via `items-center` so the filter chips and
-          chevron line up with the title block on the same baseline
-          midline. */}
+          one piece instead of two stacked rectangles.
+
+          Layout:
+            • Wide (CardShell ≥ 480px): icon · title-stack · copy ·
+              badge · headerExtra · chevron — all on one line.
+            • Narrow (< 480px): headerExtra wraps to its own row
+              below the title row. Uses CSS container queries so
+              the wrap is driven by THIS card's width, not the
+              viewport (cards can be narrow in wide windows when
+              the chat panel is sized down).
+
+          Optional sticky behaviour: when `stickyHeaderTop` is set
+          the header element sticks at that offset while the body
+          scrolls. The brief card opts in so the title + filter
+          row stay visible while the doctor scrolls through the
+          per-specialty visit timelines. */}
       <div
-        className="flex items-center gap-[7px] px-3 py-[11px]"
+        className={cn(
+          "card-shell-header flex flex-wrap items-center gap-x-[10px] gap-y-[8px] px-3 py-[10px]",
+          stickyHeaderTop && "z-[5] backdrop-blur",
+        )}
         style={{
           background: "linear-gradient(180deg, rgba(75,74,213,0.07) 0%, rgba(75,74,213,0.02) 60%, transparent 100%)",
+          containerType: "inline-size",
+          position: stickyHeaderTop ? "sticky" : undefined,
+          top: stickyHeaderTop,
         }}
       >
-        {/* Icon — always TP blue */}
+        {/* Icon — always TP blue. Bumped from 26 → 34 so it carries
+            visual weight against the larger title block. */}
         <div
-          className="flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center rounded-[8px]"
+          className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[9px]"
           style={{ background: "var(--tp-blue-50, rgba(75, 74, 213, 0.08))" }}
         >
           {tpIconName ? (
-            <TPMedicalIcon name={tpIconName} variant="bulk" size={15} color="var(--tp-blue-500, #4B4AD5)" />
+            <TPMedicalIcon name={tpIconName} variant="bulk" size={19} color="var(--tp-blue-500, #4B4AD5)" />
           ) : (
             <span style={{ color: "var(--tp-blue-500, #4B4AD5)", display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
           )}
@@ -132,7 +156,7 @@ export function CardShell({
             </span>
           </span>
           {date && (
-            <span className="mt-[2px] text-[12px] font-normal text-tp-slate-400 leading-[1.4]">
+            <span className="mt-[5px] text-[12px] font-normal text-tp-slate-400 leading-[1.45]">
               {date}
             </span>
           )}
@@ -157,9 +181,6 @@ export function CardShell({
           </div>
         )}
 
-        {/* Spacer — pushes badge and chevron to the right */}
-        <span className="flex-1" />
-
         {/* Badge — truncated with tooltip if too long */}
         {badge && (
           <span
@@ -173,21 +194,38 @@ export function CardShell({
           </span>
         )}
 
-        {/* Header Extra (e.g. data completeness donut) — gap-[6px] from badge */}
-        {headerExtra && <div className="ml-[4px] flex-shrink-0">{headerExtra}</div>}
-
-        {/* Source indicator removed from header — now rendered in ChatBubble feedback area */}
+        {/* Header Extra (e.g. filters / data-completeness donut).
+            On a narrow card it wraps to its own row via the @container
+            query in the inline <style> below — `basis-full` keeps it
+            on a fresh line; at ≥480px container width `basis-auto`
+            flips it back inline next to the chevron. */}
+        {headerExtra && (
+          <div className="card-shell-header-extra ml-[4px] min-w-0 flex-shrink-0">
+            {headerExtra}
+          </div>
+        )}
 
         {/* Collapse toggle — line icon, no stroke bg */}
         {collapsible && (
           <button
             type="button"
             onClick={() => setCollapsed(!collapsed)}
-            className="flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-[6px] bg-tp-slate-100 text-tp-slate-600 transition-colors hover:bg-tp-slate-200"
+            className="card-shell-header-chevron flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center rounded-[6px] bg-tp-slate-100 text-tp-slate-600 transition-colors hover:bg-tp-slate-200"
           >
-            {collapsed ? <ArrowDown2 size={12} variant="Linear" /> : <ArrowUp2 size={12} variant="Linear" />}
+            {collapsed ? <ArrowDown2 size={14} variant="Linear" /> : <ArrowUp2 size={14} variant="Linear" />}
           </button>
         )}
+
+        {/* @container query — when the CardShell header narrows below
+            480px the headerExtra wraps onto its own row. Without this
+            block, all items stay on a single crunched line. */}
+        <style>{`
+          .card-shell-header { container-type: inline-size; }
+          .card-shell-header-extra { flex-basis: 100%; order: 99; margin-left: 0; }
+          @container (min-width: 480px) {
+            .card-shell-header-extra { flex-basis: auto; order: 0; margin-left: 4px; }
+          }
+        `}</style>
       </div>
 
       {/* Body */}

@@ -67,7 +67,11 @@ export function ChatThread({
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col px-[8px] pt-[14px] pb-[12px] bg-transparent",
+        // pt zeroed because the parent scroll container already
+        // provides exactly the navbar-clearing padding; any extra
+        // top padding here read as a visible gap below the navbar
+        // before the first message / sticky card engages.
+        "flex flex-col px-[8px] pt-0 pb-[12px] bg-transparent",
         className,
       )}
     >

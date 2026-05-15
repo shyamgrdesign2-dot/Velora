@@ -627,16 +627,18 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <rect width={VB} height={VB} fill="url(#fadeRadial)" />
         </mask>
 
-        {/* Comet pulse — uses a darker saturated violet so the
-            traveling pulses pop against the very pale base stroke
-            (which inherits `currentColor`). The whole tail fades
-            from transparent to a deeper indigo head so the eye
-            tracks each pulse as a clear "telemetry blip". */}
+        {/* Comet pulse — "shiny passing light" gradient: a soft
+            violet/indigo tail fading to a near-white head, so the
+            pulse reads as a brief shimmer travelling along the
+            line, not a saturated dark stroke. Each colour stop
+            stays in the lavender/indigo family for tonal harmony
+            with the rest of the surface; the final white-with-soft-
+            blue tip creates the metallic-shine impression. */}
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="#7C3AED" stopOpacity="0" />
-          <stop offset="0.55" stopColor="#7C3AED" stopOpacity="0.55" />
-          <stop offset="0.9"  stopColor="#5B21B6" stopOpacity="0.95" />
-          <stop offset="1"    stopColor="#4338CA" stopOpacity="1" />
+          <stop offset="0"    stopColor="#A78BFA" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#C4B5FD" stopOpacity="0.45" />
+          <stop offset="0.85" stopColor="#E0E7FF" stopOpacity="0.9" />
+          <stop offset="1"    stopColor="#FFFFFF" stopOpacity="1" />
         </linearGradient>
       </defs>
 
@@ -645,7 +647,7 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           d={ALL_EDGES_D}
           stroke="currentColor"
           strokeWidth={LINE_T}
-          strokeOpacity="0.55"
+          strokeOpacity="0.65"
           strokeLinecap="square"
           fill="none"
         />

@@ -1901,33 +1901,29 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           ) : null}
 
           {/* Specialty / Doctor filter row — sticks at the same lane
-              as the SectionSummaryBar so the filters stay accessible
-              while the doctor scrolls through the specialty list.
-              The whole band (top divider · filter row · bottom
-              divider) pins together; once it scrolls past, the
-              first specialty heading takes over the same lane. */}
+              as the SectionSummaryBar. The wrapper carries its own
+              opaque white wash + backdrop-blur, so the visible band
+              is bracketed by the medical-history content above and
+              the first specialty heading below without needing
+              explicit hairline dividers. */}
           <div
-            className="mt-[4px] z-[3] flex flex-col gap-[8px] bg-white/95 py-[2px] backdrop-blur"
+            className="mt-[4px] z-[3] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] bg-white/95 py-[6px] backdrop-blur"
             style={{
               position: "sticky",
               top: "var(--velora-specialty-sticky-top, 0px)",
             }}
           >
-            <div className="h-px w-full bg-tp-slate-100" aria-hidden />
-            <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[6px]">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
-                Filter
-              </span>
-              <BriefFilterBar
-                specialties={specialtyOptions}
-                selectedSpecialties={filterSpecialties}
-                onSpecialtiesChange={setFilterSpecialties}
-                doctors={doctorOptions}
-                selectedDoctors={filterDoctors}
-                onDoctorsChange={setFilterDoctors}
-              />
-            </div>
-            <div className="h-px w-full bg-tp-slate-100" aria-hidden />
+            <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400">
+              Filter
+            </span>
+            <BriefFilterBar
+              specialties={specialtyOptions}
+              selectedSpecialties={filterSpecialties}
+              onSpecialtiesChange={setFilterSpecialties}
+              doctors={doctorOptions}
+              selectedDoctors={filterDoctors}
+              onDoctorsChange={setFilterDoctors}
+            />
           </div>
 
           {filteredSpecialties.map(({ rec, originalIdx }, mapIdx) => {

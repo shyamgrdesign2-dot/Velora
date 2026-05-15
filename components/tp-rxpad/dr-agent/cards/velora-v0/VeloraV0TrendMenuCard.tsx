@@ -5,7 +5,7 @@ import { Activity, Health, InfoCircle as IconsaxInfo } from "iconsax-reactjs"
 import { Info } from "lucide-react"
 import { CardShell } from "../CardShell"
 import { FloatingTooltip } from "./highlight"
-import { TrendChartBlock } from "./VeloraV0TrendDetailCard"
+import { TrendChartBlock, ReferenceInfoTip } from "./VeloraV0TrendDetailCard"
 import type { VeloraV0TrendMenuData } from "../../types"
 
 /**
@@ -188,21 +188,24 @@ function TrendChartCard({
   chip: VeloraV0TrendMenuData["chips"][number]
   onTap?: () => void
 }) {
-  const latest = chip.series?.[0]
   const accentLine = chip.category === "vital" ? "#8B5CF6" : "#10B981"
   return (
     <div
       className="rounded-[12px] border bg-white p-[12px]"
       style={{ borderColor: "rgba(103,58,172,0.16)" }}
     >
-      {/* Header: trend name (clickable) + latest reading */}
-      <button
-        type="button"
-        onClick={onTap}
-        title={chip.rationale}
-        className="group/header flex w-full items-start justify-between gap-[8px] text-left"
-      >
-        <span className="flex flex-col gap-[1px]">
+      {/* Header: trend name (clickable) + optional info-icon tooltip
+          carrying the reference / target line. The latest reading
+          isn't repeated here — it's already on the chart as the
+          rightmost data point's value label and on the table view
+          as the first row. */}
+      <div className="flex items-center gap-[6px]">
+        <button
+          type="button"
+          onClick={onTap}
+          title={chip.rationale}
+          className="group/header inline-flex items-baseline gap-[6px] text-left"
+        >
           <span
             className="text-[14px] font-semibold transition-opacity group-hover/header:opacity-80"
             style={{
@@ -220,29 +223,18 @@ function TrendChartCard({
               {chip.unit}
             </span>
           )}
-        </span>
-        {latest && (
-          <span className="flex flex-col items-end gap-[1px]">
-            <span className="text-[14px] font-semibold leading-none text-tp-slate-700">
-              {latest.value}
-            </span>
-            <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
-              {latest.date}
-            </span>
-          </span>
-        )}
-      </button>
+        </button>
+        {chip.targetLine && <ReferenceInfoTip targetLine={chip.targetLine} />}
+      </div>
 
-      {/* Chart + optional reference line — only when there's a
-          series. No-series chips just show the header with
-          rationale tooltip. */}
+      {/* Chart — only when there's a series. No-series chips just
+          show the header with rationale tooltip. */}
       {chip.series && chip.series.length > 0 && (
         <div className="mt-[10px]">
           <TrendChartBlock
             series={chip.series}
             unit={chip.unit}
             accentLine={accentLine}
-            targetLine={chip.targetLine}
           />
         </div>
       )}

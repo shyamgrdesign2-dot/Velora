@@ -1,8 +1,10 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useRef, useState } from "react"
 import { Activity, Health } from "iconsax-reactjs"
+import { Info } from "lucide-react"
 import { CardShell } from "../CardShell"
+import { FloatingTooltip } from "./highlight"
 import type { VeloraV0TrendDetailData, VeloraV0TrendSeriesPoint } from "../../types"
 
 /**
@@ -39,11 +41,21 @@ export function VeloraV0TrendDetailCard({ data }: { data: VeloraV0TrendDetailDat
       ]}
     >
       <div className="flex flex-col gap-[10px]">
+        {/* Heading row inside the body: trend name + (optional)
+            reference info tooltip. The reference target used to
+            render as a slate paragraph below the chart; it's now
+            one hover away via the info icon so the chart owns the
+            vertical space. */}
+        <div className="flex items-center gap-[6px]">
+          <span className="text-[13px] font-semibold text-tp-slate-700">
+            {data.trendName}
+          </span>
+          {data.targetLine && <ReferenceInfoTip targetLine={data.targetLine} />}
+        </div>
         <TrendChartBlock
           series={data.series}
           unit={data.unit}
           accentLine={accentLine}
-          targetLine={data.targetLine}
         />
       </div>
     </CardShell>
@@ -66,12 +78,10 @@ export function TrendChartBlock({
   series,
   unit,
   accentLine,
-  targetLine,
 }: {
   series: VeloraV0TrendSeriesPoint[]
   unit?: string
   accentLine: string
-  targetLine?: string
 }) {
   const [view, setView] = useState<"graph" | "table">("graph")
   const numericCount = series.reduce(
@@ -99,34 +109,69 @@ export function TrendChartBlock({
         </div>
       )}
 
-      {canChart && view === "graph" ? (
-        <TrendLineChart series={series} unit={unit} accentLine={accentLine} />
-      ) : (
-        <div className="overflow-hidden rounded-[10px] border border-tp-slate-200">
-          <div className="grid grid-cols-[110px_1fr_auto] items-center gap-[8px] border-b border-tp-slate-100 bg-tp-slate-50/60 px-[12px] py-[6px] text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-slate-500">
-            <span>Date</span>
-            <span>Value</span>
-            <span>Flag</span>
+      {/* Chart / table wrapper — capped to 400 px and centred inside
+          the (potentially wider) parent card. Keeps the chart
+          density readable as the surrounding card grows on wide
+          screens; on narrow screens the wrapper shrinks naturally. */}
+      <div className="mx-auto w-full max-w-[400px]">
+        {canChart && view === "graph" ? (
+          <TrendLineChart series={series} unit={unit} accentLine={accentLine} />
+        ) : (
+          <div className="overflow-hidden rounded-[10px] border border-tp-slate-200">
+            <div className="grid grid-cols-[110px_1fr_auto] items-center gap-[8px] border-b border-tp-slate-100 bg-tp-slate-50/60 px-[12px] py-[6px] text-[10.5px] font-semibold uppercase tracking-[0.05em] text-tp-slate-500">
+              <span>Date</span>
+              <span>Value</span>
+              <span>Flag</span>
+            </div>
+            <ul className="divide-y divide-tp-slate-100">
+              {series.map((p, i) => (
+                <TrendRow key={i} point={p} isLatest={i === 0} accentLineColor={accentLine} />
+              ))}
+            </ul>
           </div>
-          <ul className="divide-y divide-tp-slate-100">
-            {series.map((p, i) => (
-              <TrendRow key={i} point={p} isLatest={i === 0} accentLineColor={accentLine} />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Reference / target line, when the registry provides one. */}
-      {targetLine && (
-        <div className="flex items-start gap-[6px] rounded-[8px] bg-tp-slate-50 px-[10px] py-[7px] text-[12px] leading-[1.5] text-tp-slate-600">
-          <span className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-            Reference
-          </span>
-          <span className="text-tp-slate-300">·</span>
-          <span>{targetLine}</span>
-        </div>
-      )}
+        )}
+      </div>
     </div>
+  )
+}
+
+/**
+ * ReferenceInfoTip — small info icon that surfaces the trend's
+ * target / reference line as a hover tooltip instead of an
+ * always-visible paragraph below the chart. Used inline next to
+ * the trend name in the menu's per-trend card header.
+ */
+export function ReferenceInfoTip({ targetLine }: { targetLine: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  return (
+    <>
+      <span
+        ref={ref}
+        tabIndex={0}
+        role="img"
+        aria-label={`Reference: ${targetLine}`}
+        className="inline-flex cursor-help items-center text-tp-slate-400 hover:text-tp-slate-700"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+      >
+        <Info size={13} strokeWidth={2} aria-hidden />
+      </span>
+      <FloatingTooltip
+        open={open}
+        triggerRef={ref}
+        placement="top-center"
+        width={280}
+        className="rounded-[8px] bg-tp-slate-800 px-[12px] py-[9px] text-[11.5px] font-normal leading-[1.5] text-white shadow-xl"
+      >
+        <span className="block font-semibold uppercase tracking-[0.06em] text-[10px] text-tp-slate-300">
+          Reference
+        </span>
+        <span className="mt-[4px] block">{targetLine}</span>
+      </FloatingTooltip>
+    </>
   )
 }
 

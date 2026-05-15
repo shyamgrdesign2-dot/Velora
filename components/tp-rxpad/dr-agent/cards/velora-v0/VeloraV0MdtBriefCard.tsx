@@ -1940,12 +1940,22 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
             const idx = originalIdx
             return (
             <div key={originalIdx} className="flex flex-col gap-[4px]" data-mdt-anchor={mapIdx === 0 ? "first-specialty" : undefined}>
-              <div data-mdt-anchor={mapIdx === 0 ? "specialty-bar" : undefined}>
-                {/* New accordion heading — collapses/expands the body
-                    inline (no sidebar opener). Meta (N doctors · N visits
-                    · date range) lives inside the heading itself; the
-                    source ⓘ stays in the trailing slot so audit info is
-                    still one hover away. */}
+              {/* The previous build wrapped <SpecialtyHeading /> in
+                  an extra <div data-mdt-anchor="specialty-bar"> for
+                  the design-system tour. That wrapper became the
+                  heading's CSS containing block — and since its
+                  height equalled the heading itself, sticky had
+                  zero room to slide; the heading scrolled past the
+                  filter as if it weren't sticky at all.
+                  `display: contents` keeps the anchor reachable for
+                  the deep-dive tour but removes the wrapper from
+                  the box tree, so the sticky heading's containing
+                  block walks up to the specialty wrapper (heading +
+                  body) — exactly the range we want it pinned over. */}
+              <div
+                data-mdt-anchor={mapIdx === 0 ? "specialty-bar" : undefined}
+                style={{ display: "contents" }}
+              >
                 <SpecialtyHeading
                   rec={rec}
                   expanded={isExpanded}

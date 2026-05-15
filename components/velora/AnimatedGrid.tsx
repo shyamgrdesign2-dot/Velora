@@ -447,10 +447,10 @@ const VB = 2500
 // ---------- Tuning knobs ----------
 const SPEED = 1050         // u/s — uniform across every lane: SAME motion everywhere
 const CYCLE = 3.0          // total cycle (active travel + brief idle pause)
-const COMET_LEN = 200      // length of the bright comet (longer tail / softer fade)
-const COMET_T = 4          // comet thickness
-const LINE_T = 3.5         // dim base line thickness
-const CLIP_T = 5           // clip thickness (>= COMET_T)
+const COMET_LEN = 220      // length of the bright comet (longer tail / softer fade)
+const COMET_T = 6          // comet thickness — bumped so pulses read clearly on the login surface
+const LINE_T = 6           // dim base line thickness — visible at a glance, not whisper-thin
+const CLIP_T = 7           // clip thickness (>= COMET_T)
 const INTERCEPT_TOL = 10   // cluster diagonals whose intercept differs by < this (snap noise)
 
 // Build a thin rotated-rectangle path for one edge (used in clip paths).
@@ -616,11 +616,11 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           id="fadeRadial"
           cx="0" cy="0" r="1"
           gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(1287.01 1250) rotate(180) scale(973.733 973.725)"
+          gradientTransform="translate(1287.01 1250) rotate(180) scale(1380 1380)"
         >
-          <stop offset="0"    stopColor="white" stopOpacity="0.7" />
-          <stop offset="0.21" stopColor="white" stopOpacity="0.9" />
-          <stop offset="0.43" stopColor="white" stopOpacity="1" />
+          <stop offset="0"    stopColor="white" stopOpacity="0.9" />
+          <stop offset="0.40" stopColor="white" stopOpacity="1" />
+          <stop offset="0.70" stopColor="white" stopOpacity="0.85" />
           <stop offset="1"    stopColor="white" stopOpacity="0" />
         </radialGradient>
         <mask id="fadeMask" maskUnits="userSpaceOnUse" x="0" y="0" width={VB} height={VB}>
@@ -640,7 +640,7 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           d={ALL_EDGES_D}
           stroke="white"
           strokeWidth={LINE_T}
-          strokeOpacity="0.22"
+          strokeOpacity="0.55"
           strokeLinecap="square"
           fill="none"
         />

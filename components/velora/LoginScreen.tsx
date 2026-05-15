@@ -63,22 +63,20 @@ export function LoginScreen({
     }, 350)
   }
 
-  function handleGoogleSignIn() {
-    // V0: skip the OAuth round-trip entirely. The real implementation
-    // would redirect to /auth/google here.
-    setSubmitting(true)
-    setTimeout(() => onAuthenticated(), 250)
-  }
-
   return (
     <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-[#1A1948]">
       {/* ── Layer 1 — AI conic-gradient wash ── */}
       <div className="velora-login-wash pointer-events-none absolute inset-0" aria-hidden />
 
-      {/* ── Layer 2 — Animated grid scaffolding ── */}
+      {/* ── Layer 2 — Animated grid scaffolding.
+            Cranked-up visibility per design call: container scaled to
+            160vmin (the grid extends past the viewport so we always
+            see the dense centre, not the fade edges), opacity nudged
+            to ~0.95, blend mode kept on screen so the white strokes
+            pop against the deep gradient. ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="velora-login-grid h-[140vmin] w-[140vmin]">
-          <AnimatedGrid className="h-full w-full opacity-[0.55]" />
+        <div className="velora-login-grid h-[160vmin] w-[160vmin]">
+          <AnimatedGrid className="h-full w-full opacity-95" />
         </div>
       </div>
 
@@ -101,11 +99,13 @@ export function LoginScreen({
               "0 1px 0 rgba(255,255,255,0.6) inset, 0 24px 60px -20px rgba(15,9,46,0.45), 0 12px 28px -16px rgba(15,9,46,0.30)",
           }}
         >
-          {/* Brand mark — Velora sparkle + wordmark */}
-          <div className="mb-[22px] flex items-center justify-center gap-[8px]">
+          {/* Brand mark — just the Velora sparkle icon, scaled up.
+              Wordmark + Beta tag dropped per the simplified spec
+              (the headline below already names the product). */}
+          <div className="mb-[20px] flex items-center justify-center">
             <span
-              className="relative inline-flex h-[32px] w-[32px] items-center justify-center overflow-hidden"
-              style={{ borderRadius: 9 }}
+              className="relative inline-flex h-[64px] w-[64px] items-center justify-center overflow-hidden"
+              style={{ borderRadius: 18 }}
               aria-hidden
             >
               <img
@@ -119,61 +119,22 @@ export function LoginScreen({
                 alt=""
                 draggable={false}
                 className="relative z-10"
-                width={18}
-                height={18}
+                width={36}
+                height={36}
               />
-            </span>
-            <span
-              className="text-[18px] font-semibold leading-none text-tp-slate-800"
-              style={{ letterSpacing: "0.1px" }}
-            >
-              Velora
-            </span>
-            <span
-              className="inline-flex shrink-0 items-center rounded-[5px] px-[7px] py-[3px] text-[10px] font-bold uppercase leading-none text-white"
-              style={{
-                background: "linear-gradient(135deg, #FB923C 0%, #F97316 50%, #EA580C 100%)",
-                letterSpacing: "0.08em",
-                boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.45), 0 1px 2px rgba(234,88,12,0.20)",
-              }}
-              aria-label="Beta release"
-            >
-              Beta
             </span>
           </div>
 
-          {/* Headline — Playfair Display via --font-display */}
+          {/* Headline — Playfair Display via --font-display.
+              Subtitle removed per simplified spec. */}
           <h1
-            className="velora-login-headline mb-[6px] text-center text-[36px] font-bold leading-[1.1] text-tp-slate-900"
+            className="velora-login-headline mb-[26px] text-center text-[36px] font-bold leading-[1.1] text-tp-slate-900"
           >
             Sign in to{" "}
             <span className="velora-login-headline-accent italic">Velora</span>
           </h1>
-          <p className="mb-[24px] text-center text-[13px] leading-[1.5] text-tp-slate-500">
-            Hospital-signed clinical AI · Private, cited, you decide
-          </p>
 
-          {/* ── Google SSO (top — primary entry) ── */}
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={submitting}
-            className="mb-[18px] flex w-full items-center justify-center gap-[10px] rounded-[10px] border border-tp-slate-200 bg-white px-[16px] py-[11px] text-[14px] font-semibold text-tp-slate-800 transition-all hover:bg-tp-slate-50 active:scale-[0.99] disabled:cursor-default disabled:opacity-60"
-          >
-            <GoogleGlyph />
-            Continue with Google
-          </button>
-
-          <div className="mb-[18px] flex items-center gap-[10px]" aria-hidden>
-            <span className="h-px flex-1 bg-tp-slate-100" />
-            <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-tp-slate-400">
-              or
-            </span>
-            <span className="h-px flex-1 bg-tp-slate-100" />
-          </div>
-
-          {/* ── Password sign-in form ── */}
+          {/* ── Username + password (only auth path) ── */}
           <form onSubmit={handleSubmit} noValidate>
             <label className="mb-[14px] block">
               <span className="mb-[6px] block text-[12px] font-semibold text-tp-slate-700">
@@ -186,7 +147,7 @@ export function LoginScreen({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="admin"
-                className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-violet-400 focus:outline-none focus:ring-2 focus:ring-tp-violet-100"
+                className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
               />
             </label>
 
@@ -201,7 +162,7 @@ export function LoginScreen({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] pr-[44px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-violet-400 focus:outline-none focus:ring-2 focus:ring-tp-violet-100"
+                  className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] pr-[44px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
                 />
                 <button
                   type="button"
@@ -231,16 +192,12 @@ export function LoginScreen({
             New here? Velora accounts are provisioned by your hospital admin.
           </p>
         </div>
-
-        {/* Trust marker — outside the card, on the gradient */}
-        <p className="mt-[18px] text-center text-[11px] leading-[1.5] text-white/70">
-          Anchored to hospital-signed guidelines · Private · Cited · You decide
-        </p>
       </div>
 
       <style>{`
-        /* Conic AI wash — same palette as da-gradient-wash but at higher
-           opacity (this is the actual background, not a subtle tint). */
+        /* Conic AI wash — deeper indigo / violet / midnight-blue palette.
+           Darker than the chat-panel wash so the white card pops and the
+           grid lines (which are white) read clearly. */
         @property --velora-login-angle {
           syntax: '<angle>';
           initial-value: 0deg;
@@ -249,17 +206,17 @@ export function LoginScreen({
         .velora-login-wash {
           background: conic-gradient(
             from var(--velora-login-angle) at 50% 50%,
-            #E38BBE 0deg,
-            #B06CE0 55deg,
-            #8B5CF6 115deg,
-            #6B5FE0 180deg,
-            #4B4AD5 235deg,
-            #4FACFE 295deg,
-            #E38BBE 360deg
+            #1E1B4B 0deg,
+            #312E81 55deg,
+            #4338CA 115deg,
+            #5B21B6 180deg,
+            #4C1D95 235deg,
+            #1E3A8A 295deg,
+            #1E1B4B 360deg
           );
           animation: veloraLoginRotate 28s linear infinite;
           will-change: --velora-login-angle;
-          filter: saturate(1.05);
+          filter: saturate(1.1);
         }
         @keyframes veloraLoginRotate {
           from { --velora-login-angle: 0deg; }
@@ -302,15 +259,17 @@ export function LoginScreen({
           opacity: 0.55;
         }
 
-        /* CTA — AI gradient pill */
+        /* CTA — solid blue. Per spec, this surface uses blue only for
+           the primary action; violet stays for the "Velora" headline
+           accent so the brand wordmark still reads as the AI surface. */
         .velora-login-cta {
-          background: linear-gradient(135deg, #6B5FE0 0%, #8B5CF6 45%, #B06CE0 100%);
+          background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E40AF 100%);
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.30),
-            0 8px 20px -8px rgba(107,95,224,0.55);
+            inset 0 1px 0 rgba(255,255,255,0.32),
+            0 8px 20px -8px rgba(29,78,216,0.55);
         }
         .velora-login-cta:hover:not(:disabled) {
-          filter: brightness(1.04);
+          filter: brightness(1.06);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -321,25 +280,3 @@ export function LoginScreen({
   )
 }
 
-function GoogleGlyph() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden>
-      <path
-        fill="#4285F4"
-        d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"
-      />
-      <path
-        fill="#34A853"
-        d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86a5.27 5.27 0 0 1-4.95-3.64H1.04v2.28A8.99 8.99 0 0 0 9 18Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M4.05 10.78A5.4 5.4 0 0 1 3.77 9c0-.62.11-1.22.28-1.78V4.94H1.04A9 9 0 0 0 0 9c0 1.45.34 2.82.94 4.06l3.11-2.28Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M9 3.58c1.32 0 2.51.45 3.44 1.34l2.58-2.58A8.97 8.97 0 0 0 9 0 8.99 8.99 0 0 0 1.04 4.94l3.01 2.28C4.78 5.05 6.7 3.58 9 3.58Z"
-      />
-    </svg>
-  )
-}

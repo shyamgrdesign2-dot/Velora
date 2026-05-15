@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Eye, EyeSlash } from "iconsax-reactjs"
 import AnimatedGrid from "./AnimatedGrid"
 
@@ -44,6 +44,16 @@ export function LoginScreen({
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const usernameRef = useRef<HTMLInputElement>(null)
+
+  // Auto-focus the username field on mount so the doctor can
+  // start typing immediately. `autoFocus` alone is unreliable
+  // under React strict-mode / hydration edge cases — a manual
+  // focus() in a layout-effect-equivalent useEffect is the
+  // belt-and-suspenders fix.
+  useEffect(() => {
+    usernameRef.current?.focus()
+  }, [])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -83,21 +93,16 @@ export function LoginScreen({
       />
 
       {/* ── Layer 2 — Animated grid scaffolding.
-            Base strokes painted in #C4B5FD (Tailwind violet-300) via
-            `currentColor` — pale enough to read as ambient
-            scaffolding, but a touch warmer than violet-200 so the
-            geometry is visible without competing.
-            Comet pulses (hardcoded in AnimatedGrid) now use a
-            lavender → near-white → pure-white gradient so each
-            traveling pulse reads as a soft shimmer of light
-            passing along the line — the "shiny" effect.
-            Container scaled up from 54vmin → 88vmin so the cell
-            ratio is bigger overall; combined with the unchanged
-            stroke thickness this gives a larger, more visible
-            geometry without making the line weight chunky. ── */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-[#C4B5FD]">
+            Base strokes use the Velora AI gradient (pink → violet →
+            indigo → blue) at 30 % opacity — the grid feels like the
+            Velora brand instead of a flat lavender tint.
+            Comet pulses ride along it with a warm peach → white
+            gradient + soft Gaussian glow filter so each traveling
+            pulse reads as a glow passing along the line (warm comet
+            against the cool violet scaffolding). ── */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="velora-login-grid h-[88vmin] w-[88vmin]">
-          <AnimatedGrid className="h-full w-full opacity-95" />
+          <AnimatedGrid className="h-full w-full opacity-90" />
         </div>
       </div>
 
@@ -184,12 +189,13 @@ export function LoginScreen({
                 Username
               </span>
               <input
+                ref={usernameRef}
                 type="text"
                 autoComplete="username"
                 autoFocus
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin"
+                placeholder="Please enter your username"
                 className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
               />
             </label>
@@ -204,7 +210,7 @@ export function LoginScreen({
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Please enter your password"
                   className="block w-full rounded-[10px] border border-tp-slate-200 bg-white px-[14px] py-[11px] pr-[44px] text-[14px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
                 />
                 <button

@@ -1921,7 +1921,7 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               gap, acting as a hairline "divider cut" between the
               heading lane and the filter lane. */}
           <div
-            className="z-[5] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] border-t border-tp-slate-100 bg-white py-[6px] backdrop-blur"
+            className="z-[5] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] border-t border-tp-slate-100 bg-white pt-[12px] pb-[8px] backdrop-blur"
             style={{
               position: "sticky",
               top: "var(--velora-specialty-sticky-top, 0px)",

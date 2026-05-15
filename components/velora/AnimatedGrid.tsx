@@ -582,6 +582,7 @@ function LanePulse({ lane }: { lane: Lane }) {
       width={COMET_LEN}
       height={COMET_T}
       fill="url(#cometGrad)"
+      filter="url(#cometGlow)"
     >
       <animateMotion
         dur={`${CYCLE}s`}
@@ -627,27 +628,46 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <rect width={VB} height={VB} fill="url(#fadeRadial)" />
         </mask>
 
-        {/* Comet pulse — "shiny passing light" gradient: a soft
-            violet/indigo tail fading to a near-white head, so the
-            pulse reads as a brief shimmer travelling along the
-            line, not a saturated dark stroke. Each colour stop
-            stays in the lavender/indigo family for tonal harmony
-            with the rest of the surface; the final white-with-soft-
-            blue tip creates the metallic-shine impression. */}
+        {/* Comet pulse — "glowy passing light" using a different
+            tonal family from the base lines: a near-white head
+            backed by a warm peach/pink fade, so each pulse reads
+            as a brief glow travelling along the violet scaffolding.
+            The contrast between cool base (violet) and warm
+            comet (peach → white) is what makes the motion legible. */}
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="#A78BFA" stopOpacity="0" />
-          <stop offset="0.55" stopColor="#C4B5FD" stopOpacity="0.45" />
-          <stop offset="0.85" stopColor="#E0E7FF" stopOpacity="0.9" />
+          <stop offset="0"    stopColor="#FBCFE8" stopOpacity="0" />
+          <stop offset="0.50" stopColor="#FCE7F3" stopOpacity="0.55" />
+          <stop offset="0.85" stopColor="#FFFFFF" stopOpacity="0.95" />
           <stop offset="1"    stopColor="#FFFFFF" stopOpacity="1" />
         </linearGradient>
+        {/* Base-line stroke — uses the Velora AI gradient family
+            (pink → violet → indigo → blue) at low opacity so the
+            scaffolding feels like the Velora brand rather than a
+            single lavender tint. */}
+        <linearGradient id="baseLineGrad" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0"   stopColor="#E38BBE" />
+          <stop offset="0.25" stopColor="#B06CE0" />
+          <stop offset="0.50" stopColor="#8B5CF6" />
+          <stop offset="0.75" stopColor="#6B5FE0" />
+          <stop offset="1"   stopColor="#4FACFE" />
+        </linearGradient>
+        {/* Glow filter for the comet — soft Gaussian blur so the
+            "passing light" reads as glow, not a sharp dash. */}
+        <filter id="cometGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.2" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
       <g mask="url(#fadeMask)">
         <path
           d={ALL_EDGES_D}
-          stroke="currentColor"
+          stroke="url(#baseLineGrad)"
           strokeWidth={LINE_T}
-          strokeOpacity="0.65"
+          strokeOpacity="0.30"
           strokeLinecap="square"
           fill="none"
         />

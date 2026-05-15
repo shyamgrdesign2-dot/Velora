@@ -180,7 +180,7 @@ export function CardShell({
             </span>
           </span>
           {date && (
-            <span className="mt-[5px] text-[12px] font-normal text-tp-slate-400 leading-[1.45]">
+            <span className="mt-[1px] text-[12px] font-normal text-tp-slate-400 leading-[1.4]">
               {date}
             </span>
           )}

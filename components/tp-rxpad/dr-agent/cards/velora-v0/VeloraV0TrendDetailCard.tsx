@@ -53,11 +53,10 @@ export function VeloraV0TrendDetailCard({ data }: { data: VeloraV0TrendDetailDat
               {data.unit}
             </span>
           )}
-          {data.whyOffered && (
-            <span className="text-[11.5px] italic text-tp-slate-500">
-              {data.whyOffered}
-            </span>
-          )}
+          {/* `whyOffered` rationale block removed — the chip + unit
+              already name the trend, and the cited guideline footer
+              below carries the audit info. The verbose italic
+              paragraph was reading as filler. */}
         </div>
 
         {/* Series table */}

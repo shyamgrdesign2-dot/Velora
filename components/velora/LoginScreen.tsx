@@ -82,15 +82,16 @@ export function LoginScreen({
         }}
       />
 
-      {/* ── Layer 2 — Animated grid scaffolding. The strokes are
-            painted in tp-violet-500 (currentColor on the wrapper) so
-            they actually read against the now-very-light wash; on
-            the previous (white-stroke) build the grid was invisible
-            because either the stroke or the blend mode collapsed
-            against the lighter background. ── */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-tp-violet-500">
-        <div className="velora-login-grid h-[105vmin] w-[105vmin]">
-          <AnimatedGrid className="h-full w-full opacity-90" />
+      {/* ── Layer 2 — Animated grid scaffolding. Strokes painted in
+            tp-violet-200 (a soft pale tone) via `currentColor`, so
+            the geometry reads as a delicate scaffolding instead of
+            a bold violet rule. Container clamped to 70vmin so the
+            cells stay small on bigger screens — previously at
+            105vmin the SVG filled the entire viewport and individual
+            cells came out chunky on desktop. ── */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-[#C4B5FD]">
+        <div className="velora-login-grid h-[70vmin] w-[70vmin]">
+          <AnimatedGrid className="h-full w-full opacity-95" />
         </div>
       </div>
 

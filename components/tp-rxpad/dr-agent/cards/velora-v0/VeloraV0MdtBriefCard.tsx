@@ -1914,9 +1914,14 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
               (content scrolls behind it cleanly), and the specialty
               headings stack BELOW it on their own lane. bg-white +
               backdrop-blur keep the band fully opaque so nothing
-              bleeds through. */}
+              bleeds through.
+              No top margin — the filter slots directly under the
+              card title (when both are sticky) and a 1px slate-100
+              top border replaces what used to be the 4px breathing
+              gap, acting as a hairline "divider cut" between the
+              heading lane and the filter lane. */}
           <div
-            className="mt-[4px] z-[5] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] bg-white py-[6px] backdrop-blur"
+            className="z-[5] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] border-t border-tp-slate-100 bg-white py-[6px] backdrop-blur"
             style={{
               position: "sticky",
               top: "var(--velora-specialty-sticky-top, 0px)",

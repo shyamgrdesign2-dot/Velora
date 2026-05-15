@@ -49,7 +49,7 @@ export default function VeloraHomePage() {
             replyOverride={(message) => buildVeloraV0Reply(message)}
             autoOpenPatientSheetOnMount
             patientSelectorConfirmCtaLabel="Continue"
-            trustMarkerText="ADA · WHO HTN · NICE NG56 · Private, cited, you decide"
+            trustMarkerText="Anchored to hospital-signed guidelines · Private · Cited · You decide"
           />
         </div>
       </div>

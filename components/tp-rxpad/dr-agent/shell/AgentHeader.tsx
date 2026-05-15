@@ -635,23 +635,16 @@ export function AgentHeader({
       />
 
       <style>{`
-        /* Homepage navbar — same liquid-glass family as the brand tag,
-           but tuned for a full-width bar: softer top highlight (no
-           bright "lip" running across the page), no 1px inset border
-           (which read as a "light outline" on the left/top/bottom in
-           full-width mode), and a richer bottom edge so the navbar
-           reads as glass that catches light at the bottom seam. */
+        /* Homepage navbar — plain translucent white with a backdrop
+           blur. No violet tint, no inset highlights, no glossy bottom
+           seam — the brand chip + profile + kebab carry all the color;
+           the bar itself is a neutral surface that lets content show
+           through softly when it scrolls underneath. */
         .da-agent-navbar {
-          background:
-            linear-gradient(180deg, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.22) 100%),
-            linear-gradient(135deg, rgba(213,101,234,0.10) 0%, rgba(103,58,172,0.07) 55%, rgba(75,74,213,0.07) 100%);
-          backdrop-filter: blur(16px) saturate(150%);
-          -webkit-backdrop-filter: blur(16px) saturate(150%);
-          border-bottom: 1px solid rgba(103,58,172,0.10);
-          box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.55),
-            inset 0 -6px 14px -8px rgba(103,58,172,0.18),
-            0 8px 20px -12px rgba(103,58,172,0.18);
+          background: rgba(255,255,255,0.78);
+          backdrop-filter: blur(14px) saturate(140%);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          border-bottom: 1px solid rgba(15,23,42,0.06);
         }
         /* Dr. Agent brand tag — iOS liquid-glass with subtle AI gradient tint.
            Low bg opacity + strong blur + saturate so content scrolling behind

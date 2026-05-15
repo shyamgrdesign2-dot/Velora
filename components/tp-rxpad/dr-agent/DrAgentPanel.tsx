@@ -1170,11 +1170,13 @@ export function DrAgentPanel({
           ref={chatScrollRef}
           className={cn(
             "da-chat-scroll flex flex-1 flex-col overflow-y-auto",
-            // Homepage navbar is 42px tall; the patient chip moved
-            // out of the floating area into the bottom trust row,
-            // so we only need ≈ the navbar height up top — no extra
-            // chip-clearing buffer.
-            mode === "homepage" ? "pt-[46px]" : "pt-[52px]",
+            // Homepage: pt EQUALS the navbar height so the chat
+            // content sits flush against the navbar bottom — no
+            // breathing buffer, no gap before sticky engages. When
+            // the user scrolls, the sticky card header pins at
+            // top:42 (--velora-card-sticky-top), which is exactly
+            // where the navbar ends.
+            mode === "homepage" ? "pt-[42px]" : "pt-[52px]",
           )}
           // Sticky-offset tokens for nested cards. The Velora brief
           // CardShell header sticks below the navbar; SpecialtyHeading

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import { Setting2 } from "iconsax-reactjs"
+import { Setting2, More, Logout, MessageEdit, Clock, Profile } from "iconsax-reactjs"
 import { cn } from "@/lib/utils"
 import type { DoctorViewType, DrAgentVariant, SpecialtyTabId } from "../types"
 import { GuidelineSettingsSidebar } from "./GuidelineSettingsSidebar"
@@ -104,6 +104,17 @@ export function AgentHeader({
   // to the minimize button. V0: the trigger is always rendered (the
   // demo audience IS the admin). Future: gate behind a role check.
   const [guidelineSettingsOpen, setGuidelineSettingsOpen] = useState(false)
+  // Homepage navbar — profile + kebab dropdowns (standalone surface only).
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [kebabOpen, setKebabOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
+  const kebabRef = useRef<HTMLDivElement>(null)
+
+  // Standalone (homepage) mode is detected via the presence of the
+  // patient chip props — the embedded sidebar mode never passes these.
+  // When true, the floating tag set is replaced by a full-width sticky
+  // header navbar with profile + kebab affordances on the right.
+  const homepageMode = !!patientChipLabel || !!onPatientChipClick
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -116,6 +127,22 @@ export function AgentHeader({
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
   }, [dropdownOpen])
+
+  // Close profile/kebab menus on outside click
+  useEffect(() => {
+    if (!profileOpen && !kebabOpen) return
+    function handleClick(e: MouseEvent) {
+      const target = e.target as Node
+      if (profileOpen && profileRef.current && !profileRef.current.contains(target)) {
+        setProfileOpen(false)
+      }
+      if (kebabOpen && kebabRef.current && !kebabRef.current.contains(target)) {
+        setKebabOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [profileOpen, kebabOpen])
 
   const activeSpecLabel = SPECIALTY_OPTIONS.find((o) => o.id === activeSpecialty)?.label ?? "GP"
   const activeDoctorLabel = DOCTOR_VIEW_OPTIONS.find((o) => o.id === doctorViewType)?.shortLabel
@@ -135,12 +162,37 @@ export function AgentHeader({
     }
   }
 
+  // Navbar height differs between modes: the homepage standalone surface
+  // uses a taller full-width bar (60px) so the profile + kebab + brand
+  // chip read as a real product header. The embedded sidebar keeps the
+  // 52px transparent strip so it sits flush against the host EMR chrome.
+  const headerHeight = homepageMode ? 60 : 52
+  // Patient chip top offset — below the navbar with a small breathing
+  // gap. In the legacy floating mode it sits inside the header strip.
+  const patientChipTop = homepageMode ? headerHeight + 10 : 10
+
   return (
     <div className={cn("relative z-20", className)}>
-      {/* Header — transparent, floating liquid-glass tags (no bar, no divider). */}
+      {/* Header — homepage mode renders a full-width sticky navbar with
+          a soft white/glass fill; embedded mode keeps the transparent
+          floating-tags strip so it sits flush against the host EMR. */}
       <div
-        className="relative flex items-center justify-between px-[14px]"
-        style={{ height: 52, background: "transparent" }}
+        className={cn(
+          "relative flex items-center justify-between",
+          homepageMode
+            ? "sticky top-0 z-30 w-full px-[20px]"
+            : "px-[14px]",
+        )}
+        style={{
+          height: headerHeight,
+          background: homepageMode
+            ? "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%)"
+            : "transparent",
+          backdropFilter: homepageMode ? "blur(14px) saturate(140%)" : undefined,
+          WebkitBackdropFilter: homepageMode ? "blur(14px) saturate(140%)" : undefined,
+          borderBottom: homepageMode ? "1px solid rgba(15,23,42,0.06)" : undefined,
+          boxShadow: homepageMode ? "0 1px 0 rgba(15,23,42,0.02), 0 6px 16px -10px rgba(15,23,42,0.08)" : undefined,
+        }}
       >
         {/* Left: Dr. Agent brand tag — floating liquid-glass card with 10px radius */}
         <div className="pointer-events-auto relative z-10 flex items-center gap-[6px]">
@@ -335,43 +387,10 @@ export function AgentHeader({
           </div>}
         </div>
 
-        {/* Centre: floating patient-context chip. Visible only when the
-            host page supplies a patient label (the standalone Velora
-            homepage does; the embedded EMR sidebar does not). Same
-            liquid-glass treatment as the Velora brand tag on the left
-            so the two tags read as a coherent floating set. Clicking
-            opens the existing PatientSelector via `onPatientChipClick`. */}
-        {patientChipLabel && (
-          <button
-            type="button"
-            onClick={onPatientChipClick}
-            disabled={!onPatientChipClick}
-            aria-label={`Patient context: ${patientChipLabel}${patientChipMeta ? ` (${patientChipMeta})` : ""}`}
-            title="Switch patient"
-            className="da-agent-brand-tag pointer-events-auto absolute left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-[7px] rounded-[10px] py-[5px] pl-[10px] pr-[9px] transition-transform active:scale-[0.98] disabled:cursor-default"
-            style={{ top: 10 }}
-          >
-            <span className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-white/60 text-tp-slate-600">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path opacity="0.4" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="currentColor" />
-                <path d="M12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z" fill="currentColor" />
-              </svg>
-            </span>
-            <span className="text-[13px] font-semibold leading-none text-tp-slate-800" style={{ letterSpacing: "0.1px" }}>
-              {patientChipLabel}
-            </span>
-            {patientChipMeta && (
-              <span className="text-[11px] font-normal leading-none text-tp-slate-500">
-                ({patientChipMeta})
-              </span>
-            )}
-            {onPatientChipClick && (
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" className="shrink-0 text-tp-slate-500" aria-hidden>
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </button>
-        )}
+        {/* Centre: floating patient-context chip lives OUTSIDE the
+            navbar (see below) so it can sit just under the bar in
+            homepage mode. Rendered after the navbar so the absolute
+            position is anchored to the outer wrapper. */}
 
         {/* Right: admin · guideline settings + collapse — two floating
             glass tags sitting together so the doctor-facing collapse
@@ -414,8 +433,159 @@ export function AgentHeader({
               <path d="M13 9l3 3-3 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+
+          {/* Homepage navbar only: user profile + vertical kebab. The
+              profile click opens a small dropdown with the signed-in
+              clinician's identity + a logout option; the kebab opens
+              a chat-session menu. Both are dummy targets in V0 (this
+              surface is a pilot demo) but they signal the production
+              shape so reviewers can see where things will plug in. */}
+          {homepageMode && (
+            <>
+              <span aria-hidden className="mx-[2px] h-[22px] w-px bg-tp-slate-200" />
+              {/* Profile dropdown */}
+              <div ref={profileRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileOpen((v) => !v)
+                    setKebabOpen(false)
+                  }}
+                  className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-tp-violet-50 text-tp-violet-700 transition-colors hover:bg-tp-violet-100 active:scale-[0.95]"
+                  aria-haspopup="menu"
+                  aria-expanded={profileOpen}
+                  aria-label="Open profile menu"
+                  title="Profile"
+                >
+                  <Profile size={18} variant="Bulk" />
+                </button>
+                {profileOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full z-[140] mt-[8px] min-w-[244px] overflow-hidden rounded-[12px] border border-tp-slate-100 bg-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.18)]"
+                  >
+                    {/* Identity block */}
+                    <div className="flex items-center gap-[10px] border-b border-tp-slate-100 px-[14px] py-[12px]">
+                      <span className="inline-flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full bg-tp-violet-100 text-tp-violet-700">
+                        <Profile size={20} variant="Bulk" />
+                      </span>
+                      <span className="flex flex-col leading-tight">
+                        <span className="text-[13.5px] font-semibold text-tp-slate-800">Dr. Shyam GR</span>
+                        <span className="text-[11.5px] text-tp-slate-500">shyam.gr@tatvacare.in</span>
+                      </span>
+                    </div>
+                    {/* Org line */}
+                    <div className="px-[14px] py-[8px] text-[11px] uppercase tracking-wider text-tp-slate-400">
+                      Zydus · TatvaPractice
+                    </div>
+                    {/* Logout */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileOpen(false)
+                        // Dummy logout — V0 demo surface.
+                      }}
+                      role="menuitem"
+                      className="flex w-full items-center gap-[10px] border-t border-tp-slate-100 px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-rose-50 hover:text-tp-rose-700"
+                    >
+                      <Logout size={16} variant="Bulk" className="text-tp-rose-500" />
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* Vertical kebab */}
+              <div ref={kebabRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKebabOpen((v) => !v)
+                    setProfileOpen(false)
+                  }}
+                  className="flex h-[36px] w-[36px] items-center justify-center rounded-full text-tp-slate-600 transition-colors hover:bg-tp-slate-100 hover:text-tp-slate-900 active:scale-[0.95]"
+                  aria-haspopup="menu"
+                  aria-expanded={kebabOpen}
+                  aria-label="Open session menu"
+                  title="More"
+                >
+                  <More size={20} variant="Bold" className="rotate-90" />
+                </button>
+                {kebabOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full z-[140] mt-[8px] min-w-[228px] overflow-hidden rounded-[12px] border border-tp-slate-100 bg-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.18)]"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setKebabOpen(false)}
+                      role="menuitem"
+                      className="flex w-full items-center gap-[10px] px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-slate-50"
+                    >
+                      <MessageEdit size={16} variant="Bulk" className="text-tp-violet-600" />
+                      <span className="font-medium">Start new chat session</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setKebabOpen(false)}
+                      role="menuitem"
+                      className="flex w-full items-center gap-[10px] border-t border-tp-slate-100 px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-slate-50"
+                    >
+                      <Clock size={16} variant="Bulk" className="text-tp-slate-500" />
+                      <span className="font-medium">Chat session history</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setKebabOpen(false)}
+                      role="menuitem"
+                      className="flex w-full items-center gap-[10px] border-t border-tp-slate-100 px-[14px] py-[10px] text-left text-[13px] text-tp-slate-700 transition-colors hover:bg-tp-slate-50"
+                    >
+                      <Setting2 size={16} variant="Bulk" className="text-tp-slate-500" />
+                      <span className="font-medium">Settings</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Floating patient-context chip — lives BELOW the navbar in
+          homepage mode (anchored to the outer wrapper). Visible only
+          when the host page supplies a patient label. Same liquid-
+          glass treatment as the Velora brand tag. Clicking opens the
+          existing PatientSelector via `onPatientChipClick`. */}
+      {patientChipLabel && (
+        <button
+          type="button"
+          onClick={onPatientChipClick}
+          disabled={!onPatientChipClick}
+          aria-label={`Patient context: ${patientChipLabel}${patientChipMeta ? ` (${patientChipMeta})` : ""}`}
+          title="Switch patient"
+          className="da-agent-brand-tag pointer-events-auto absolute left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-[7px] rounded-[10px] py-[5px] pl-[10px] pr-[9px] transition-transform active:scale-[0.98] disabled:cursor-default"
+          style={{ top: patientChipTop }}
+        >
+          <span className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-white/60 text-tp-slate-600">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path opacity="0.4" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="currentColor" />
+              <path d="M12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z" fill="currentColor" />
+            </svg>
+          </span>
+          <span className="text-[13px] font-semibold leading-none text-tp-slate-800" style={{ letterSpacing: "0.1px" }}>
+            {patientChipLabel}
+          </span>
+          {patientChipMeta && (
+            <span className="text-[11px] font-normal leading-none text-tp-slate-500">
+              ({patientChipMeta})
+            </span>
+          )}
+          {onPatientChipClick && (
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" className="shrink-0 text-tp-slate-500" aria-hidden>
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </button>
+      )}
 
       {/* Admin sidebar — slide-in panel. Renders into document.body via
           its own portal, so it sits above every chat surface. */}

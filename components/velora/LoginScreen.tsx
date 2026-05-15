@@ -69,7 +69,10 @@ export function LoginScreen({
             (the same asset that lives behind the Velora icon tile in
             the chat welcome card). Scaled past the viewport + heavily
             blurred so the doctor reads "soft tinted backdrop" instead
-            of a recognisable GIF. ── */}
+            of a recognisable GIF. Opacity dropped to 0.55 so the
+            colour reads as a faint hue, not a saturated background —
+            this also leaves enough headroom for the white grid lines
+            above it to stay clearly visible. ── */}
       <div
         className="velora-login-wash pointer-events-none absolute inset-0"
         aria-hidden
@@ -77,15 +80,20 @@ export function LoginScreen({
           backgroundImage: "url(/icons/dr-agent/chat-bg.gif)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          opacity: 0.55,
         }}
       />
 
       {/* ── Layer 2 — Animated grid scaffolding. Sits ABOVE the wash
-            but below the vignette so the line art reads as the
-            "scaffolding" on top of the soft tinted backdrop. ── */}
+            but below the vignette. The previous build used
+            mix-blend-mode: multiply on this layer, which on a white
+            stroke is the identity transform — the grid was painted
+            but invisible. We now render with normal compositing so
+            the strokes actually appear; opacity nudged up to 0.95
+            so the line art reads at a glance. ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="velora-login-grid h-[105vmin] w-[105vmin]">
-          <AnimatedGrid className="h-full w-full opacity-[0.55]" />
+          <AnimatedGrid className="h-full w-full opacity-95" />
         </div>
       </div>
 

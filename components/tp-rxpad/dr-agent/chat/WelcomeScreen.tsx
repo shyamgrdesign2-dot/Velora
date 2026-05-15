@@ -343,16 +343,12 @@ export function WelcomeScreen({
       </p>
 
       {/* Quick action cards — responsive grid.
-          Narrow (chat column < 768px viewport):  single column stack,
-                                                 full-width rows so the
-                                                 subtitle can wrap fully
-                                                 without truncation.
-          Wide  (≥ 768px viewport):              2×2 grid; there's
-                                                 horizontal room for
-                                                 the subtitle to live
-                                                 next to the title in a
-                                                 normal-density card. */}
-      <div className="relative z-[1] mt-[16px] grid w-full grid-cols-1 gap-[10px] md:grid-cols-2">
+          Breakpoint is intentionally low: anything wider than 300 px
+          gets the 2×2 layout (most phones in portrait already qualify);
+          below 300 px we fall back to a single-column stack so the
+          subtitle can wrap without truncation on the very narrowest
+          surfaces. */}
+      <div className="relative z-[1] mt-[16px] grid w-full grid-cols-1 gap-[10px] min-[300px]:grid-cols-2">
         {actions.map((action, i) => (
           <button
             key={i}

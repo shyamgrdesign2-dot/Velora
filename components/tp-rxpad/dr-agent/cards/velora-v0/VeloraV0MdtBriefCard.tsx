@@ -948,18 +948,10 @@ function VisitCard({
     >
       {/* Header strip — informational only (no toggle). Doctor (semibold,
           violet to flag clinical attribution) on the left, a highlighted
-          violet date pill next to the name. Sticky so it hovers under
-          the specialty heading while the user scrolls through this visit's
-          body.
-          NOTE: the outer wrapper is NOT `overflow-hidden` — sticky
-          positioning silently breaks when an ancestor clips overflow, so
-          the header would scroll away with the rest of the card. The
-          solid violet-50 sticky background ensures content scrolling
-          behind it is cleanly masked. */}
-      <div
-        className="group/visit sticky z-[2] flex w-full items-center justify-between gap-[8px] rounded-t-[12px] bg-tp-violet-50 px-[12px] py-[8px]"
-        style={{ top: "var(--velora-visit-sticky-top, 38px)" }}
-      >
+          violet date pill next to the name. NO longer sticky: the doctor
+          name + date strip scrolls with its visit body. Only the parent
+          specialty heading needs to stay pinned for orientation. */}
+      <div className="group/visit flex w-full items-center justify-between gap-[8px] rounded-t-[12px] bg-tp-violet-50 px-[12px] py-[8px]">
         <div className="flex min-w-0 flex-wrap items-center gap-x-[8px] gap-y-[3px]">
           <span className="text-[14px] font-semibold text-tp-violet-700">{c.doctor}</span>
           {/* Date pill — highlighted violet chip placed right next to the

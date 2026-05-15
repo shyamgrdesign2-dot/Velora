@@ -1189,9 +1189,20 @@ export function DrAgentPanel({
           style={
             mode === "homepage"
               ? ({
+                  // Cascade tuned so each lane sits FLUSH against
+                  // the one above it (no visible gap when a section
+                  // is pinned at its sticky position):
+                  //   navbar bottom         = 42px
+                  //   + card header height  = ~50px → card-sticky-top is 42
+                  //   + specialty lane      = 42 + 50 = 92  (Medical
+                  //                          history, Filter band,
+                  //                          Specialty headings all
+                  //                          share this lane)
+                  // Visit-card doctor-name strip is no longer
+                  // sticky (see VisitCard); only the specialty
+                  // heading carries context once a visit is open.
                   ["--velora-card-sticky-top" as never]: "42px",
-                  ["--velora-specialty-sticky-top" as never]: "108px",
-                  ["--velora-visit-sticky-top" as never]: "150px",
+                  ["--velora-specialty-sticky-top" as never]: "92px",
                 } as React.CSSProperties)
               : undefined
           }

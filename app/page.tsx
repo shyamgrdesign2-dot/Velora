@@ -1,43 +1,44 @@
 "use client"
 
-import Link from "next/link"
-import { BookOpen } from "lucide-react"
 import { DrAgentPanel } from "@/components/tp-rxpad/dr-agent/DrAgentPanel"
 import { VeloraSyncProvider } from "@/lib/velora/sync-context"
 import { buildVeloraV0Reply } from "@/lib/velora/v0-replies"
 
 /**
- * Velora — standalone clinical AI chat.
+ * Velora — standalone clinical AI chat (production-leaning surface).
  *
- * Renders the same agent panel that lives inside the EMR sidebar in TatvaPractice,
- * but as the entire product surface — no RxPad, no EMR shell. The panel keeps its
- * sidebar dimensions (450–500px) and is centered against a soft TP slate background.
+ * Two homepage-only chrome changes vs. the embedded sidebar mode:
  *
- * A small documentation entry-point sits outside the panel (top-right) and routes
- * to /dr-agent-design-system, which carries the full agent docs.
+ *   • The agent's "minimize" collapse tag is hidden — there's nothing
+ *     to collapse to in standalone mode.
+ *   • The chat-input box at the bottom is hidden too. The doctor never
+ *     types here in the demo build; the canned suggestion pills are
+ *     the only entry point. The sticky **trust-marker** line below the
+ *     input is preserved (kept as a footer).
+ *
+ * The patient context is surfaced via a floating liquid-glass chip in
+ * the top-centre of the agent header (driven by AgentHeader's
+ * `patientChipLabel` / `patientChipMeta` / `onPatientChipClick` props
+ * that DrAgentPanel passes through when `mode === "homepage"`).
+ *
+ * A separate documentation-link icon used to live at top-right; it was
+ * removed for the demo surface. The /dr-agent-design-system route
+ * remains accessible directly.
  */
 export default function VeloraHomePage() {
   return (
     <VeloraSyncProvider>
-      {/*
-        Velora is a full-screen standalone product, not an embedded sidebar — so the
-        "Minimize agent" collapse button in AgentHeader has nothing meaningful to
-        collapse to. Hide it here without modifying the shared AgentHeader.
-      */}
-      <style>{`#dr-agent-panel-root .da-agent-collapse-tag { display: none !important; }`}</style>
-      <div className="relative flex h-screen w-screen items-stretch justify-center bg-tp-slate-100">
-        {/* Documentation entry point — icon-only, mirrors the panel's collapse-tag style */}
-        <Link
-          href="/dr-agent-design-system"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open Velora documentation"
-          title="Documentation"
-          className="fixed right-5 top-5 z-40 flex h-[32px] w-[32px] items-center justify-center rounded-[10px] text-tp-slate-600 transition-colors hover:text-tp-slate-900 active:scale-[0.95]"
-        >
-          <BookOpen className="h-4 w-4" strokeWidth={1.7} />
-        </Link>
+      <style>{`
+        /* Hide the agent's "Minimize agent" tag — standalone surface
+           has nowhere to collapse to. */
+        #dr-agent-panel-root .da-agent-collapse-tag { display: none !important; }
 
+        /* Hide the chat-input box (textarea + patient chip + send +
+           voice). The sticky bottom container that holds it stays
+           visible because it also carries the trust-marker line. */
+        #dr-agent-panel-root .chat-input-border { display: none !important; }
+      `}</style>
+      <div className="relative flex h-screen w-screen items-stretch justify-center bg-tp-slate-100">
         <div className="h-full w-full">
           <DrAgentPanel
             mode="homepage"

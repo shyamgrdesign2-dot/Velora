@@ -1104,6 +1104,23 @@ export function DrAgentPanel({
         showDoctorViewSelector={showDoctorViewSelector}
         intakeMode={intakeMode}
         onIntakeModeChange={handleIntakeModeChange}
+        // Homepage mode: surface the patient as a floating chip in the
+        // header (replaces the input-chip the embedded EMR mode uses).
+        // Tapping it opens the patient sheet — same handler the
+        // chat-input chip wires up.
+        patientChipLabel={
+          mode === "homepage" && selectedPatientId !== HOMEPAGE_COMMON_ID
+            ? patient.label || undefined
+            : undefined
+        }
+        patientChipMeta={
+          mode === "homepage" && selectedPatientId !== HOMEPAGE_COMMON_ID && patient.gender && patient.age
+            ? `${patient.gender}, ${patient.age}y`
+            : undefined
+        }
+        onPatientChipClick={
+          mode === "homepage" ? () => setIsPatientSheetOpen(true) : undefined
+        }
       />
       </div>
 

@@ -71,6 +71,13 @@ interface AgentHeaderProps {
   variant?: DrAgentVariant
   /** Override brand tag title (defaults to "Dr. Agent") */
   brandTitle?: string
+  /** When set, renders a floating liquid-glass patient-context chip in
+   *  the centre of the header. Used by the standalone Velora homepage
+   *  to surface the patient name (previously shown inside the chat
+   *  input chip). Tapping it fires `onPatientChipClick`. */
+  patientChipLabel?: string
+  patientChipMeta?: string
+  onPatientChipClick?: () => void
 }
 
 export function AgentHeader({
@@ -86,6 +93,9 @@ export function AgentHeader({
   onIntakeModeChange,
   variant = "full",
   brandTitle,
+  patientChipLabel,
+  patientChipMeta,
+  onPatientChipClick,
 }: AgentHeaderProps) {
   const isV0 = variant === "v0"
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -324,6 +334,44 @@ export function AgentHeader({
             )}
           </div>}
         </div>
+
+        {/* Centre: floating patient-context chip. Visible only when the
+            host page supplies a patient label (the standalone Velora
+            homepage does; the embedded EMR sidebar does not). Same
+            liquid-glass treatment as the Velora brand tag on the left
+            so the two tags read as a coherent floating set. Clicking
+            opens the existing PatientSelector via `onPatientChipClick`. */}
+        {patientChipLabel && (
+          <button
+            type="button"
+            onClick={onPatientChipClick}
+            disabled={!onPatientChipClick}
+            aria-label={`Patient context: ${patientChipLabel}${patientChipMeta ? ` (${patientChipMeta})` : ""}`}
+            title="Switch patient"
+            className="da-agent-brand-tag pointer-events-auto absolute left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-[7px] rounded-[10px] py-[5px] pl-[10px] pr-[9px] transition-transform active:scale-[0.98] disabled:cursor-default"
+            style={{ top: 10 }}
+          >
+            <span className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-white/60 text-tp-slate-600">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path opacity="0.4" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="currentColor" />
+                <path d="M12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z" fill="currentColor" />
+              </svg>
+            </span>
+            <span className="text-[13px] font-semibold leading-none text-tp-slate-800" style={{ letterSpacing: "0.1px" }}>
+              {patientChipLabel}
+            </span>
+            {patientChipMeta && (
+              <span className="text-[11px] font-normal leading-none text-tp-slate-500">
+                ({patientChipMeta})
+              </span>
+            )}
+            {onPatientChipClick && (
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" className="shrink-0 text-tp-slate-500" aria-hidden>
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+        )}
 
         {/* Right: admin · guideline settings + collapse — two floating
             glass tags sitting together so the doctor-facing collapse

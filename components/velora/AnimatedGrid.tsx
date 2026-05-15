@@ -628,17 +628,16 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           <rect width={VB} height={VB} fill="url(#fadeRadial)" />
         </mask>
 
-        {/* Comet pulse — "glowy passing light" using a different
-            tonal family from the base lines: a near-white head
-            backed by a warm peach/pink fade, so each pulse reads
-            as a brief glow travelling along the violet scaffolding.
-            The contrast between cool base (violet) and warm
-            comet (peach → white) is what makes the motion legible. */}
+        {/* Comet pulse — "glowy passing light" tinted sky-blue
+            (cool, distinct from white): a soft cyan tail fading
+            into a brighter sky-blue head. The base scaffolding is
+            warm (pink → violet → indigo); a cool comet against it
+            reads as light passing through, not a saturated dash. */}
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="#FBCFE8" stopOpacity="0" />
-          <stop offset="0.50" stopColor="#FCE7F3" stopOpacity="0.55" />
-          <stop offset="0.85" stopColor="#FFFFFF" stopOpacity="0.95" />
-          <stop offset="1"    stopColor="#FFFFFF" stopOpacity="1" />
+          <stop offset="0"    stopColor="#BAE6FD" stopOpacity="0" />
+          <stop offset="0.50" stopColor="#BAE6FD" stopOpacity="0.45" />
+          <stop offset="0.85" stopColor="#7DD3FC" stopOpacity="0.85" />
+          <stop offset="1"    stopColor="#38BDF8" stopOpacity="1" />
         </linearGradient>
         {/* Base-line stroke — uses the Velora AI gradient family
             (pink → violet → indigo → blue) at low opacity so the
@@ -667,7 +666,7 @@ export default function AnimatedGrid({ className }: { className?: string }) {
           d={ALL_EDGES_D}
           stroke="url(#baseLineGrad)"
           strokeWidth={LINE_T}
-          strokeOpacity="0.30"
+          strokeOpacity="0.18"
           strokeLinecap="square"
           fill="none"
         />

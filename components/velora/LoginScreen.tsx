@@ -64,63 +64,93 @@ export function LoginScreen({
   }
 
   return (
-    <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-[#1A1948]">
-      {/* ── Layer 1 — AI conic-gradient wash ── */}
-      <div className="velora-login-wash pointer-events-none absolute inset-0" aria-hidden />
+    <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-white">
+      {/* ── Layer 1 — animated AI wash, reusing the chat-bg.gif
+            (the same asset that lives behind the Velora icon tile in
+            the chat welcome card). Scaled past the viewport + heavily
+            blurred so the doctor reads "soft tinted backdrop" instead
+            of a recognisable GIF. ── */}
+      <div
+        className="velora-login-wash pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          backgroundImage: "url(/icons/dr-agent/chat-bg.gif)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
 
-      {/* ── Layer 2 — Animated grid scaffolding.
-            Container sized to 105vmin so each cell appears tighter
-            (the SVG viewBox is fixed at 2500u, so smaller container
-            = denser grid). Stroke thickness + opacity are tuned in
-            AnimatedGrid itself; this layer just controls the
-            overall visibility. ── */}
+      {/* ── Layer 2 — Animated grid scaffolding. Sits ABOVE the wash
+            but below the vignette so the line art reads as the
+            "scaffolding" on top of the soft tinted backdrop. ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="velora-login-grid h-[105vmin] w-[105vmin]">
-          <AnimatedGrid className="h-full w-full opacity-[0.75]" />
+          <AnimatedGrid className="h-full w-full opacity-[0.55]" />
         </div>
       </div>
 
-      {/* ── Layer 3 — Vignette so the card has somewhere to sit ── */}
+      {/* ── Layer 3 — Stronger radial vignette. Aggressive fade on
+            all four sides so only the centre of the wash + grid is
+            crisp; the corners go almost white. The user explicitly
+            asked for "increase the fade a bit more" — these stops
+            push the dark-edge falloff well into the centre. ── */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(15,9,46,0.0) 0%, rgba(15,9,46,0.18) 60%, rgba(15,9,46,0.42) 100%)",
+            "radial-gradient(ellipse 62% 55% at 50% 50%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.70) 75%, rgba(255,255,255,0.92) 100%)",
         }}
       />
 
-      {/* ── Layer 4 — Card ── */}
+      {/* ── Layer 4 — Card.
+            Liquid-glass treatment: translucent white over the wash,
+            backdrop-blur so the violet/blue smear behind the card
+            stays visible as a soft halo, 1px inset white highlight
+            on the top edge, generous corner radius. ── */}
       <div className="relative z-10 w-full max-w-[440px] px-[20px]">
         <div
-          className="rounded-[24px] bg-white px-[28px] pt-[36px] pb-[28px]"
+          className="rounded-[32px] px-[28px] pt-[36px] pb-[28px]"
           style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.72) 100%)",
+            backdropFilter: "blur(28px) saturate(140%)",
+            WebkitBackdropFilter: "blur(28px) saturate(140%)",
+            border: "1px solid rgba(255,255,255,0.6)",
             boxShadow:
-              "0 1px 0 rgba(255,255,255,0.6) inset, 0 24px 60px -20px rgba(15,9,46,0.45), 0 12px 28px -16px rgba(15,9,46,0.30)",
+              "inset 0 1px 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.18), 0 24px 60px -20px rgba(30,27,75,0.28), 0 12px 28px -16px rgba(30,27,75,0.18)",
           }}
         >
-          {/* Brand mark — just the Velora sparkle icon, scaled up.
-              Wordmark + Beta tag dropped per the simplified spec
-              (the headline below already names the product). */}
-          <div className="mb-[20px] flex items-center justify-center">
+          {/* Brand mark — animated Velora sparkle. Same composition as
+              the chat WelcomeScreen icon (white tile + chat-bg.gif
+              animated wash at low opacity + slowly rotating spark)
+              scaled to 56px so it carries weight on the login surface
+              without dwarfing the Playfair headline. */}
+          <div className="mb-[18px] flex items-center justify-center">
             <span
-              className="relative inline-flex h-[64px] w-[64px] items-center justify-center overflow-hidden"
-              style={{ borderRadius: 18 }}
+              className="pointer-events-none select-none relative inline-flex items-center justify-center overflow-hidden"
+              style={{ width: 56, height: 56, borderRadius: 56 * 0.24 }}
               aria-hidden
             >
-              <img
-                src="/icons/dr-agent/agent-bg.svg"
-                alt=""
-                draggable={false}
-                className="absolute inset-0 h-full w-full object-cover"
+              <div className="absolute inset-0 bg-white" style={{ borderRadius: 56 * 0.24 }} />
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: "url(/icons/dr-agent/chat-bg.gif)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: 56 * 0.24,
+                  opacity: 0.32,
+                }}
               />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/icons/dr-agent/agent-spark.svg"
+                width={56 * 0.72}
+                height={56 * 0.72}
                 alt=""
                 draggable={false}
-                className="relative z-10"
-                width={36}
-                height={36}
+                className="velora-login-spark-rotate relative z-10"
               />
             </span>
           </div>
@@ -195,57 +225,65 @@ export function LoginScreen({
       </div>
 
       <style>{`
-        /* Conic AI wash — deeper indigo / violet / midnight-blue palette.
-           Darker than the chat-panel wash so the white card pops and the
-           grid lines (which are white) read clearly. */
-        @property --velora-login-angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
+        /* Wash layer — chat-bg.gif scaled past the viewport and
+           heavily blurred + saturated so the doctor sees a soft
+           tinted backdrop rather than a recognisable GIF. */
         .velora-login-wash {
-          background: conic-gradient(
-            from var(--velora-login-angle) at 50% 50%,
-            #1E1B4B 0deg,
-            #312E81 55deg,
-            #4338CA 115deg,
-            #5B21B6 180deg,
-            #4C1D95 235deg,
-            #1E3A8A 295deg,
-            #1E1B4B 360deg
-          );
-          animation: veloraLoginRotate 28s linear infinite;
-          will-change: --velora-login-angle;
-          filter: saturate(1.1);
-        }
-        @keyframes veloraLoginRotate {
-          from { --velora-login-angle: 0deg; }
-          to   { --velora-login-angle: 360deg; }
+          filter: blur(60px) saturate(135%);
+          transform: scale(1.25);
         }
 
         /* Soft drift on the grid so the lines don't feel static. */
         .velora-login-grid {
           animation: veloraGridDrift 60s ease-in-out infinite;
           transform-origin: center;
-          mix-blend-mode: screen;
+          mix-blend-mode: multiply;
+          opacity: 0.55;
         }
         @keyframes veloraGridDrift {
           0%, 100% { transform: scale(1.0) rotate(0deg); }
           50%       { transform: scale(1.04) rotate(0.6deg); }
         }
 
-        /* Playfair Display headline + violet→pink gradient on "Velora". */
+        /* Slow rotation on the Velora sparkle — matches the chat
+           welcome icon (16s linear). */
+        @keyframes veloraLoginSparkRotate {
+          0%   { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .velora-login-spark-rotate {
+          animation: veloraLoginSparkRotate 16s linear infinite;
+        }
+
+        /* Playfair Display headline + violet→pink gradient that
+           gently shifts position across the "Velora" word so the
+           wordmark feels alive without distracting. */
         .velora-login-headline {
           font-family: var(--font-display), "Playfair Display", Georgia, serif;
           letter-spacing: -0.01em;
         }
         .velora-login-headline-accent {
-          background: linear-gradient(135deg, #B06CE0 0%, #8B5CF6 40%, #E38BBE 100%);
+          background: linear-gradient(
+            120deg,
+            #6366F1 0%,
+            #8B5CF6 22%,
+            #B06CE0 45%,
+            #E38BBE 65%,
+            #B06CE0 82%,
+            #8B5CF6 100%
+          );
+          background-size: 280% 100%;
+          background-position: 0% 50%;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
           color: transparent;
           position: relative;
+          animation: veloraHeadlineShift 9s ease-in-out infinite;
+        }
+        @keyframes veloraHeadlineShift {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
         }
         .velora-login-headline-accent::after {
           content: "";
@@ -256,24 +294,30 @@ export function LoginScreen({
           height: 2px;
           background: linear-gradient(90deg, #B06CE0 0%, #E38BBE 100%);
           border-radius: 2px;
-          opacity: 0.55;
+          opacity: 0.45;
         }
 
-        /* CTA — solid blue. Per spec, this surface uses blue only for
-           the primary action; violet stays for the "Velora" headline
-           accent so the brand wordmark still reads as the AI surface. */
+        /* CTA — solid primary blue (single tone, not gradient).
+           Per spec: blue is the only colour used for the primary
+           action so the doctor reads it as "system action", not
+           an AI affordance. */
         .velora-login-cta {
-          background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E40AF 100%);
+          background: #2563EB;
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.32),
-            0 8px 20px -8px rgba(29,78,216,0.55);
+            inset 0 1px 0 rgba(255,255,255,0.28),
+            0 8px 20px -8px rgba(37,99,235,0.50);
         }
         .velora-login-cta:hover:not(:disabled) {
-          filter: brightness(1.06);
+          background: #1D4ED8;
+        }
+        .velora-login-cta:active:not(:disabled) {
+          background: #1E40AF;
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .velora-login-wash, .velora-login-grid { animation: none; }
+          .velora-login-grid,
+          .velora-login-headline-accent,
+          .velora-login-spark-rotate { animation: none; }
         }
       `}</style>
     </div>

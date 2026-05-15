@@ -89,7 +89,7 @@ export default function VeloraHomePage() {
             replyOverride={(message) => buildVeloraV0Reply(message)}
             autoOpenPatientSheetOnMount
             patientSelectorConfirmCtaLabel="Continue"
-            trustMarkerText="Your data is saved"
+            trustMarkerText="Your data is safe with Velora · End-to-end private"
             onLogout={() => {
               try {
                 window.localStorage.removeItem(AUTH_KEY)

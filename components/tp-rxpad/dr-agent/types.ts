@@ -1306,6 +1306,18 @@ export interface VeloraV0TrendMenuChip {
   /** Tooltip / rationale shown on hover — verbatim from the
    *  registry's `rationale` field. */
   rationale: string
+  /** Display unit (rendered next to the latest value on the mini
+   *  card — e.g. "mmHg", "g/dL", "mL/min/1.73 m²"). */
+  unit?: string
+  /** Full structured series so the menu card can render an inline
+   *  sparkline + latest reading per trend — no extra round-trip
+   *  needed to see the data. Newest reading first. Empty / undefined
+   *  means the chip stays as a label-only pill. */
+  series?: VeloraV0TrendSeriesPoint[]
+  /** Reference / target line statement (e.g. "Target per WHO HEARTS
+   *  2023: < 140/90 mmHg"). Shown as a soft footnote on the mini
+   *  card when present. */
+  targetLine?: string
 }
 
 export interface VeloraV0TrendMenuData {

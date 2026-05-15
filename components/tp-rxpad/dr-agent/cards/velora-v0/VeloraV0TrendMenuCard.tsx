@@ -145,7 +145,7 @@ function TrendChipGroup({
   onPillTap?: (message: string) => void
 }) {
   return (
-    <div className="flex flex-col gap-[6px]">
+    <div className="flex flex-col gap-[8px]">
       <div className="flex items-center gap-[6px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
         <span className="text-tp-violet-500">{icon}</span>
         <span>{label}</span>
@@ -154,13 +154,17 @@ function TrendChipGroup({
           {chips.length} on file
         </span>
       </div>
-      <div className="flex flex-wrap gap-[6px]">
+      {/* Inline mini-card per trend: title + sparkline + latest
+          reading. One column on narrow, two columns when the menu
+          card has room. Tapping a card fires the same canned
+          question the legacy pill used to fire — the doctor lands
+          on the full trend-detail card. */}
+      <div className="grid grid-cols-1 gap-[8px] min-[420px]:grid-cols-2">
         {chips.map((chip) => (
-          <AIPillButton
+          <TrendMiniCard
             key={chip.id}
-            label={chip.label}
-            title={chip.rationale}
-            onClick={() => onPillTap?.(chip.question)}
+            chip={chip}
+            onTap={() => onPillTap?.(chip.question)}
           />
         ))}
       </div>
@@ -168,43 +172,169 @@ function TrendChipGroup({
   )
 }
 
-/** AI-suggestion pill — same gradient treatment used elsewhere on the
- *  agent surface (welcome screen cards, situation-at-a-glance
- *  follow-ups). Reads unmistakably as a clickable AI tap target:
- *  soft fuchsia → purple → indigo gradient background, hairline
- *  purple ring, gradient-text label. */
-function AIPillButton({
-  label,
-  title,
-  onClick,
+/** Mini per-trend card surfaced inside the TrendMenu.
+ *
+ *   ┌─────────────────────────────────────┐
+ *   │ Blood pressure          138/85 mmHg │
+ *   │  ▁▂▃▅▇  (sparkline)     12 May '26  │
+ *   │  Target per WHO HEARTS …            │
+ *   └─────────────────────────────────────┘
+ *
+ *  Renders three shapes depending on what data is available:
+ *    a) ≥ 2 numeric points → sparkline + latest reading
+ *    b) 1 point            → no sparkline, just the value + date
+ *    c) no series          → falls back to a quiet pill-style card
+ *                            with just the label (legacy pill)
+ *  All three are clickable; the click handler is the same.
+ */
+function TrendMiniCard({
+  chip,
+  onTap,
 }: {
-  label: string
-  title?: string
-  onClick?: () => void
+  chip: VeloraV0TrendMenuData["chips"][number]
+  onTap?: () => void
 }) {
+  const points = chip.series ?? []
+  const numerics = points.map((p) => parseTrendNumeric(p.value))
+  const validPairs = points
+    .map((p, i) => ({ point: p, n: numerics[i] }))
+    .filter((x) => Number.isFinite(x.n))
+  const hasNumeric = validPairs.length > 0
+  const hasSparkline = validPairs.length >= 2
+
+  // Latest reading — first item in the series (newest first).
+  const latest = points[0]
+
   return (
     <button
       type="button"
-      onClick={onClick}
-      title={title}
-      className="inline-flex shrink-0 items-center rounded-full px-[12px] py-[6px] text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.97]"
+      onClick={onTap}
+      title={chip.rationale}
+      className="velora-trend-mini group/mini flex w-full flex-col gap-[6px] rounded-[12px] px-[12px] py-[10px] text-left transition-all active:scale-[0.99]"
       style={{
         background:
-          "linear-gradient(135deg, rgba(213,101,234,0.10) 0%, rgba(103,58,172,0.10) 50%, rgba(26,25,148,0.10) 100%)",
-        border: "1px solid rgba(103,58,172,0.20)",
+          "linear-gradient(135deg, rgba(213,101,234,0.06) 0%, rgba(103,58,172,0.06) 50%, rgba(26,25,148,0.06) 100%)",
+        border: "1px solid rgba(103,58,172,0.18)",
       }}
     >
-      <span
-        style={{
-          background:
-            "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}
-      >
-        {label}
-      </span>
+      {/* Top row: label on the left, latest reading on the right. */}
+      <div className="flex w-full items-start justify-between gap-[8px]">
+        <span
+          className="min-w-0 truncate text-[13px] font-semibold"
+          style={{
+            background:
+              "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {chip.label}
+        </span>
+        {latest && (
+          <span className="shrink-0 text-right text-[13px] font-semibold leading-none text-tp-slate-700">
+            {latest.value}
+            {chip.unit && (
+              <span className="ml-[3px] text-[10.5px] font-normal text-tp-slate-400">
+                {chip.unit}
+              </span>
+            )}
+          </span>
+        )}
+      </div>
+
+      {/* Middle row: sparkline (if ≥ 2 numeric points) OR a single
+          date label (if 1 point). Hidden entirely if no series. */}
+      {hasSparkline ? (
+        <div className="flex items-center justify-between gap-[10px]">
+          <TrendSparkline values={validPairs.map((p) => p.n)} />
+          {latest && (
+            <span className="shrink-0 text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
+              {latest.date}
+            </span>
+          )}
+        </div>
+      ) : latest ? (
+        <div className="flex items-center justify-between gap-[8px]">
+          <span className="text-[10.5px] uppercase tracking-[0.06em] text-tp-slate-400">
+            {hasNumeric ? "Single reading" : "Latest"}
+          </span>
+          <span className="shrink-0 text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
+            {latest.date}
+          </span>
+        </div>
+      ) : null}
+
+      {/* Bottom row: optional target / reference line. */}
+      {chip.targetLine && (
+        <p className="text-[10.5px] leading-[1.4] text-tp-slate-500">
+          {chip.targetLine}
+        </p>
+      )}
     </button>
   )
+}
+
+/** Pure SVG sparkline. Maps `values` (left → right, oldest → newest)
+ *  to a polyline inside a 100 × 28 viewBox; auto-scales y to the
+ *  min/max of the series so flat ranges (BP 130-140) still read as
+ *  a curve, not a flat line at the bottom of the box. */
+function TrendSparkline({ values }: { values: number[] }) {
+  // Series came in newest-first; reverse for left-to-right time.
+  const v = [...values].reverse()
+  const n = v.length
+  const W = 100
+  const H = 28
+  const PAD_Y = 3
+  const min = Math.min(...v)
+  const max = Math.max(...v)
+  const range = max - min || 1
+  const points = v
+    .map((val, i) => {
+      const x = n === 1 ? W / 2 : (i / (n - 1)) * W
+      const y = H - PAD_Y - ((val - min) / range) * (H - PAD_Y * 2)
+      return `${x.toFixed(1)},${y.toFixed(1)}`
+    })
+    .join(" ")
+  const lastIdx = n - 1
+  const lastX = n === 1 ? W / 2 : (lastIdx / (n - 1)) * W
+  const lastY = H - PAD_Y - ((v[lastIdx] - min) / range) * (H - PAD_Y * 2)
+  return (
+    <svg
+      width={W}
+      height={H}
+      viewBox={`0 0 ${W} ${H}`}
+      className="min-w-0 flex-1"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id="velora-trend-spark" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#D565EA" />
+          <stop offset="60%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#4338CA" />
+        </linearGradient>
+      </defs>
+      <polyline
+        points={points}
+        fill="none"
+        stroke="url(#velora-trend-spark)"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="#4338CA" />
+    </svg>
+  )
+}
+
+/** Parse a free-text trend value into a number for plotting.
+ *  Combo readings ("120/80", "120 / 80 mmHg") use the FIRST number
+ *  — for BP that's systolic, which is the more clinically scanned
+ *  half. Non-numeric values return NaN and get skipped. */
+function parseTrendNumeric(value: string): number {
+  if (!value) return NaN
+  const match = value.match(/-?\d+(?:\.\d+)?/)
+  return match ? parseFloat(match[0]) : NaN
 }

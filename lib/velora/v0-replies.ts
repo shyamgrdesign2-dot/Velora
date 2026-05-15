@@ -4453,6 +4453,12 @@ export function buildVeloraV0Reply(rawMessage: string): ReplyResult | null {
       category: t.category,
       question: t.question,
       rationale: t.rationale,
+      // Pass full structured data through so the menu card can
+      // render an inline mini-chart (latest value + sparkline +
+      // optional target line) instead of a label-only pill.
+      unit: t.unit,
+      series: t.series,
+      targetLine: t.targetLine,
     }))
     const isMenu =
       m === "show recent trends" ||

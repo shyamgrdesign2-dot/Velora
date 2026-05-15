@@ -67,11 +67,14 @@ export function ChatThread({
     <div
       ref={containerRef}
       className={cn(
-        // pt zeroed because the parent scroll container already
-        // provides exactly the navbar-clearing padding; any extra
-        // top padding here read as a visible gap below the navbar
-        // before the first message / sticky card engages.
-        "flex flex-col px-[8px] pt-0 pb-[12px] bg-transparent",
+        // Initial-state breathing room above the first message —
+        // 20px so the first chat bubble doesn't crash into the
+        // navbar bottom. This padding lives INSIDE the scroll
+        // content, so the moment the user scrolls down it slides
+        // away with the rest of the page; once scrolling is far
+        // enough for a sticky card to engage, the title pins at
+        // y=0 with no extra spacing left over.
+        "flex flex-col px-[8px] pt-[20px] pb-[12px] bg-transparent",
         className,
       )}
     >

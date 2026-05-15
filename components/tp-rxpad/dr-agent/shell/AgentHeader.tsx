@@ -78,6 +78,10 @@ interface AgentHeaderProps {
   patientChipLabel?: string
   patientChipMeta?: string
   onPatientChipClick?: () => void
+  /** When true the floating patient chip is hidden (slide-up + fade)
+   *  via CSS transition. Toggled by the host as the user scrolls down
+   *  / back up so the chip behaves like a YouTube-style nav. */
+  patientChipHidden?: boolean
 }
 
 export function AgentHeader({
@@ -96,6 +100,7 @@ export function AgentHeader({
   patientChipLabel,
   patientChipMeta,
   onPatientChipClick,
+  patientChipHidden,
 }: AgentHeaderProps) {
   const isV0 = variant === "v0"
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -163,13 +168,14 @@ export function AgentHeader({
   }
 
   // Navbar height differs between modes: the homepage standalone surface
-  // uses a taller full-width bar (60px) so the profile + kebab + brand
-  // chip read as a real product header. The embedded sidebar keeps the
-  // 52px transparent strip so it sits flush against the host EMR chrome.
-  const headerHeight = homepageMode ? 60 : 52
+  // uses a compact full-width bar (42px) so the bar itself takes minimal
+  // vertical real estate while still carrying the brand + profile +
+  // kebab affordances. The embedded sidebar keeps the 52px transparent
+  // strip so it sits flush against the host EMR chrome.
+  const headerHeight = homepageMode ? 42 : 52
   // Patient chip top offset — below the navbar with a small breathing
   // gap. In the legacy floating mode it sits inside the header strip.
-  const patientChipTop = homepageMode ? headerHeight + 10 : 10
+  const patientChipTop = homepageMode ? headerHeight + 8 : 10
 
   return (
     <div className={cn("relative z-20", className)}>
@@ -202,10 +208,10 @@ export function AgentHeader({
             <span
               className={cn(
                 "relative inline-flex shrink-0 items-center justify-center overflow-hidden",
-                homepageMode ? "h-[30px] w-[30px]" : "h-[22px] w-[22px]",
+                homepageMode ? "h-[26px] w-[26px]" : "h-[22px] w-[22px]",
               )}
               aria-hidden
-              style={{ borderRadius: homepageMode ? 9 : 7 }}
+              style={{ borderRadius: homepageMode ? 8 : 7 }}
             >
               {/* Dr. Agent sparkle — same asset used in chat bubble for consistency */}
               <img
@@ -219,14 +225,14 @@ export function AgentHeader({
                 alt=""
                 draggable={false}
                 className="relative z-10"
-                width={homepageMode ? 17 : 13}
-                height={homepageMode ? 17 : 13}
+                width={homepageMode ? 15 : 13}
+                height={homepageMode ? 15 : 13}
               />
             </span>
             <span
               className={cn(
                 "font-semibold leading-none text-tp-slate-800",
-                homepageMode ? "text-[17px]" : "text-[13.5px] text-tp-slate-700",
+                homepageMode ? "text-[15px]" : "text-[13.5px] text-tp-slate-700",
               )}
               style={{ letterSpacing: "0.1px" }}
             >
@@ -238,8 +244,8 @@ export function AgentHeader({
                 violet brand tone on the rest of the agent UI. */}
             <span
               className={cn(
-                "inline-flex shrink-0 items-center rounded-[5px] font-bold uppercase leading-none text-white",
-                homepageMode ? "px-[7px] py-[3px] text-[10.5px]" : "px-[6px] py-[2px] text-[9.5px]",
+                "inline-flex shrink-0 items-center rounded-[4px] font-bold uppercase leading-none text-white",
+                homepageMode ? "px-[6px] py-[2.5px] text-[10px]" : "px-[6px] py-[2px] text-[9.5px]",
               )}
               style={{
                 background: "linear-gradient(135deg, #FB923C 0%, #F97316 50%, #EA580C 100%)",
@@ -460,13 +466,13 @@ export function AgentHeader({
                     setProfileOpen((v) => !v)
                     setKebabOpen(false)
                   }}
-                  className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-tp-slate-100 text-tp-slate-500 transition-colors hover:bg-tp-slate-200 hover:text-tp-slate-700 active:scale-[0.95]"
+                  className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-tp-slate-100 text-tp-slate-500 transition-colors hover:bg-tp-slate-200 hover:text-tp-slate-700 active:scale-[0.95]"
                   aria-haspopup="menu"
                   aria-expanded={profileOpen}
                   aria-label="Open profile menu"
                   title="Profile"
                 >
-                  <Profile size={18} variant="Bulk" />
+                  <Profile size={16} variant="Bulk" />
                 </button>
                 {profileOpen && (
                   <div
@@ -513,7 +519,7 @@ export function AgentHeader({
                     setKebabOpen((v) => !v)
                     setProfileOpen(false)
                   }}
-                  className="flex h-[36px] w-[36px] items-center justify-center text-tp-slate-700 transition-transform active:scale-[0.95]"
+                  className="flex h-[30px] w-[30px] items-center justify-center text-tp-slate-700 transition-transform active:scale-[0.95]"
                   aria-haspopup="menu"
                   aria-expanded={kebabOpen}
                   aria-label="Open session menu"
@@ -521,8 +527,8 @@ export function AgentHeader({
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
+                    width="22"
+                    height="22"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                     className="rotate-90"
@@ -583,10 +589,21 @@ export function AgentHeader({
           type="button"
           onClick={onPatientChipClick}
           disabled={!onPatientChipClick}
+          aria-hidden={patientChipHidden || undefined}
           aria-label={`Patient context: ${patientChipLabel}${patientChipMeta ? ` (${patientChipMeta})` : ""}`}
           title="Switch patient"
-          className="da-agent-brand-tag pointer-events-auto absolute left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-[7px] rounded-[10px] py-[5px] pl-[10px] pr-[9px] transition-transform active:scale-[0.98] disabled:cursor-default"
-          style={{ top: patientChipTop }}
+          className={cn(
+            "da-agent-brand-tag pointer-events-auto absolute left-1/2 z-10 inline-flex items-center gap-[7px] rounded-[10px] py-[5px] pl-[10px] pr-[9px] disabled:cursor-default",
+            "transition-[transform,opacity] duration-200 ease-out active:scale-[0.98]",
+          )}
+          style={{
+            top: patientChipTop,
+            transform: patientChipHidden
+              ? `translateX(-50%) translateY(-${patientChipTop + 36}px)`
+              : "translateX(-50%) translateY(0)",
+            opacity: patientChipHidden ? 0 : 1,
+            pointerEvents: patientChipHidden ? "none" : undefined,
+          }}
         >
           <span className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-white/60 text-tp-slate-600">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>

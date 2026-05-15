@@ -1063,6 +1063,41 @@ export function DrAgentPanel({
     }
   }, [])
 
+  // ── Patient-chip auto-hide on scroll direction ──
+  // YouTube-style nav: scrolling down hides the floating patient chip,
+  // scrolling back up reveals it. Only relevant in homepage mode (the
+  // embedded sidebar doesn't render the chip). Uses a small threshold
+  // so micro-scrolls don't flicker the chip in and out.
+  const [patientChipHidden, setPatientChipHidden] = useState(false)
+  useEffect(() => {
+    if (mode !== "homepage") return
+    const el = chatScrollRef.current
+    if (!el) return
+    let lastTop = el.scrollTop
+    let ticking = false
+    const THRESHOLD = 8 // px — ignore micro-scrolls
+    const REVEAL_AT_TOP = 24 // px — always show near the very top
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const top = el.scrollTop
+        const delta = top - lastTop
+        if (top < REVEAL_AT_TOP) {
+          setPatientChipHidden(false)
+        } else if (delta > THRESHOLD) {
+          setPatientChipHidden(true)
+        } else if (delta < -THRESHOLD) {
+          setPatientChipHidden(false)
+        }
+        lastTop = top
+        ticking = false
+      })
+    }
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => el.removeEventListener("scroll", onScroll)
+  }, [mode])
+
   // ── Patient documents for bottom sheet ──
   const patientDocuments = useMemo(
     () => PATIENT_DOCUMENTS[selectedPatientId] || [],
@@ -1121,6 +1156,7 @@ export function DrAgentPanel({
         onPatientChipClick={
           mode === "homepage" ? () => setIsPatientSheetOpen(true) : undefined
         }
+        patientChipHidden={mode === "homepage" ? patientChipHidden : undefined}
       />
       </div>
 
@@ -1136,7 +1172,7 @@ export function DrAgentPanel({
           ref={chatScrollRef}
           className={cn(
             "da-chat-scroll flex flex-1 flex-col overflow-y-auto",
-            mode === "homepage" ? "pt-[120px]" : "pt-[52px]",
+            mode === "homepage" ? "pt-[96px]" : "pt-[52px]",
           )}
           // Sticky-offset tokens for nested cards. The Velora brief
           // CardShell header sticks below the navbar; SpecialtyHeading
@@ -1144,12 +1180,16 @@ export function DrAgentPanel({
           // sticks below the specialty heading. Setting these as CSS
           // vars at the scroll container keeps the cascade in one
           // place — child components just consume `var(--velora-*)`.
+          // (Navbar is 42px in homepage mode; the floating patient
+          // chip auto-hides on scroll, so once the user is scrolling
+          // we collapse the cascade to start right at the navbar
+          // bottom rather than leaving a chip-sized gap.)
           style={
             mode === "homepage"
               ? ({
-                  ["--velora-card-sticky-top" as never]: "60px",
-                  ["--velora-specialty-sticky-top" as never]: "130px",
-                  ["--velora-visit-sticky-top" as never]: "176px",
+                  ["--velora-card-sticky-top" as never]: "42px",
+                  ["--velora-specialty-sticky-top" as never]: "108px",
+                  ["--velora-visit-sticky-top" as never]: "150px",
                 } as React.CSSProperties)
               : undefined
           }

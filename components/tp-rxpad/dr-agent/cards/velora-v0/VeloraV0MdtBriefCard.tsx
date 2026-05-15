@@ -253,8 +253,8 @@ function ConsultationLabsRow({ labs, hiddenNormalCount }: { labs: VeloraV0LabRes
  *  sub-block is omitted when empty. */
 function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
   return (
-    <div className="mt-[4px] flex flex-col gap-[7px] rounded-[8px] border border-tp-error-200/80 bg-tp-error-50/40 px-[10px] py-[9px]">
-      <div className="flex items-center gap-[5px] text-[10px] font-bold uppercase tracking-[0.06em] text-tp-error-700">
+    <div className="mt-[4px] flex flex-col gap-[7px] rounded-[8px] border border-tp-slate-200 bg-tp-slate-50/70 px-[10px] py-[9px]">
+      <div className="flex items-center gap-[5px] text-[10px] font-bold uppercase tracking-[0.06em] text-tp-slate-600">
         <Flag size={11} variant="Bulk" />
         <span>Discharge summary</span>
       </div>
@@ -283,13 +283,13 @@ function DischargeSummaryBlock({ ds }: { ds: VeloraV0DischargeSummary }) {
       )}
       {ds.warningSigns && ds.warningSigns.length > 0 && (
         <div>
-          <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-error-100 px-[5px] py-[1px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-error-700">
+          <span className="mr-[6px] inline-flex items-center rounded-[4px] bg-tp-warning-100 px-[5px] py-[1.5px] align-[1px] text-[10px] font-semibold uppercase tracking-[0.04em] text-tp-warning-800">
             Warning signs
           </span>
           <ul className="ml-[2px] mt-[5px] flex flex-col gap-[3px] pl-[8px] text-[14px] leading-[1.65] text-tp-slate-700">
             {ds.warningSigns.map((w, i) => (
               <li key={i} className="flex gap-[6px]">
-                <span className="mt-[9px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-error-400" />
+                <span className="mt-[9px] inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-tp-warning-700" />
                 <span><HighlightLine text={w} /></span>
               </li>
             ))}

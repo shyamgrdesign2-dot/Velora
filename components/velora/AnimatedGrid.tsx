@@ -628,19 +628,19 @@ export default function AnimatedGrid({ className }: { className?: string }) {
         </mask>
 
         <linearGradient id="cometGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0"    stopColor="white" stopOpacity="0" />
-          <stop offset="0.55" stopColor="white" stopOpacity="0.4" />
-          <stop offset="0.9"  stopColor="white" stopOpacity="0.9" />
-          <stop offset="1"    stopColor="white" stopOpacity="1" />
+          <stop offset="0"    stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.55" stopColor="currentColor" stopOpacity="0.4" />
+          <stop offset="0.9"  stopColor="currentColor" stopOpacity="0.9" />
+          <stop offset="1"    stopColor="currentColor" stopOpacity="1" />
         </linearGradient>
       </defs>
 
       <g mask="url(#fadeMask)">
         <path
           d={ALL_EDGES_D}
-          stroke="white"
+          stroke="currentColor"
           strokeWidth={LINE_T}
-          strokeOpacity="0.40"
+          strokeOpacity="0.55"
           strokeLinecap="square"
           fill="none"
         />

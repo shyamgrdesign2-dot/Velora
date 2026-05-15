@@ -67,12 +67,10 @@ export function LoginScreen({
     <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-white">
       {/* ── Layer 1 — animated AI wash, reusing the chat-bg.gif
             (the same asset that lives behind the Velora icon tile in
-            the chat welcome card). Scaled past the viewport + heavily
-            blurred so the doctor reads "soft tinted backdrop" instead
-            of a recognisable GIF. Opacity dropped to 0.55 so the
-            colour reads as a faint hue, not a saturated background —
-            this also leaves enough headroom for the white grid lines
-            above it to stay clearly visible. ── */}
+            the chat welcome card). Opacity intentionally tiny (~6 %)
+            so the page reads as off-white with just a hint of moving
+            colour — the geometric grid above it is the dominant
+            background element. ── */}
       <div
         className="velora-login-wash pointer-events-none absolute inset-0"
         aria-hidden
@@ -80,20 +78,19 @@ export function LoginScreen({
           backgroundImage: "url(/icons/dr-agent/chat-bg.gif)",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.55,
+          opacity: 0.06,
         }}
       />
 
-      {/* ── Layer 2 — Animated grid scaffolding. Sits ABOVE the wash
-            but below the vignette. The previous build used
-            mix-blend-mode: multiply on this layer, which on a white
-            stroke is the identity transform — the grid was painted
-            but invisible. We now render with normal compositing so
-            the strokes actually appear; opacity nudged up to 0.95
-            so the line art reads at a glance. ── */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      {/* ── Layer 2 — Animated grid scaffolding. The strokes are
+            painted in tp-violet-500 (currentColor on the wrapper) so
+            they actually read against the now-very-light wash; on
+            the previous (white-stroke) build the grid was invisible
+            because either the stroke or the blend mode collapsed
+            against the lighter background. ── */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-tp-violet-500">
         <div className="velora-login-grid h-[105vmin] w-[105vmin]">
-          <AnimatedGrid className="h-full w-full opacity-95" />
+          <AnimatedGrid className="h-full w-full opacity-90" />
         </div>
       </div>
 
@@ -247,12 +244,13 @@ export function LoginScreen({
           transform: scale(2.4);
         }
 
-        /* Soft drift on the grid so the lines don't feel static. */
+        /* Soft drift on the grid so the lines don't feel static.
+           No mix-blend-mode: that was the root cause of the grid
+           being invisible — multiply on a white-stroke + light
+           background collapses the strokes to background colour. */
         .velora-login-grid {
           animation: veloraGridDrift 60s ease-in-out infinite;
           transform-origin: center;
-          mix-blend-mode: multiply;
-          opacity: 0.55;
         }
         @keyframes veloraGridDrift {
           0%, 100% { transform: scale(1.0) rotate(0deg); }

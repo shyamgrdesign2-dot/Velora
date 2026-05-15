@@ -653,9 +653,9 @@ export function ChatInput({
       {(() => {
         const showPatientChip = !!patientName && !!onPatientClick && !patientLocked
         const trust = (
-          <span className="inline-flex items-center gap-[6px]">
-            <SecuritySafe size={14} variant="Bulk" className="shrink-0 text-tp-slate-400" />
-            <span className="whitespace-nowrap text-[11.5px] leading-[1.4] text-tp-slate-400">
+          <span className="inline-flex min-w-0 items-center gap-[5px]">
+            <SecuritySafe size={12} variant="Bulk" className="shrink-0 text-tp-slate-400" />
+            <span className="truncate text-[10.5px] leading-[1.4] text-tp-slate-400">
               {trustMarkerText ?? "Data stays private · AI-assisted, you decide"}
             </span>
           </span>

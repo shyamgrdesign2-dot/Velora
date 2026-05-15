@@ -152,8 +152,15 @@ function SpecialtyHeading({
   const meta = specialtyMetaSegments(rec)
   return (
     <div
-      className="group/section-header sticky z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100/85 px-2 py-[6px] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur"
-      style={{ top: "var(--velora-specialty-sticky-top, 0px)" }}
+      className="group/section-header sticky z-[3] mb-[4px] flex w-full min-w-0 shrink-0 items-center gap-1.5 rounded-[4px] bg-tp-slate-100 px-2 py-[6px] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur"
+      style={{
+        // Specialty headings stick BELOW the filter band, not at
+        // the same lane. The dedicated `--velora-specialty-heading-
+        // sticky-top` var carries that offset (filter top + filter
+        // height). Falls back to the shared specialty lane if a
+        // host hasn't wired the heading-specific token.
+        top: "var(--velora-specialty-heading-sticky-top, var(--velora-specialty-sticky-top, 0px))",
+      }}
     >
       <button
         type="button"
@@ -1901,13 +1908,15 @@ export function VeloraV0MdtBriefCard({ data }: { data: VeloraV0MdtBriefData }) {
           ) : null}
 
           {/* Specialty / Doctor filter row — sticks at the same lane
-              as the SectionSummaryBar. The wrapper carries its own
-              opaque white wash + backdrop-blur, so the visible band
-              is bracketed by the medical-history content above and
-              the first specialty heading below without needing
-              explicit hairline dividers. */}
+              as the SectionSummaryBar. z-[5] is intentionally above
+              the SpecialtyHeading lane (z-[3]) so when both want to
+              occupy the screen the filter strip is layered on TOP
+              (content scrolls behind it cleanly), and the specialty
+              headings stack BELOW it on their own lane. bg-white +
+              backdrop-blur keep the band fully opaque so nothing
+              bleeds through. */}
           <div
-            className="mt-[4px] z-[3] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] bg-white/95 py-[6px] backdrop-blur"
+            className="mt-[4px] z-[5] flex flex-wrap items-center gap-x-[8px] gap-y-[6px] bg-white py-[6px] backdrop-blur"
             style={{
               position: "sticky",
               top: "var(--velora-specialty-sticky-top, 0px)",

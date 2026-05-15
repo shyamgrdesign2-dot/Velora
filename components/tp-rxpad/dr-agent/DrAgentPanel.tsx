@@ -1191,19 +1191,21 @@ export function DrAgentPanel({
           style={
             mode === "homepage"
               ? ({
-                  // Sticky lanes — all anchored to y=0 of the
-                  // chat-scroll viewport per design call:
-                  //   card title           → top: 0
-                  //   card header height   → ~50px tall
-                  //   specialty / filter   → top: 50  (sits flush
-                  //                          under the card title)
-                  // The card title's z-index is bumped above the
-                  // navbar (see CardShell sticky z-[31]) so when
-                  // the user scrolls, the title replaces the navbar
-                  // at the top of the page instead of hiding behind
-                  // it.
+                  // Sticky lanes — three stacked levels anchored to
+                  // y=0 of the chat-scroll viewport:
+                  //   card title              → top: 0   (z-31, above navbar)
+                  //   medical history / filter → top: 50  (z-5)
+                  //   specialty heading        → top: 92  (z-3, BELOW the filter)
+                  //
+                  // When scrolling deep into a specialty, the doctor
+                  // sees three pinned layers stacked: card title
+                  // (Cross-consultation brief), the FILTER strip
+                  // (which scopes the list), and the current
+                  // specialty heading (which names what they're
+                  // reading). Content scrolls behind all three.
                   ["--velora-card-sticky-top" as never]: "0px",
                   ["--velora-specialty-sticky-top" as never]: "50px",
+                  ["--velora-specialty-heading-sticky-top" as never]: "92px",
                 } as React.CSSProperties)
               : undefined
           }

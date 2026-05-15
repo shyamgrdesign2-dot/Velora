@@ -969,22 +969,10 @@ export function ChatBubble({
                   </>
                 )}
 
-                {/* Source dropdown */}
-                {sources && (
-                  <>
-                    <div
-                      className="h-[12px] w-[1px] flex-shrink-0"
-                      style={{
-                        background: "linear-gradient(180deg, transparent 0%, rgba(148,163,184,0.25) 50%, transparent 100%)",
-                      }}
-                    />
-                    <SourceDropdown
-                      isOpen={sourceOpen}
-                      onToggle={() => setSourceOpen(v => !v)}
-                      sources={sources}
-                    />
-                  </>
-                )}
+                {/* Source dropdown removed — provenance now lives
+                    inline on each card via the title-bar source ⓘ
+                    tooltip; the chat-bubble-level affordance was
+                    redundant. */}
               </>
             )
           })()}

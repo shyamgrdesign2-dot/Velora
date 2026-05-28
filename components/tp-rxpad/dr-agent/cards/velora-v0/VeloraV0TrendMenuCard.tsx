@@ -102,12 +102,16 @@ export function VeloraV0TrendMenuCard({
             relaxes the cap and substring-matches. Focusing the
             input opens a dropdown of every trend on file for this
             patient (with abnormal trends pinned to the top) so the
-            doctor can quick-pick without typing. */}
+            doctor can quick-pick without typing.
+            Placeholder is category-aware: "lab trends" when the
+            menu only carries lab chips (Recent-lab-trends intent),
+            "vital trends" when only vitals, generic "trends" when
+            mixed. Reads as the category the doctor just asked for. */}
         {totalAvailable > 0 && (
           <TrendSearchInput
             value={search}
             onChange={setSearch}
-            placeholder={`Search ${totalAvailable} trend${totalAvailable === 1 ? "" : "s"} for ${data.patientName.split(" ")[0]}…`}
+            placeholder={`Search ${categoryWord(data.chips)} for ${data.patientName.split(" ")[0]}…`}
             suggestions={[...data.chips].sort(rankByAbnormalThenRecent)}
           />
         )}
@@ -347,17 +351,39 @@ function TrendChipGroup({
   // ALL-CAPS "BEDSIDE VITALS · 3 ON FILE" / "LAB PARAMETERS · 5 ON
   // FILE" pill was reading as filler now that each chart card
   // carries its own coloured trend name.
+  //
+  // Collapse policy: only the FIRST card in the list expands by
+  // default — every other card opens collapsed. With 15+ trends on
+  // file the chat thread used to scroll forever; now the doctor
+  // sees the top-priority chart immediately and reveals the rest
+  // on demand by tapping a card header (which carries a chevron).
+  // The `key` includes the chip id and the first-flag so React
+  // remounts the card when the underlying list re-sorts (e.g. when
+  // the doctor searches), keeping the first-card-expanded rule
+  // consistent across renders.
   return (
     <div className="flex flex-col gap-[12px]">
-      {chips.map((chip) => (
+      {chips.map((chip, i) => (
         <TrendChartCard
-          key={chip.id}
+          key={`${chip.id}-${i === 0 ? "open" : "shut"}`}
           chip={chip}
+          defaultExpanded={i === 0}
           onTap={() => onPillTap?.(chip.question)}
         />
       ))}
     </div>
   )
+}
+
+/** Map the chips on file to the placeholder copy fragment used by
+ *  the search input. Reads as the category the doctor just asked
+ *  for ("lab trends" / "vital trends" / generic "trends"). */
+function categoryWord(chips: VeloraV0TrendMenuData["chips"]): string {
+  const hasLab = chips.some((c) => c.category === "lab")
+  const hasVital = chips.some((c) => c.category === "vital")
+  if (hasLab && !hasVital) return "lab trends"
+  if (hasVital && !hasLab) return "vital trends"
+  return "trends"
 }
 
 /** Full trend chart card — used inside the trend menu to show every
@@ -367,31 +393,39 @@ function TrendChipGroup({
  *  canned question to open the full detail card. */
 function TrendChartCard({
   chip,
+  defaultExpanded = false,
   onTap,
 }: {
   chip: VeloraV0TrendMenuData["chips"][number]
+  defaultExpanded?: boolean
   onTap?: () => void
 }) {
   const accentLine = chip.category === "vital" ? "#8B5CF6" : "#10B981"
+  const [expanded, setExpanded] = useState(defaultExpanded)
+  const isAbnormal = chip.series?.some(
+    (p) => p.flag === "alert" || p.flag === "warn",
+  )
+  const latest = chip.series?.[0]
+
   return (
     <div
-      className="rounded-[12px] border bg-white p-[12px]"
+      className="overflow-hidden rounded-[12px] border bg-white"
       style={{ borderColor: "rgba(103,58,172,0.16)" }}
     >
-      {/* Header: trend name (clickable) + optional info-icon tooltip
-          carrying the reference / target line. The latest reading
-          isn't repeated here — it's already on the chart as the
-          rightmost data point's value label and on the table view
-          as the first row. */}
-      <div className="flex items-center gap-[6px]">
+      {/* Collapsible header row — tapping anywhere in the header
+          area toggles the card open / closed. The trend NAME button
+          is still a separate inner tap target that fires the canned
+          question via `onTap` (so the doctor can pivot to the
+          dedicated detail card). */}
+      <div className="flex items-center gap-[8px] px-[12px] py-[10px]">
         <button
           type="button"
           onClick={onTap}
           title={chip.rationale}
-          className="group/header inline-flex items-baseline gap-[6px] text-left"
+          className="group/header inline-flex min-w-0 flex-1 items-baseline gap-[6px] text-left"
         >
           <span
-            className="text-[14px] font-semibold transition-opacity group-hover/header:opacity-80"
+            className="truncate text-[14px] font-semibold transition-opacity group-hover/header:opacity-80"
             style={{
               background:
                 "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
@@ -403,18 +437,67 @@ function TrendChartCard({
             {chip.label}
           </span>
           {chip.unit && (
-            <span className="text-[10.5px] font-mono text-tp-slate-400">
+            <span className="shrink-0 text-[10.5px] font-mono text-tp-slate-400">
               {chip.unit}
             </span>
           )}
         </button>
+        {/* Compact collapsed-state summary: latest reading + date +
+            abnormal tag. Only visible when the card is closed so
+            the doctor reads the most-clinically-loud datum without
+            expanding the chart. */}
+        {!expanded && (
+          <span className="flex shrink-0 items-center gap-[6px]">
+            {latest && (
+              <>
+                <span className="text-[12px] font-semibold text-tp-slate-700">
+                  {latest.value}
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
+                  {latest.date}
+                </span>
+              </>
+            )}
+            {isAbnormal && (
+              <span className="rounded-[3px] bg-tp-warning-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-warning-700">
+                Abnormal
+              </span>
+            )}
+          </span>
+        )}
         {chip.targetLine && <ReferenceInfoTip targetLine={chip.targetLine} />}
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-label={expanded ? "Collapse trend" : "Expand trend"}
+          className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[6px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100 hover:text-tp-slate-700"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden
+            className="transition-transform duration-150"
+            style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
+          >
+            <path
+              d="M6 9L12 15L18 9"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
 
-      {/* Chart — only when there's a series. No-series chips just
-          show the header with rationale tooltip. */}
-      {chip.series && chip.series.length > 0 && (
-        <div className="mt-[10px]">
+      {/* Chart — only when there's a series AND the card is
+          expanded. No-series chips and collapsed cards keep just
+          the header. */}
+      {expanded && chip.series && chip.series.length > 0 && (
+        <div className="border-t border-tp-slate-100 px-[12px] py-[10px]">
           <TrendChartBlock
             series={chip.series}
             unit={chip.unit}

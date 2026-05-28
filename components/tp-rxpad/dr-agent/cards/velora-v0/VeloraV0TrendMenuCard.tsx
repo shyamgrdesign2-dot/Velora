@@ -268,16 +268,7 @@ function TrendSearchInput({
                   className="group/sug flex w-full items-center justify-between gap-[8px] px-[12px] py-[7px] text-left transition-colors hover:bg-tp-slate-50"
                 >
                   <span className="flex min-w-0 items-baseline gap-[6px]">
-                    <span
-                      className="truncate text-[13px] font-semibold"
-                      style={{
-                        background:
-                          "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
+                    <span className="truncate text-[13px] font-semibold text-tp-slate-800">
                       {c.label}
                     </span>
                     {c.unit && (
@@ -421,16 +412,7 @@ function TrendChartCard({
           title={chip.rationale}
           className="group/header inline-flex min-w-0 flex-1 items-baseline gap-[6px] text-left"
         >
-          <span
-            className="truncate text-[14px] font-semibold transition-opacity group-hover/header:opacity-80"
-            style={{
-              background:
-                "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
+          <span className="truncate text-[14px] font-semibold text-tp-slate-800 transition-opacity group-hover/header:opacity-80">
             {chip.label}
           </span>
           {chip.unit && (

@@ -70,7 +70,7 @@ export function VeloraV0TrendMenuCard({
   return (
     <CardShell
       icon={<Activity size={15} variant="Bulk" />}
-      title="Recent trends"
+      title={`Recent ${categoryWord(data.chips)}`}
       date={`${data.patientName}${data.patientMeta ? ` (${data.patientMeta})` : ""}`}
       dataSources={[
         "OMOP `measurement`",
@@ -353,19 +353,17 @@ function TrendChipGroup({
   // carries its own coloured trend name.
   //
   // Collapse policy: only the FIRST card in the list expands by
-  // default — every other card opens collapsed. With 15+ trends on
-  // file the chat thread used to scroll forever; now the doctor
-  // sees the top-priority chart immediately and reveals the rest
-  // on demand by tapping a card header (which carries a chevron).
-  // The `key` includes the chip id and the first-flag so React
-  // remounts the card when the underlying list re-sorts (e.g. when
-  // the doctor searches), keeping the first-card-expanded rule
-  // consistent across renders.
+  // default; every other card opens collapsed and reveals its chart
+  // on tap. Keys are STABLE per chip id (no position suffix) so
+  // each card's expansion state is fully independent — expanding
+  // one card never re-mounts another, and the doctor's
+  // accumulated open/closed choices survive list re-sorts (e.g.
+  // when the doctor searches).
   return (
     <div className="flex flex-col gap-[12px]">
       {chips.map((chip, i) => (
         <TrendChartCard
-          key={`${chip.id}-${i === 0 ? "open" : "shut"}`}
+          key={chip.id}
           chip={chip}
           defaultExpanded={i === 0}
           onTap={() => onPillTap?.(chip.question)}

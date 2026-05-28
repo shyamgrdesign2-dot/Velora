@@ -337,26 +337,37 @@ function TrendChipGroup({
   chips: VeloraV0TrendMenuData["chips"]
   onPillTap?: (message: string) => void
 }) {
-  // Group heading dropped per design call — categories are still
-  // sorted (vitals before labs) by the parent's `useMemo`, but the
-  // ALL-CAPS "BEDSIDE VITALS · 3 ON FILE" / "LAB PARAMETERS · 5 ON
-  // FILE" pill was reading as filler now that each chart card
-  // carries its own coloured trend name.
+  // Accordion behaviour: only ONE card is expanded at a time.
+  // Opening a different card collapses the previously-open one.
+  // State lives here in the parent so the children can be fully
+  // controlled — each TrendChartCard is told whether it's open
+  // and what to call when its chevron is tapped.
   //
-  // Collapse policy: only the FIRST card in the list expands by
-  // default; every other card opens collapsed and reveals its chart
-  // on tap. Keys are STABLE per chip id (no position suffix) so
-  // each card's expansion state is fully independent — expanding
-  // one card never re-mounts another, and the doctor's
-  // accumulated open/closed choices survive list re-sorts (e.g.
-  // when the doctor searches).
+  // Default: the FIRST chip in the (potentially re-sorted, post-
+  // search) list is open. Re-runs whenever the visible chip set
+  // changes so the search-filtered first card opens automatically.
+  const [openId, setOpenId] = useState<string | null>(
+    chips[0]?.id ?? null,
+  )
+  useEffect(() => {
+    // If the currently-open chip is no longer in the visible list
+    // (e.g. it got filtered out by the search), reset to the new
+    // first chip. Otherwise leave the doctor's choice intact.
+    if (!openId || !chips.some((c) => c.id === openId)) {
+      setOpenId(chips[0]?.id ?? null)
+    }
+  }, [chips, openId])
+
   return (
     <div className="flex flex-col gap-[12px]">
-      {chips.map((chip, i) => (
+      {chips.map((chip) => (
         <TrendChartCard
           key={chip.id}
           chip={chip}
-          defaultExpanded={i === 0}
+          expanded={openId === chip.id}
+          onToggle={() =>
+            setOpenId((current) => (current === chip.id ? null : chip.id))
+          }
           onTap={() => onPillTap?.(chip.question)}
         />
       ))}
@@ -375,22 +386,24 @@ function categoryWord(chips: VeloraV0TrendMenuData["chips"]): string {
   return "trends"
 }
 
-/** Full trend chart card — used inside the trend menu to show every
- *  available trend as a graph (with table toggle). The card opens
- *  collapsed by default (only the first one in the list expands);
- *  tapping the chevron toggles the chart. Tapping the trend NAME
- *  button fires the canned question to open the full detail card. */
+/** Full trend chart card — fully controlled by the parent so the
+ *  accordion's "only one open at a time" rule can be enforced
+ *  centrally. `expanded` and `onToggle` come from above; the
+ *  card itself just renders the appropriate state. Tapping the
+ *  trend NAME button fires the canned question to open the full
+ *  detail card. */
 function TrendChartCard({
   chip,
-  defaultExpanded = false,
+  expanded,
+  onToggle,
   onTap,
 }: {
   chip: VeloraV0TrendMenuData["chips"][number]
-  defaultExpanded?: boolean
+  expanded: boolean
+  onToggle: () => void
   onTap?: () => void
 }) {
   const accentLine = chip.category === "vital" ? "#8B5CF6" : "#10B981"
-  const [expanded, setExpanded] = useState(defaultExpanded)
   const isAbnormal = chip.series?.some(
     (p) => p.flag === "alert" || p.flag === "warn",
   )
@@ -445,7 +458,7 @@ function TrendChartCard({
         {chip.targetLine && <ReferenceInfoTip targetLine={chip.targetLine} />}
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={onToggle}
           aria-expanded={expanded}
           aria-label={expanded ? "Collapse trend" : "Expand trend"}
           className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[6px] text-tp-slate-500 transition-colors hover:bg-tp-slate-100 hover:text-tp-slate-700"

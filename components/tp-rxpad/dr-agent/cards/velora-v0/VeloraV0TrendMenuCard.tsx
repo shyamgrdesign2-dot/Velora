@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
-import { Activity, Health, InfoCircle as IconsaxInfo } from "iconsax-reactjs"
+import React, { useMemo, useState } from "react"
+import { Activity, Health, InfoCircle as IconsaxInfo, SearchNormal1 } from "iconsax-reactjs"
 import { CardShell } from "../CardShell"
 import { TrendChartBlock, ReferenceInfoTip } from "./VeloraV0TrendDetailCard"
 import type { VeloraV0TrendMenuData } from "../../types"
@@ -20,6 +20,14 @@ import type { VeloraV0TrendMenuData } from "../../types"
  * grouped by category (vital vs lab). The doctor can never land on a
  * dead end: every chip surfaces a real per-patient trend reply.
  */
+/**
+ * Default-view top-N. When the doctor lands on the menu without
+ * searching, we show only this many trends per category — ranked
+ * abnormal-first, then by recency — so a patient with twenty labs
+ * on file doesn't dump every chart into the chat at once.
+ */
+const DEFAULT_VISIBLE_PER_CATEGORY = 5
+
 export function VeloraV0TrendMenuCard({
   data,
   onPillTap,
@@ -27,8 +35,38 @@ export function VeloraV0TrendMenuCard({
   data: VeloraV0TrendMenuData
   onPillTap?: (message: string) => void
 }) {
-  const vitals = data.chips.filter((c) => c.category === "vital")
-  const labs = data.chips.filter((c) => c.category === "lab")
+  const [search, setSearch] = useState("")
+  const trimmed = search.trim().toLowerCase()
+
+  // Filter / rank. When the doctor has typed anything, return every
+  // chip whose label substring-matches the query (no top-N cap so
+  // they always see what they're looking for). When the search box
+  // is empty, fall back to "abnormal first, then most recent, top 5
+  // per category" so the default view stays scannable.
+  const { vitals, labs } = useMemo(() => {
+    let pool = data.chips
+    if (trimmed) {
+      pool = pool.filter((c) => c.label.toLowerCase().includes(trimmed))
+    }
+    const ranked = [...pool].sort(rankByAbnormalThenRecent)
+    if (!trimmed) {
+      const v: typeof pool = []
+      const l: typeof pool = []
+      for (const c of ranked) {
+        if (c.category === "vital" && v.length < DEFAULT_VISIBLE_PER_CATEGORY) v.push(c)
+        else if (c.category === "lab" && l.length < DEFAULT_VISIBLE_PER_CATEGORY) l.push(c)
+      }
+      return { vitals: v, labs: l }
+    }
+    return {
+      vitals: ranked.filter((c) => c.category === "vital"),
+      labs: ranked.filter((c) => c.category === "lab"),
+    }
+  }, [data.chips, trimmed])
+
+  const hasResults = vitals.length > 0 || labs.length > 0
+  const totalAvailable = data.chips.length
+
   return (
     <CardShell
       icon={<Activity size={15} variant="Bulk" />}
@@ -59,7 +97,19 @@ export function VeloraV0TrendMenuCard({
           </div>
         )}
 
-        {/* Vital trends group */}
+        {/* Search input — filters the trends list by name. Default
+            view (empty input) shows top-N abnormal-first per
+            category; typing relaxes the cap and substring-matches. */}
+        {totalAvailable > 0 && (
+          <TrendSearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder={`Search ${totalAvailable} trend${totalAvailable === 1 ? "" : "s"} for ${data.patientName.split(" ")[0]}…`}
+          />
+        )}
+
+        {/* Vital trends group — only render the heading if we have
+            visible chips in this category. */}
         {vitals.length > 0 && (
           <TrendChipGroup
             icon={<Activity size={13} variant="Bulk" />}
@@ -79,16 +129,95 @@ export function VeloraV0TrendMenuCard({
           />
         )}
 
-        {/* Empty patient (no available trends at all). */}
-        {data.chips.length === 0 && (
+        {/* No-results state — split between "you typed and nothing
+            matched" and "patient has nothing at all". */}
+        {!hasResults && totalAvailable > 0 && (
+          <p className="rounded-[10px] border border-dashed border-tp-slate-200 bg-tp-slate-50/70 px-[12px] py-[10px] text-center text-[12.5px] italic text-tp-slate-500">
+            No trends match <span className="not-italic font-semibold text-tp-slate-700">"{search.trim()}"</span> for {data.patientName}.
+          </p>
+        )}
+        {totalAvailable === 0 && (
           <p className="rounded-[10px] border border-tp-slate-200 bg-tp-slate-50/70 px-[12px] py-[10px] text-[12.5px] italic text-tp-slate-500">
             No vital / lab trends are on file for {data.patientName} right now.
             Open the cross-consultation brief for the verbatim record.
           </p>
         )}
+
+        {/* "Showing N of M" footer — only visible in the default
+            (no-search) state when the cap actually trimmed the list,
+            so the doctor knows there's more behind the search box. */}
+        {!trimmed && hasResults && totalAvailable > vitals.length + labs.length && (
+          <p className="text-center text-[11px] text-tp-slate-400">
+            Showing {vitals.length + labs.length} of {totalAvailable}.
+            Type above to search the rest.
+          </p>
+        )}
       </div>
     </CardShell>
   )
+}
+
+/** Search input matching the rest of the Velora chrome — slate-200
+ *  border, slate-300 placeholder, blue focus ring. */
+function TrendSearchInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string
+  onChange: (next: string) => void
+  placeholder: string
+}) {
+  return (
+    <div className="relative">
+      <span className="pointer-events-none absolute left-[10px] top-1/2 -translate-y-1/2 text-tp-slate-400">
+        <SearchNormal1 size={14} variant="Linear" />
+      </span>
+      <input
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="block w-full rounded-[10px] border border-tp-slate-200 bg-white py-[8px] pl-[32px] pr-[10px] text-[12.5px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
+        aria-label="Search trends"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label="Clear search"
+          className="absolute right-[8px] top-1/2 -translate-y-1/2 rounded-[4px] px-[6px] py-[2px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-400 transition-colors hover:bg-tp-slate-100 hover:text-tp-slate-600"
+        >
+          Clear
+        </button>
+      )}
+    </div>
+  )
+}
+
+/** Sort comparator: trends with abnormal recent flags float to the
+ *  top; among equal-priority trends, the more recently-dated one
+ *  comes first. We approximate "recency" with the index of the
+ *  series array since the trend registry stores newest-first. */
+function rankByAbnormalThenRecent(
+  a: VeloraV0TrendMenuData["chips"][number],
+  b: VeloraV0TrendMenuData["chips"][number],
+): number {
+  const aScore = abnormalScore(a)
+  const bScore = abnormalScore(b)
+  if (aScore !== bScore) return bScore - aScore
+  // Tie-breaker: more readings = surface first (proxy for recency).
+  return (b.series?.length ?? 0) - (a.series?.length ?? 0)
+}
+
+function abnormalScore(chip: VeloraV0TrendMenuData["chips"][number]): number {
+  if (!chip.series) return 0
+  let score = 0
+  for (const p of chip.series) {
+    if (p.flag === "alert") score += 3
+    else if (p.flag === "warn") score += 1
+  }
+  return score
 }
 
 function TrendChipGroup({

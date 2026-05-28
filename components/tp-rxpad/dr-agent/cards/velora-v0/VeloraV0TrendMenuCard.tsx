@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
-import { Activity, Health, InfoCircle as IconsaxInfo, SearchNormal1 } from "iconsax-reactjs"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Activity, InfoCircle as IconsaxInfo, SearchNormal1 } from "iconsax-reactjs"
 import { CardShell } from "../CardShell"
 import { TrendChartBlock, ReferenceInfoTip } from "./VeloraV0TrendDetailCard"
 import type { VeloraV0TrendMenuData } from "../../types"
@@ -98,33 +98,27 @@ export function VeloraV0TrendMenuCard({
         )}
 
         {/* Search input — filters the trends list by name. Default
-            view (empty input) shows top-N abnormal-first per
-            category; typing relaxes the cap and substring-matches. */}
+            view (empty input) shows top-N abnormal-first; typing
+            relaxes the cap and substring-matches. Focusing the
+            input opens a dropdown of every trend on file for this
+            patient (with abnormal trends pinned to the top) so the
+            doctor can quick-pick without typing. */}
         {totalAvailable > 0 && (
           <TrendSearchInput
             value={search}
             onChange={setSearch}
             placeholder={`Search ${totalAvailable} trend${totalAvailable === 1 ? "" : "s"} for ${data.patientName.split(" ")[0]}…`}
+            suggestions={[...data.chips].sort(rankByAbnormalThenRecent)}
           />
         )}
 
-        {/* Vital trends group — only render the heading if we have
-            visible chips in this category. */}
-        {vitals.length > 0 && (
+        {/* Result list — vitals first, then labs. No group heading
+            (the per-card colour gradient on each trend name is the
+            visual anchor; an ALL-CAPS "BEDSIDE VITALS" pill on top
+            was reading as filler). */}
+        {(vitals.length > 0 || labs.length > 0) && (
           <TrendChipGroup
-            icon={<Activity size={13} variant="Bulk" />}
-            label="Bedside vitals"
-            chips={vitals}
-            onPillTap={onPillTap}
-          />
-        )}
-
-        {/* Lab trends group */}
-        {labs.length > 0 && (
-          <TrendChipGroup
-            icon={<Health size={13} variant="Bulk" />}
-            label="Lab parameters"
-            chips={labs}
+            chips={[...vitals, ...labs]}
             onPillTap={onPillTap}
           />
         )}
@@ -157,29 +151,72 @@ export function VeloraV0TrendMenuCard({
   )
 }
 
-/** Search input matching the rest of the Velora chrome — slate-200
- *  border, slate-300 placeholder, blue focus ring. */
+/** Search input + focus dropdown.
+ *
+ *   • Slate-200 border, blue focus ring, search icon on the left,
+ *     "Clear" button on the right when populated.
+ *   • Focusing the input opens a dropdown of every trend on file
+ *     for this patient (sorted abnormal-first by the parent). The
+ *     doctor can tap any row to set the search to that label —
+ *     filtering the result list below to a single trend without
+ *     typing. Outside-click and Escape close the dropdown.
+ *   • Each suggestion row shows the trend name (gradient text on
+ *     the Velora AI palette) + unit. A subtle "ABNORMAL" tag pins
+ *     to the right of rows whose series carries any alert / warn
+ *     flag, so the dropdown doubles as a triage shortcut. */
 function TrendSearchInput({
   value,
   onChange,
   placeholder,
+  suggestions,
 }: {
   value: string
   onChange: (next: string) => void
   placeholder: string
+  suggestions: VeloraV0TrendMenuData["chips"]
 }) {
+  const [open, setOpen] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  // Outside-click + Escape closes the dropdown.
+  useEffect(() => {
+    if (!open) return
+    function onClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("mousedown", onClick)
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("mousedown", onClick)
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [open])
+
   return (
-    <div className="relative">
+    <div ref={wrapperRef} className="relative">
       <span className="pointer-events-none absolute left-[10px] top-1/2 -translate-y-1/2 text-tp-slate-400">
         <SearchNormal1 size={14} variant="Linear" />
       </span>
       <input
         type="search"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value)
+          // Re-open the dropdown if the doctor starts retyping after
+          // a previous outside-click closed it.
+          if (!open) setOpen(true)
+        }}
+        onFocus={() => setOpen(true)}
         placeholder={placeholder}
         className="block w-full rounded-[10px] border border-tp-slate-200 bg-white py-[8px] pl-[32px] pr-[10px] text-[12.5px] text-tp-slate-800 placeholder:text-tp-slate-400 focus:border-tp-blue-500 focus:outline-none focus:ring-2 focus:ring-tp-blue-100"
         aria-label="Search trends"
+        aria-expanded={open}
+        aria-haspopup="listbox"
       />
       {value && (
         <button
@@ -190,6 +227,84 @@ function TrendSearchInput({
         >
           Clear
         </button>
+      )}
+
+      {/* Suggestion dropdown */}
+      {open && suggestions.length > 0 && (
+        <div
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-30 mt-[4px] max-h-[260px] overflow-y-auto rounded-[10px] border border-tp-slate-200 bg-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.18)]"
+        >
+          <p className="px-[12px] pt-[10px] pb-[4px] text-[10px] font-semibold uppercase tracking-[0.08em] text-tp-slate-400">
+            Trends on file{value.trim() ? ` (filtered)` : ""}
+          </p>
+          {suggestions
+            .filter((c) =>
+              value.trim()
+                ? c.label.toLowerCase().includes(value.trim().toLowerCase())
+                : true,
+            )
+            .map((c) => {
+              const isAbnormal = c.series?.some(
+                (p) => p.flag === "alert" || p.flag === "warn",
+              )
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  role="option"
+                  onMouseDown={(e) => {
+                    // Prevent input blur from closing before click fires.
+                    e.preventDefault()
+                  }}
+                  onClick={() => {
+                    onChange(c.label)
+                    setOpen(false)
+                  }}
+                  className="group/sug flex w-full items-center justify-between gap-[8px] px-[12px] py-[7px] text-left transition-colors hover:bg-tp-slate-50"
+                >
+                  <span className="flex min-w-0 items-baseline gap-[6px]">
+                    <span
+                      className="truncate text-[13px] font-semibold"
+                      style={{
+                        background:
+                          "linear-gradient(91deg, #D565EA 3%, #673AAC 67%, #1A1994 130%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      {c.label}
+                    </span>
+                    {c.unit && (
+                      <span className="shrink-0 text-[10px] font-mono text-tp-slate-400">
+                        {c.unit}
+                      </span>
+                    )}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-[6px]">
+                    <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
+                      {c.category === "vital" ? "Vital" : "Lab"}
+                    </span>
+                    {isAbnormal && (
+                      <span className="rounded-[3px] bg-tp-warning-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-warning-700">
+                        Abnormal
+                      </span>
+                    )}
+                  </span>
+                </button>
+              )
+            })}
+          {suggestions.filter((c) =>
+            value.trim()
+              ? c.label.toLowerCase().includes(value.trim().toLowerCase())
+              : true,
+          ).length === 0 && (
+            <p className="px-[12px] py-[10px] text-[12px] italic text-tp-slate-500">
+              No trends match "{value.trim()}".
+            </p>
+          )}
+        </div>
       )}
     </div>
   )
@@ -221,43 +336,26 @@ function abnormalScore(chip: VeloraV0TrendMenuData["chips"][number]): number {
 }
 
 function TrendChipGroup({
-  icon,
-  label,
   chips,
   onPillTap,
 }: {
-  icon: React.ReactNode
-  label: string
   chips: VeloraV0TrendMenuData["chips"]
   onPillTap?: (message: string) => void
 }) {
+  // Group heading dropped per design call — categories are still
+  // sorted (vitals before labs) by the parent's `useMemo`, but the
+  // ALL-CAPS "BEDSIDE VITALS · 3 ON FILE" / "LAB PARAMETERS · 5 ON
+  // FILE" pill was reading as filler now that each chart card
+  // carries its own coloured trend name.
   return (
-    <div className="flex flex-col gap-[10px]">
-      <div className="flex items-center gap-[6px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-tp-slate-500">
-        <span className="text-tp-violet-500">{icon}</span>
-        <span>{label}</span>
-        <span className="text-tp-slate-300">·</span>
-        <span className="font-medium normal-case tracking-normal text-tp-slate-400">
-          {chips.length} on file
-        </span>
-      </div>
-      {/* Each available trend renders as a full TrendChartBlock
-          (graph/table toggle, reference line, the same UI shipped
-          by VeloraV0TrendDetailCard). Stacked vertically — one
-          card per metric — so the doctor reads every trend without
-          extra taps. The trend NAME above each block is the
-          tap-target that fires the canned question (so the doctor
-          can still pivot to a dedicated detail card when they
-          want the full citation footer + data-sources surface). */}
-      <div className="flex flex-col gap-[12px]">
-        {chips.map((chip) => (
-          <TrendChartCard
-            key={chip.id}
-            chip={chip}
-            onTap={() => onPillTap?.(chip.question)}
-          />
-        ))}
-      </div>
+    <div className="flex flex-col gap-[12px]">
+      {chips.map((chip) => (
+        <TrendChartCard
+          key={chip.id}
+          chip={chip}
+          onTap={() => onPillTap?.(chip.question)}
+        />
+      ))}
     </div>
   )
 }

@@ -442,21 +442,19 @@ function TrendChartCard({
             </span>
           )}
         </button>
-        {/* Compact collapsed-state summary: latest reading + date +
-            abnormal tag. Only visible when the card is closed so
-            the doctor reads the most-clinically-loud datum without
-            expanding the chart. */}
+        {/* Compact collapsed-state summary: just the latest-reading
+            date + abnormal tag. The raw value is intentionally NOT
+            shown here — combo readings like "TC 4.6 · LDL 2.7 ·
+            HDL 1.1 · TG 1.6" or "120/80" read as noise upfront; the
+            actual numbers are on the chart and the table when the
+            doctor expands. The latest DATE is enough signal for
+            "is this stale?" at-a-glance triage. */}
         {!expanded && (
           <span className="flex shrink-0 items-center gap-[6px]">
             {latest && (
-              <>
-                <span className="text-[12px] font-semibold text-tp-slate-700">
-                  {latest.value}
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
-                  {latest.date}
-                </span>
-              </>
+              <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
+                {latest.date}
+              </span>
             )}
             {isAbnormal && (
               <span className="rounded-[3px] bg-tp-warning-50 px-[5px] py-[1px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-tp-warning-700">

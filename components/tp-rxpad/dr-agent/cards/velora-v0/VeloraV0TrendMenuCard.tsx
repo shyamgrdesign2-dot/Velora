@@ -387,10 +387,10 @@ function categoryWord(chips: VeloraV0TrendMenuData["chips"]): string {
 }
 
 /** Full trend chart card — used inside the trend menu to show every
- *  available trend as a graph (with table toggle) instead of a tiny
- *  sparkline pill. The wrapper is a soft-violet card with the trend
- *  name + latest reading at the top; clicking that header fires the
- *  canned question to open the full detail card. */
+ *  available trend as a graph (with table toggle). The card opens
+ *  collapsed by default (only the first one in the list expands);
+ *  tapping the chevron toggles the chart. Tapping the trend NAME
+ *  button fires the canned question to open the full detail card. */
 function TrendChartCard({
   chip,
   defaultExpanded = false,
@@ -405,7 +405,6 @@ function TrendChartCard({
   const isAbnormal = chip.series?.some(
     (p) => p.flag === "alert" || p.flag === "warn",
   )
-  const latest = chip.series?.[0]
 
   return (
     <div
@@ -442,18 +441,18 @@ function TrendChartCard({
             </span>
           )}
         </button>
-        {/* Compact collapsed-state summary: just the latest-reading
-            date + abnormal tag. The raw value is intentionally NOT
-            shown here — combo readings like "TC 4.6 · LDL 2.7 ·
-            HDL 1.1 · TG 1.6" or "120/80" read as noise upfront; the
-            actual numbers are on the chart and the table when the
-            doctor expands. The latest DATE is enough signal for
-            "is this stale?" at-a-glance triage. */}
+        {/* Compact collapsed-state summary: reading-count + abnormal
+            tag. Neither the raw value (combo readings like "TC 4.6 ·
+            LDL 2.7 · HDL 1.1 · TG 1.6" read as noise upfront) nor
+            the date (no actionable signal at a glance) are shown
+            here — both live inside the chart / table once the
+            card expands. The reading COUNT answers "how much data
+            am I getting?" before the doctor commits a tap. */}
         {!expanded && (
           <span className="flex shrink-0 items-center gap-[6px]">
-            {latest && (
+            {chip.series && chip.series.length > 0 && (
               <span className="text-[10px] uppercase tracking-[0.06em] text-tp-slate-400">
-                {latest.date}
+                {chip.series.length} reading{chip.series.length === 1 ? "" : "s"}
               </span>
             )}
             {isAbnormal && (
